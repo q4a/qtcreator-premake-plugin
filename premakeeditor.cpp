@@ -188,9 +188,13 @@ ProjectFilesDocument::~ProjectFilesDocument()
 
 bool ProjectFilesDocument::save(const QString &name)
 {
+#if IDE_VER < IDE_VERSION_CHECK(2,2,80)
+    if (! BaseTextDocument::save(name))
+        return false;
+#else
     if (! BaseTextDocument::save(0, name, false))
         return false;
-
+#endif
     m_manager->notifyChanged(name);
     return true;
 }

@@ -35,6 +35,7 @@
 
 #include <projectexplorer/iprojectmanager.h>
 #include <coreplugin/icontext.h>
+#include <QtCore/QDataStream>
 
 struct lua_State;
 
