@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <mime-type type="text/x-lua">
+        <_comment>Lua script</_comment>
+    <sub-class-of type='application/x-executable'/>
+    <sub-class-of type="text/plain"/>
+    <magic priority="50">
+        <match type="string" value="/bin/lua" offset="0"/>
+        <match type="string" value="/bin/env lua" offset="0"/>
+    </magic>
+    <glob pattern="*.lua"/>
+  </mime-type>
+  <mime-type type="text/x-premake">
+    <sub-class-of type="text/x-lua"/>
+    <comment>Premake 4 Project file</comment>
+    <glob pattern="premake4.lua"/>
+  </mime-type>
+</mime-info>

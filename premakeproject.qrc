@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/premakeproject">
+        <file>PremakeProject.mimetypes.xml</file>
+        <file>images/premake.png</file>
+        <file>images/lua_small.png</file>
+        <file>premakebridge.lua</file>
+    </qresource>
+</RCC>

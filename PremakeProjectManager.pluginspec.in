@@ -1,0 +1,14 @@
+<plugin name=\"PremakeProjectManager\" version=\"$$QTCREATOR_VERSION\" compatVersion=\"$$QTCREATOR_VERSION\">
+    <vendor>Konstantin Tokarev</vendor>
+    <copyright>(C) 2011 Konstantin Tokarev</copyright>
+    <license>LGPL 2.1</license>
+    <category>Build Systems</category>
+    <description>Premake support</description>
+    <url></url>
+    <dependencyList>
+        <dependency name=\"TextEditor\" version=\"$$QTCREATOR_VERSION\"/>
+        <dependency name=\"ProjectExplorer\" version=\"$$QTCREATOR_VERSION\"/>
+        <dependency name=\"CppTools\" version=\"$$QTCREATOR_VERSION\"/>
+        <dependency name=\"Designer\" version=\"$$QTCREATOR_VERSION\" type=\"optional\"/>
+    </dependencyList>
+</plugin>
