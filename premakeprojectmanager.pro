@@ -23,7 +23,6 @@ HEADERS = premakeproject.h \
     premakeprojectnodes.h \
     premakeprojectwizard.h \
     premakeeditor.h \
-    pkgconfigtool.h \
     premakemakestep.h \
     premakebuildconfiguration.h
 SOURCES = premakeproject.cpp \
@@ -33,7 +32,6 @@ SOURCES = premakeproject.cpp \
     premakeprojectnodes.cpp \
     premakeprojectwizard.cpp \
     premakeeditor.cpp \
-    pkgconfigtool.cpp \
     premakemakestep.cpp \
     premakebuildconfiguration.cpp \
     premake/src/host/scripts.c \
