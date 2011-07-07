@@ -10,6 +10,26 @@
 	local versionhelp   = "premake4 (Premake Build Script Generator) %s"
 	
 
+--
+-- An extension to builtin dofile and require: track external dependencies of scriptfile
+--
+	premake.scriptdepends = { }
+
+	local builtin_dofile = dofile
+	function dofile(filename)
+		table.insert(premake.scriptdepends, path.getabsolute(filename))
+		return builtin_dofile(filename)
+	end
+
+	local builtin_require = require
+	function require(modname)
+		builtin_require(modname)
+		-- Track only local modules which can be parts of project
+		local filename = string.gsub(modname, "%.", "/")..".lua"
+		if os.isfile(filename) then
+			table.insert(premake.scriptdepends, path.getabsolute(filename))
+		end
+	end
 
 --
 -- Inject a new target platform into each solution; called if the --platform
