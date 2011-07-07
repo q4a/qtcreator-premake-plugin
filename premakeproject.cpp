@@ -168,6 +168,11 @@ void PremakeProject::parseProject(RefreshOptions options)
 
     if (options & Files) {
         getLuaTable(L, "_qtcreator_files", m_files);
+        getLuaTable(L, "_qtcreator_scriptdepends", m_scriptDepends);
+        m_scriptDepends.removeDuplicates();
+        foreach(const QString &file, m_files) {
+            m_scriptDepends.removeAll(file);
+        }
     }
 
     if (options & Configuration) {
@@ -256,6 +261,9 @@ QStringList PremakeProject::allIncludePaths() const
 
 QStringList PremakeProject::files() const
 { return m_files; }
+
+QStringList PremakeProject::scriptDepends() const
+{ return m_scriptDepends; }
 
 //QStringList PremakeProject::generated() const
 //{ return m_generated; }

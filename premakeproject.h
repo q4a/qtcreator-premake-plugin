@@ -110,6 +110,7 @@ public:
     QByteArray defines() const;
     QStringList allIncludePaths() const;
     QStringList files() const;
+    QStringList scriptDepends() const;
     ProjectExplorer::ToolChain *toolChain() const;
     void setToolChain(ProjectExplorer::ToolChain *tc);
 
@@ -131,6 +132,7 @@ private:
     QString m_projectName;
 
     QStringList m_files;
+    QStringList m_scriptDepends;
     QStringList m_includePaths;
     QByteArray m_defines;
 

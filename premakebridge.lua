@@ -31,6 +31,7 @@
 _qtcreator_files = {}
 _qtcreator_includes = {}
 _qtcreator_defines = {}
+_qtcreator_scriptdepends = {}
 
 function _qtcreator_projectname()
     return solution().name
@@ -43,6 +44,7 @@ function _qtcreator_rootpath()
     for sln in premake.solution.each()  do
         for _, prj in ipairs(sln.projects) do
             for _,file in ipairs(premake.getconfig(prj).files) do
+                file = path.rebase(file, prj.location, prj.basedir)
                 if not path.isabsolute(file) then
                     local upDirCount = 0
                     for n,part in ipairs(file:explode('/', true)) do
@@ -52,12 +54,10 @@ function _qtcreator_rootpath()
                         end
                         if upDirCount >= maxUpDirCount then
                             maxUpDirCount = upDirCount
-                            deepPath = prj.location
+                            deepPath = prj.basedir
                         end
                     end
-                    --print(file, upDirCount)
                 end
-                print("maxUpDirCount = ", maxUpDirCount)
             end
         end
     end
@@ -77,6 +77,7 @@ newaction {
     trigger = '_qtcreator',
     description = '',
     execute = function()
+        _qtcreator_scriptdepends = premake.scriptdepends
         for sln in premake.solution.each()  do
             for _, prj in ipairs(sln.projects) do
                 for _,file in ipairs(premake.getconfig(prj).files) do

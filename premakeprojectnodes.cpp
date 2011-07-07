@@ -62,16 +62,25 @@ void PremakeProjectNode::refresh()
     //ProjectExplorerPlugin::instance()->setCurrentNode(0); // ### remove me
 
 
-    FileNode *projectFileNode = new FileNode(m_project->file()->fileName(),
-                                              ProjectFileType,
-                                              /* generated = */ false);
+    QList<FileNode *> projectFileNodes;
 
-    QStringList files = m_project->files();
-    files.removeAll(m_project->file()->fileName());
+    projectFileNodes << new FileNode(m_project->file()->fileName(),
+                                     ProjectFileType,
+                                     /* generated = */ false);
+
+//    foreach(const QString &filename, m_project->scriptDepends()) {
+//        projectFileNodes << new FileNode(filename,
+//                                         ProjectFileType,
+//                                         /* generated = */ false);
+//    }
 
     addFileNodes(QList<FileNode *>()
-                 << projectFileNode,
+                 << projectFileNodes,
                  this);
+
+    QStringList files = m_project->files();
+    files << m_project->scriptDepends();
+    files.removeAll(m_project->file()->fileName());
 
     QStringList filePaths;
     QHash<QString, QStringList> filesInPath;
