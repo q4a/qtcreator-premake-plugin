@@ -47,16 +47,18 @@ function _qtcreator_rootpath()
                 file = path.rebase(file, prj.location, prj.basedir)
                 if not path.isabsolute(file) then
                     local upDirCount = 0
-                    for n,part in ipairs(file:explode('/', true)) do
-                        if part ~= '..' then break end
-                        if n > upDirCount then
-                            upDirCount = n
+                    local cur = 0
+                    repeat
+                        local next = file:find("../", cur + 1, true)
+                        if next then
+                            cur = next
+                            upDirCount = upDirCount + 1
+                            if upDirCount >= maxUpDirCount then
+                                maxUpDirCount = upDirCount
+                                deepPath = prj.basedir
+                            end
                         end
-                        if upDirCount >= maxUpDirCount then
-                            maxUpDirCount = upDirCount
-                            deepPath = prj.basedir
-                        end
-                    end
+                    until (not next)
                 end
             end
         end
