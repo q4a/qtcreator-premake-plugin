@@ -5,6 +5,7 @@ isEmpty(QTC_SOURCE): QTC_SOURCE = ../qt-creator
 isEmpty(QTC_BUILD): QTC_BUILD = $$QTC_SOURCE
 message("Qt Creator source code: $$QTC_SOURCE")
 message("Qt Creator binaries: $$QTC_BUILD")
+message("Qt Creator installation root: $$QTC_INSTALL_ROOT")
 
 IDE_BUILD_TREE = $$QTC_BUILD
 
@@ -98,4 +99,40 @@ lua_highlight.target = $$QTC_SOURCE/share/qtcreator/generic-highlighter/lua.xml
 lua_highlight.commands = $$QMAKE_COPY generic-highlighter/lua.xml $$lua_highlight.target
 QMAKE_EXTRA_TARGETS += lua_highlight
 PRE_TARGETDEPS += $$lua_highlight.target
+
+## Installation ##
+!isEmpty(QTC_INSTALL_ROOT) {
+
+    install_lua_highlight.files = generic-highlighter/lua.xml
+
+    unix:!macx {
+        install_plugin.files = \
+            $$DESTDIR/lib$${TARGET}.so \
+            $$DESTDIR/$${TARGET}.pluginspec
+
+        exists($$QTC_INSTALL_ROOT/lib/qtcreator) {
+            install_plugin.path = $$QTC_INSTALL_ROOT/lib/qtcreator/plugins/Nokia
+        } else:exists($$QTC_INSTALL_ROOT/lib64/qtcreator) {
+            install_plugin.path = $$QTC_INSTALL_ROOT/lib64/qtcreator/plugins/Nokia
+        } else {
+            error("Cannot find library path of Qt Creator")
+        }
+        install_lua_highlight.path = $$QTC_INSTALL_ROOT/share/qtcreator/generic-highlighter
+    }
+
+    macx {
+        install_plugin.files = \
+            $$DESTDIR/lib$${TARGET}.dylib \
+            $$DESTDIR/$${TARGET}.pluginspec
+
+        install_plugin.path = $$QTC_INSTALL_ROOT/Contents/PlugIns/Nokia
+        install_lua_highlight.path = $$QTC_INSTALL_ROOT/Contents/Resources/generic-highlighter
+    }
+
+#win32:      install_plugin.files = $$DESTDIR/$${TARGET}.dll $$DESTDIR/$${TARGET}.pluginspec # ???
+
+    INSTALLS = \
+        install_plugin \
+        install_lua_highlight
+}
 
