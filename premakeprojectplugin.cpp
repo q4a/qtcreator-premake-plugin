@@ -34,7 +34,7 @@
 #include "premakeprojectmanager.h"
 #include "premakeprojectwizard.h"
 #include "premakeprojectconstants.h"
-#include "premakeeditor.h"
+#include "luaeditor.h"
 #include "premakemakestep.h"
 #include "premaketarget.h"
 

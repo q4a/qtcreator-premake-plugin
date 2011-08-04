@@ -30,7 +30,7 @@
 **
 **************************************************************************/
 
-#include "premakeeditor.h"
+#include "luaeditor.h"
 #include "premakeprojectmanager.h"
 #include "premakeprojectconstants.h"
 #include "luacompleter.h"
