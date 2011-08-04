@@ -40,7 +40,7 @@
 namespace PremakeProjectManager {
 namespace Internal {
 
-class ProjectFilesFactory;
+class LuaEditorFactory;
 
 class PremakeProjectPlugin: public ExtensionSystem::IPlugin
 {
@@ -54,7 +54,7 @@ public:
     virtual void extensionsInitialized();
 
 private:
-    ProjectFilesFactory *m_projectFilesEditorFactory;
+    LuaEditorFactory *m_luaEditorFactory;
 };
 
 } // namespace Internal

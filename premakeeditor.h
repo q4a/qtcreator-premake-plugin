@@ -33,8 +33,9 @@
 #ifndef PREMAKEPROJECTFILESEDITOR_H
 #define PREMAKEPROJECTFILESEDITOR_H
 
-#include <texteditor/basetexteditor.h>
+#include <texteditor/plaintexteditor.h>
 #include <texteditor/basetextdocument.h>
+#include <texteditor/normalindenter.h>
 
 #include <coreplugin/editormanager/ieditorfactory.h>
 
@@ -46,18 +47,18 @@ namespace PremakeProjectManager {
 namespace Internal {
 
 class PremakeManager;
-class ProjectFilesEditor;
-class ProjectFilesEditorWidget;
-class ProjectFilesDocument;
-class ProjectFilesFactory;
+class LuaEditor;
+class LuaEditorWidget;
+class LuaDocument;
+class LuaEditorFactory;
 
-class ProjectFilesFactory: public Core::IEditorFactory
+class LuaEditorFactory: public Core::IEditorFactory
 {
     Q_OBJECT
 
 public:
-    ProjectFilesFactory(PremakeManager *manager, TextEditor::TextEditorActionHandler *handler);
-    virtual ~ProjectFilesFactory();
+    LuaEditorFactory(PremakeManager *manager, TextEditor::TextEditorActionHandler *handler);
+    virtual ~LuaEditorFactory();
 
     PremakeManager *manager() const;
 
@@ -74,13 +75,13 @@ private:
     QStringList m_mimeTypes;
 };
 
-class ProjectFilesEditor : public TextEditor::BaseTextEditor
+class LuaEditor : public TextEditor::PlainTextEditor
 {
     Q_OBJECT
 
 public:
-    ProjectFilesEditor(ProjectFilesEditorWidget *editorWidget);
-    virtual ~ProjectFilesEditor();
+    LuaEditor(LuaEditorWidget *editorWidget);
+    virtual ~LuaEditor();
 
     virtual Core::Context context() const;
     virtual QString id() const;
@@ -94,37 +95,38 @@ private:
     Core::Context m_context;
 };
 
-class ProjectFilesEditorWidget : public TextEditor::BaseTextEditorWidget
+class LuaEditorWidget : public TextEditor::PlainTextEditorWidget
 {
     Q_OBJECT
 
 public:
-    ProjectFilesEditorWidget(QWidget *parent, ProjectFilesFactory *factory,
+    LuaEditorWidget(QWidget *parent, LuaEditorFactory *factory,
                        TextEditor::TextEditorActionHandler *handler);
-    virtual ~ProjectFilesEditorWidget();
+    virtual ~LuaEditorWidget();
 
-    ProjectFilesFactory *factory() const;
+    LuaEditorFactory *factory() const;
     TextEditor::TextEditorActionHandler *actionHandler() const;
 
     virtual TextEditor::BaseTextEditor *createEditor();
 
 private:
-    ProjectFilesFactory *m_factory;
+    LuaEditorFactory *m_factory;
     TextEditor::TextEditorActionHandler *m_actionHandler;
 };
 
-class ProjectFilesDocument: public TextEditor::BaseTextDocument
+class LuaIndenter : public TextEditor::NormalIndenter
 {
-    Q_OBJECT
-
 public:
-    ProjectFilesDocument(PremakeManager *manager);
-    virtual ~ProjectFilesDocument();
+    LuaIndenter();
+    virtual ~LuaIndenter();
 
-    virtual bool save(const QString &name);
+    virtual bool isElectricCharacter(const QChar &ch) const;
 
-private:
-    PremakeManager *m_manager;
+    virtual void indentBlock(QTextDocument *doc,
+                             const QTextBlock &block,
+                             const QChar &typedChar,
+                             TextEditor::BaseTextEditorWidget *editor);
+
 };
 
 } // namespace Internal

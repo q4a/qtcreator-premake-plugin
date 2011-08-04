@@ -50,13 +50,13 @@ using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
 
 PremakeProjectPlugin::PremakeProjectPlugin()
-    : m_projectFilesEditorFactory(0)
+    : m_luaEditorFactory(0)
 { }
 
 PremakeProjectPlugin::~PremakeProjectPlugin()
 {
-    removeObject(m_projectFilesEditorFactory);
-    delete m_projectFilesEditorFactory;
+    removeObject(m_luaEditorFactory);
+    delete m_luaEditorFactory;
 }
 
 bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage)
@@ -74,10 +74,10 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     PremakeManager *manager = new PremakeManager;
 
     TextEditor::TextEditorActionHandler *actionHandler =
-            new TextEditor::TextEditorActionHandler(Constants::C_FILESEDITOR);
+            new TextEditor::TextEditorActionHandler(Constants::C_LUAEDITOR);
 
-    m_projectFilesEditorFactory = new ProjectFilesFactory(manager, actionHandler);
-    addObject(m_projectFilesEditorFactory);
+    m_luaEditorFactory = new LuaEditorFactory(manager, actionHandler);
+    addObject(m_luaEditorFactory);
 
     addAutoReleasedObject(manager);
     addAutoReleasedObject(new PremakeMakeStepFactory);

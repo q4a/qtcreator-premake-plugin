@@ -33,12 +33,16 @@
 #include "premakeeditor.h"
 #include "premakeprojectmanager.h"
 #include "premakeprojectconstants.h"
+#include "luacompleter.h"
 
 #include <coreplugin/editormanager/editormanager.h>
 #include <coreplugin/fileiconprovider.h>
 #include <texteditor/fontsettings.h>
+#include <texteditor/tabsettings.h>
 #include <texteditor/texteditoractionhandler.h>
 #include <texteditor/texteditorsettings.h>
+
+#include <QDebug>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
@@ -48,50 +52,51 @@ using namespace PremakeProjectManager::Internal;
 // ProjectFilesFactory
 ////////////////////////////////////////////////////////////////////////////////////////
 
-ProjectFilesFactory::ProjectFilesFactory(PremakeManager *manager,
+LuaEditorFactory::LuaEditorFactory(PremakeManager *manager,
                                          TextEditor::TextEditorActionHandler *handler)
     : Core::IEditorFactory(manager),
       m_manager(manager),
       m_actionHandler(handler)
 {
-//    m_mimeTypes.append(QLatin1String(Constants::PREMAKEMIMETYPE));
     Core::FileIconProvider *iconProvider = Core::FileIconProvider::instance();
     iconProvider->registerIconOverlayForSuffix(QIcon(QLatin1String(Constants::ICON_LUA_FILE)),
                                         QLatin1String("lua"));
+    m_mimeTypes << QLatin1String(Constants::LUA_MIMETYPE)
+                << QLatin1String(Constants::PREMAKEMIMETYPE);
 }
 
-ProjectFilesFactory::~ProjectFilesFactory()
+LuaEditorFactory::~LuaEditorFactory()
 {
 }
 
-PremakeManager *ProjectFilesFactory::manager() const
+PremakeManager *LuaEditorFactory::manager() const
 {
     return m_manager;
 }
 
-Core::IEditor *ProjectFilesFactory::createEditor(QWidget *parent)
+Core::IEditor *LuaEditorFactory::createEditor(QWidget *parent)
 {
-    ProjectFilesEditorWidget *ed = new ProjectFilesEditorWidget(parent, this, m_actionHandler);
+    LuaEditorWidget *ed = new LuaEditorWidget(parent, this, m_actionHandler);
     TextEditor::TextEditorSettings::instance()->initializeEditor(ed);
     return ed->editor();
 }
 
-QStringList ProjectFilesFactory::mimeTypes() const
+QStringList LuaEditorFactory::mimeTypes() const
 {
     return m_mimeTypes;
 }
 
-QString ProjectFilesFactory::id() const
+QString LuaEditorFactory::id() const
 {
-    return QLatin1String(Constants::FILES_EDITOR_ID);
+    return QLatin1String(Constants::LUA_EDITOR_ID);
 }
 
-QString ProjectFilesFactory::displayName() const
+QString LuaEditorFactory::displayName() const
 {
-    return tr(Constants::FILES_EDITOR_DISPLAY_NAME);
+    return tr(Constants::LUA_EDITOR_DISPLAY_NAME);
 }
 
-Core::IFile *ProjectFilesFactory::open(const QString &fileName)
+Core::IFile *LuaEditorFactory::open(const QString &fileName)
 {
     Core::EditorManager *editorManager = Core::EditorManager::instance();
 
@@ -105,33 +110,33 @@ Core::IFile *ProjectFilesFactory::open(const QString &fileName)
 // ProjectFilesEditable
 ////////////////////////////////////////////////////////////////////////////////////////
 
-ProjectFilesEditor::ProjectFilesEditor(ProjectFilesEditorWidget *editor)
-  : TextEditor::BaseTextEditor(editor),
-    m_context(Constants::C_FILESEDITOR)
+LuaEditor::LuaEditor(LuaEditorWidget *editor)
+  : TextEditor::PlainTextEditor(editor),
+    m_context(Constants::C_LUAEDITOR)
 { }
 
-ProjectFilesEditor::~ProjectFilesEditor()
+LuaEditor::~LuaEditor()
 { }
 
-Core::Context ProjectFilesEditor::context() const
+Core::Context LuaEditor::context() const
 {
     return m_context;
 }
 
-QString ProjectFilesEditor::id() const
+QString LuaEditor::id() const
 {
-    return QLatin1String(Constants::FILES_EDITOR_ID);
+    return QLatin1String(Constants::LUA_EDITOR_ID);
 }
 
-bool ProjectFilesEditor::duplicateSupported() const
+bool LuaEditor::duplicateSupported() const
 {
     return true;
 }
 
-Core::IEditor *ProjectFilesEditor::duplicate(QWidget *parent)
+Core::IEditor *LuaEditor::duplicate(QWidget *parent)
 {
-    ProjectFilesEditorWidget *parentEditor = qobject_cast<ProjectFilesEditorWidget *>(editorWidget());
-    ProjectFilesEditorWidget *editor = new ProjectFilesEditorWidget(parent,
+    LuaEditorWidget *parentEditor = qobject_cast<LuaEditorWidget *>(editorWidget());
+    LuaEditorWidget *editor = new LuaEditorWidget(parent,
                                                         parentEditor->factory(),
                                                         parentEditor->actionHandler());
     TextEditor::TextEditorSettings::instance()->initializeEditor(editor);
@@ -142,59 +147,110 @@ Core::IEditor *ProjectFilesEditor::duplicate(QWidget *parent)
 // ProjectFilesEditor
 ////////////////////////////////////////////////////////////////////////////////////////
 
-ProjectFilesEditorWidget::ProjectFilesEditorWidget(QWidget *parent, ProjectFilesFactory *factory,
+LuaEditorWidget::LuaEditorWidget(QWidget *parent, LuaEditorFactory *factory,
                                        TextEditor::TextEditorActionHandler *handler)
-    : TextEditor::BaseTextEditorWidget(parent),
+    : TextEditor::PlainTextEditorWidget(parent),
       m_factory(factory),
       m_actionHandler(handler)
 {
-    PremakeManager *manager = factory->manager();
-    ProjectFilesDocument *doc = new ProjectFilesDocument(manager);
-    setBaseTextDocument(doc);
+    setMimeType(QLatin1String(Constants::LUA_MIMETYPE));
+    setDisplayName(QLatin1String(Constants::LUA_EDITOR_DISPLAY_NAME));
+    setIndenter(new LuaIndenter);
+    setAutoCompleter(new LuaCompleter);
 
     handler->setupActions(this);
 }
 
-ProjectFilesEditorWidget::~ProjectFilesEditorWidget()
+LuaEditorWidget::~LuaEditorWidget()
 { }
 
-ProjectFilesFactory *ProjectFilesEditorWidget::factory() const
+LuaEditorFactory *LuaEditorWidget::factory() const
 {
     return m_factory;
 }
 
-TextEditor::TextEditorActionHandler *ProjectFilesEditorWidget::actionHandler() const
+TextEditor::TextEditorActionHandler *LuaEditorWidget::actionHandler() const
 {
     return m_actionHandler;
 }
 
-TextEditor::BaseTextEditor *ProjectFilesEditorWidget::createEditor()
+TextEditor::BaseTextEditor *LuaEditorWidget::createEditor()
 {
-    return new ProjectFilesEditor(this);
+    return new LuaEditor(this);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-// ProjectFilesDocument
-////////////////////////////////////////////////////////////////////////////////////////
+LuaIndenter::LuaIndenter()
+{}
 
-ProjectFilesDocument::ProjectFilesDocument(PremakeManager *manager)
-    : m_manager(manager)
+LuaIndenter::~LuaIndenter()
+{}
+
+bool LuaIndenter::isElectricCharacter(const QChar &ch) const
 {
-    setMimeType(QLatin1String(Constants::FILES_MIMETYPE));
+    if (ch == QLatin1Char('{')
+            || ch == QLatin1Char('}')
+            || ch == QLatin1Char('d') // end
+            || ch == QLatin1Char('e') // else
+            || ch == QLatin1Char('l') // until
+            ) {
+        return true;
+    }
+    return false;
 }
 
-ProjectFilesDocument::~ProjectFilesDocument()
-{ }
-
-bool ProjectFilesDocument::save(const QString &name)
+void LuaIndenter::indentBlock(QTextDocument *doc, const QTextBlock &block, const QChar &typedChar, TextEditor::BaseTextEditorWidget *editor)
 {
-#if IDE_VER < IDE_VERSION_CHECK(2,2,80)
-    if (! BaseTextDocument::save(name))
-        return false;
-#else
-    if (! BaseTextDocument::save(0, name, false))
-        return false;
-#endif
-    m_manager->notifyChanged(name);
-    return true;
+    const QString blockText = block.text();//.trimmed();
+    if ((typedChar == 'd' && !blockText.endsWith("end"))
+     || (typedChar == 'e' && !blockText.endsWith("else"))
+     || (typedChar == 'l' && !blockText.endsWith("until"))
+    ) {
+        return;
+    }
+
+
+    const TextEditor::TabSettings &ts = editor->tabSettings();
+
+    // At beginning: Leave as is.
+    if (block == doc->begin())
+        return;
+
+    QTextBlock previous = block.previous();
+    QString previousText = previous.text();
+    // Empty line indicates a start of a new paragraph. Leave as is.
+    while (previousText.isEmpty() || previousText.trimmed().isEmpty()) {
+        previous = previous.previous();
+        if (previous == doc->begin())
+            return;
+        previousText = previous.text();
+    }
+
+    int firstNonSpace = ts.firstNonSpace(previousText);
+
+
+    // Just use previous line.
+    ts.indentLine(block, ts.columnAt(previousText, firstNonSpace));
+
+    // Increase indent after lines that start a block:
+    // 'function', 'if', 'for', 'while', 'repeat', 'else', 'elseif', '{'
+    int midx = previousText.indexOf(QRegExp("^\\s*\\b(if|for|while|repeat|else|elseif|do|then)\\b"));
+    if (midx == -1) {
+        midx = previousText.indexOf(QRegExp("\\{\\s*$"));
+        if (midx == -1) {
+            midx = previousText.indexOf(QRegExp("\\bfunction\\b\\s*"));
+        }
+    }
+    if(midx != -1) {
+        // Increase indent if what we found previously is not in a comment and
+        // an "end" or "until" is not present on the same line.
+        if (!previousText.contains(QRegExp("\\b(end|until)\\b"))) {
+            ts.reindentLine(block, ts.m_indentSize);
+        }
+    }
+
+    // Decrease indent on end, else (and elseif), until and '}'
+    if (blockText.contains(QRegExp("^\\s*\\b(end|else|until)\\b"))
+            || blockText.trimmed() == "}") {
+        ts.reindentLine(block, -ts.m_indentSize);
+    }
 }

@@ -43,25 +43,19 @@ namespace PremakeProjectManager {
 namespace Constants {
 
 const char *const PROJECTCONTEXT     = "PremakeProject.ProjectContext";
-const char *const PREMAKEMIMETYPE    = "text/x-premake"; // ### FIXME
+const char *const PREMAKEMIMETYPE    = "text/x-premake";
 const char *const MAKESTEP           = "PremakeProjectManager.MakeStep";
 
 // contexts
-const char *const C_FILESEDITOR      = ".files Editor";
+const char *const C_LUAEDITOR      = "Lua Editor";
 
 // kinds
 const char *const PROJECT_KIND       = "Premake";
 
-const char *const FILES_EDITOR_ID    = "QT4.FilesEditor";
-const char *const FILES_EDITOR_DISPLAY_NAME = QT_TRANSLATE_NOOP("OpenWith::Editors", ".files Editor");
+const char *const LUA_EDITOR_ID    = "Premake.LuaEditor";
+const char *const LUA_EDITOR_DISPLAY_NAME = QT_TRANSLATE_NOOP("OpenWith::Editors", "Lua Editor");
 
-const char *const FILES_MIMETYPE     = "application/vnd.nokia.qt.generic.files";
-
-const char *const INCLUDES_EDITOR    = ".includes Editor";
-const char *const INCLUDES_MIMETYPE  = "application/vnd.nokia.qt.generic.includes";
-
-const char *const CONFIG_EDITOR      = ".config Editor";
-const char *const CONFIG_MIMETYPE    = "application/vnd.nokia.qt.generic.config";
+const char *const LUA_MIMETYPE     = "text/x-lua";
 
 // Project
 const char *const PREMAKEPROJECT_ID  = "PremakeProjectManager.PremakeProject";
