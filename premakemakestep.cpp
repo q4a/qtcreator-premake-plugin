@@ -143,8 +143,16 @@ bool PremakeMakeStep::fromMap(const QVariantMap &map)
 QString PremakeMakeStep::allArguments() const
 {
     QString args = m_premakeArguments;
-//    Utils::QtcProcess::addArgs(&args, m_buildTargets);
-    args += QString(" --file=%1 gmake").arg(premakeBuildConfiguration()->projectFileName());
+    if (premakeBuildConfiguration()->shadowBuildEnabled()) {
+        QDir projectDir = QFileInfo(premakeBuildConfiguration()
+                                    ->projectFileName()).dir();
+
+        if (projectDir.absolutePath() != premakeBuildConfiguration()->buildDirectory()) {
+            args += QString(" --to=%1")
+                    .arg(projectDir.relativeFilePath(premakeBuildConfiguration()->buildDirectory()));
+        }
+    }
+    args += " gmake";
     return args;
 }
 
@@ -154,7 +162,7 @@ void PremakeMakeStep::run(QFutureInterface<bool> &fi)
     // TODO Generate makefiles here
     lua_State *L = LuaManager::instance()->luaStateForGenerating(
                 premakeBuildConfiguration()->projectFileName(),
-                false,
+                premakeBuildConfiguration()->shadowBuildEnabled(),
                 premakeBuildConfiguration()->buildDirectory());
     if(call_premake_main(L) != 0){
         emit addOutput(lua_tostring(L, -1), BuildStep::ErrorMessageOutput);
@@ -213,6 +221,10 @@ PremakeMakeStepConfigWidget::PremakeMakeStepConfigWidget(PremakeMakeStep *makeSt
     connect(m_ui->makeArgumentsLineEdit, SIGNAL(textEdited(QString)),
             this, SLOT(makeArgumentsLineEditTextEdited()));
     connect(ProjectExplorer::ProjectExplorerPlugin::instance(), SIGNAL(settingsChanged()),
+            this, SLOT(updateDetails()));
+    connect(makeStep->buildConfiguration(), SIGNAL(buildDirectoryChanged()),
+            this, SLOT(updateDetails()));
+    connect(makeStep->buildConfiguration(), SIGNAL(shadowBuildChanged()),
             this, SLOT(updateDetails()));
 }
 

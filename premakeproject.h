@@ -52,6 +52,7 @@ struct lua_State;
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
+class QCheckBox;
 QT_END_NAMESPACE
 
 namespace Utils {
@@ -190,11 +191,13 @@ private Q_SLOTS:
     void toolChainSelected(int index);
     void toolChainChanged(ProjectExplorer::ToolChain *);
     void updateToolChainList();
+    void shadowBuildToggled(bool);
 
 private:
     PremakeTarget *m_target;
     Utils::PathChooser *m_pathChooser;
     QComboBox *m_toolChainChooser;
+    QCheckBox *m_shadowBuild;
     PremakeBuildConfiguration *m_buildConfiguration;
 };
 

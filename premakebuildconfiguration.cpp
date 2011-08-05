@@ -52,6 +52,7 @@ namespace {
 const char * const PREMAKE_BC_ID("PremakeProjectManager.PremakeBuildConfiguration");
 
 const char * const BUILD_DIRECTORY_KEY("PremakeProjectManager.PremakeBuildConfiguration.BuildDirectory");
+const char * const SHADOW_BUILD_KEY("PremakeProjectManager.PremakeBuildConfiguration.ShadowBuild");
 }
 
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
@@ -80,12 +81,14 @@ QVariantMap PremakeBuildConfiguration::toMap() const
 {
     QVariantMap map(BuildConfiguration::toMap());
     map.insert(QLatin1String(BUILD_DIRECTORY_KEY), m_buildDirectory);
+    map.insert(QLatin1String(SHADOW_BUILD_KEY), m_shadowBuildEnabled);
     return map;
 }
 
 bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 {
     m_buildDirectory = map.value(QLatin1String(BUILD_DIRECTORY_KEY), target()->project()->projectDirectory()).toString();
+    m_shadowBuildEnabled = map.value(QLatin1String(SHADOW_BUILD_KEY), target()->project()->projectDirectory()).toBool();
 
     return BuildConfiguration::fromMap(map);
 }
@@ -260,5 +263,16 @@ QString PremakeBuildConfiguration::defaultMakeTarget() const
 QString PremakeBuildConfiguration::makefile() const
 {
     return QString("Makefile");
+}
+
+bool PremakeBuildConfiguration::shadowBuildEnabled() const
+{
+    return m_shadowBuildEnabled;
+}
+
+void PremakeBuildConfiguration::setShadowBuildEnabled(bool enabled)
+{
+    m_shadowBuildEnabled = enabled;
+    emit shadowBuildChanged();
 }
 

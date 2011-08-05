@@ -102,6 +102,15 @@
 			dofile(fname)
 		end
 
+		-- Hook
+		if not premake.option.get("to") then
+			print "Injecting --to"
+			for sln in premake.solution.each()  do
+				sln.location = _OPTIONS["to"]
+			end
+			_OPTIONS["to"] = nil
+		end
+
 
 		-- Process special options
 		

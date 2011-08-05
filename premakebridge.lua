@@ -105,17 +105,6 @@ newaction {
     valid_tools = premake.action.get("gmake").valid_tools,
 
     execute = function()
-        if not premake.option.get("to") then
-            print "Injecting --to"
-            newoption {
-                trigger = "to",
-                value   = "path",
-                description = "Set the output location for the generated files"
-            }
-            for sln in premake.solution.each()  do
-                sln.location = _OPTIONS["to"]
-            end
-        end
         premake.action.call("gmake")
     end
 }

@@ -53,6 +53,7 @@
 
 #include <QtGui/QFormLayout>
 #include <QtGui/QMainWindow>
+#include <QtGui/QCheckBox>
 #include <QtGui/QComboBox>
 
 using namespace PremakeProjectManager;
@@ -397,6 +398,20 @@ PremakeBuildSettingsWidget::PremakeBuildSettingsWidget(PremakeTarget *target)
     fl->setContentsMargins(0, -1, 0, -1);
     fl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
+    // Qt Profile
+
+    // tool chain
+    m_toolChainChooser = new QComboBox;
+    m_toolChainChooser->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    updateToolChainList();
+    fl->addRow(tr("Tool chain:"), m_toolChainChooser);
+
+    // Shadow build
+    m_shadowBuild = new QCheckBox;
+    m_shadowBuild->setChecked(true);
+    fl->addRow(tr("Shadow build:"), m_shadowBuild);
+    connect(m_shadowBuild, SIGNAL(toggled(bool)), this, SLOT(shadowBuildToggled(bool)));
+
     // build directory
     m_pathChooser = new Utils::PathChooser(this);
     m_pathChooser->setEnabled(true);
@@ -404,12 +419,7 @@ PremakeBuildSettingsWidget::PremakeBuildSettingsWidget(PremakeTarget *target)
     fl->addRow(tr("Build directory:"), m_pathChooser);
     connect(m_pathChooser, SIGNAL(changed(QString)), this, SLOT(buildDirectoryChanged()));
 
-    // tool chain
-    m_toolChainChooser = new QComboBox;
-    m_toolChainChooser->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    updateToolChainList();
 
-    fl->addRow(tr("Tool chain:"), m_toolChainChooser);
     connect(m_toolChainChooser, SIGNAL(activated(int)), this, SLOT(toolChainSelected(int)));
     connect(m_target->premakeProject(), SIGNAL(toolChainChanged(ProjectExplorer::ToolChain*)),
             this, SLOT(toolChainChanged(ProjectExplorer::ToolChain*)));
@@ -429,6 +439,7 @@ void PremakeBuildSettingsWidget::init(BuildConfiguration *bc)
 {
     m_buildConfiguration = static_cast<PremakeBuildConfiguration *>(bc);
     m_pathChooser->setPath(m_buildConfiguration->rawBuildDirectory());
+    m_pathChooser->setEnabled(m_buildConfiguration->shadowBuildEnabled());
 }
 
 void PremakeBuildSettingsWidget::buildDirectoryChanged()
@@ -470,6 +481,13 @@ void PremakeBuildSettingsWidget::updateToolChainList()
                 && m_target->premakeProject()->toolChain()->id() == tc->id())
             m_toolChainChooser->setCurrentIndex(m_toolChainChooser->count() - 1);
     }
+}
+
+
+void PremakeBuildSettingsWidget::shadowBuildToggled(bool checked)
+{
+    m_pathChooser->setEnabled(checked);
+    m_buildConfiguration->setShadowBuildEnabled(checked);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

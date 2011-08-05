@@ -82,6 +82,11 @@ public:
     QString defaultMakeTarget() const;
     QString makefile() const;
 
+    bool shadowBuildEnabled() const;
+    void setShadowBuildEnabled(bool enabled);
+
+signals:
+    void shadowBuildChanged();
 
 protected:
     PremakeBuildConfiguration(PremakeTarget *parent, PremakeBuildConfiguration *source);
@@ -91,6 +96,7 @@ protected:
 private:
     QString m_buildDirectory;
     QString m_fileName;
+    bool m_shadowBuildEnabled;
 };
 
 class PremakeBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurationFactory
