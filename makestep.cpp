@@ -134,13 +134,13 @@ bool MakeStep::init()
 {
     PremakeBuildConfiguration *bc = premakeBuildConfiguration();
 
-    m_tasks.clear();
-    if (!bc->toolChain()) {
-        m_tasks.append(ProjectExplorer::Task(ProjectExplorer::Task::Error,
-                                             tr("Qt Creator needs a tool chain set up to build. Configure a tool chain in Project mode."),
-                                             QString(), -1,
-                                             QLatin1String(ProjectExplorer::Constants::TASK_CATEGORY_BUILDSYSTEM)));
-    }
+//    m_tasks.clear();
+//    if (!bc->toolChain()) {
+//        m_tasks.append(ProjectExplorer::Task(ProjectExplorer::Task::Error,
+//                                             tr("Qt Creator needs a tool chain set up to build. Configure a tool chain in Project mode."),
+//                                             QString(), -1,
+//                                             QLatin1String(ProjectExplorer::Constants::TASK_CATEGORY_BUILDSYSTEM)));
+//    }
 
     ProjectExplorer::ProcessParameters *pp = processParameters();
     pp->setMacroExpander(bc->macroExpander());
