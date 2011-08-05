@@ -237,6 +237,7 @@ QString PremakeBuildConfiguration::projectFileName() const
     return m_fileName;
 }
 
+#if IDE_VER >= IDE_VERSION_CHECK(2,2,80)
 QtSupport::BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
 {
 }
@@ -244,6 +245,7 @@ QtSupport::BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
 void PremakeBuildConfiguration::setQtVersion(QtSupport::BaseQtVersion *)
 {
 }
+#endif
 
 QString PremakeBuildConfiguration::makeCommand() const
 {

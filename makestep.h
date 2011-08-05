@@ -124,6 +124,8 @@ public:
     explicit MakeStepConfigWidget(MakeStep *makeStep);
     virtual ~MakeStepConfigWidget();
 
+    virtual void init() {}
+
     QString displayName() const;
     QString summaryText() const;
 private slots:

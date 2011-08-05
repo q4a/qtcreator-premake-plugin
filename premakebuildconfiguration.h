@@ -33,8 +33,14 @@
 #ifndef PREMAKEBUILDCONFIGURATION_H
 #define PREMAKEBUILDCONFIGURATION_H
 
+#include "premakeprojectconstants.h"
 #include <projectexplorer/buildconfiguration.h>
-#include <qtsupport/qtversionmanager.h>
+
+#if IDE_VER < IDE_VERSION_CHECK(2,2,80)
+    #include <qt4projectmanager/qtversionmanager.h>
+#else
+    #include <qtsupport/qtversionmanager.h>
+#endif
 
 namespace PremakeProjectManager {
 namespace Internal {
@@ -66,9 +72,11 @@ public:
 
     QString projectFileName() const;
 
+#if IDE_VER >= IDE_VERSION_CHECK(2,2,80)
     // returns the qtVersion
     QtSupport::BaseQtVersion *qtVersion() const;
     void setQtVersion(QtSupport::BaseQtVersion *);
+#endif
 
     QString makeCommand() const;
     QString defaultMakeTarget() const;
