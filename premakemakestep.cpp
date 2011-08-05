@@ -144,7 +144,7 @@ QString PremakeMakeStep::allArguments() const
 {
     QString args = m_premakeArguments;
 //    Utils::QtcProcess::addArgs(&args, m_buildTargets);
-    args += " gmake";
+    args += QString(" --file=%1 gmake").arg(premakeBuildConfiguration()->projectFileName());
     return args;
 }
 
@@ -244,7 +244,8 @@ void PremakeMakeStepConfigWidget::init()
 
 void PremakeMakeStepConfigWidget::updateDetails()
 {
-    m_summaryText = QString("<b>Premake:</b> premake4 %1").arg(m_makeStep->allArguments());
+    m_summaryText = QString("<b>Premake:</b> premake4 %1 %2 %3").arg(m_makeStep->allArguments())
+            .arg(tr("in")).arg(m_makeStep->buildConfiguration()->buildDirectory());
     emit updateSummary();
 }
 
