@@ -98,7 +98,9 @@ SOURCES += \
 RESOURCES += premakeproject.qrc
 FORMS += premakemakestep.ui \
     makestep.ui
-OTHER_FILES += premakebridge.lua
+OTHER_FILES += premakebridge.lua \
+    PremakeProject.mimetypes.xml \
+    README
 
 unix:!macx {
     DEFINES += LUA_USE_DLOPEN LUA_USE_POSIX
@@ -151,6 +153,7 @@ PRE_TARGETDEPS += $$lua_highlight.target
         install_plugin \
         install_lua_highlight
 }
+
 
 
 
