@@ -55,6 +55,7 @@ const char * const BUILD_DIRECTORY_KEY("PremakeProjectManager.PremakeBuildConfig
 
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
     : BuildConfiguration(parent, QLatin1String(PREMAKE_BC_ID))
+    , m_fileName(parent->premakeProject()->file()->fileName())
 {
 }
 
@@ -226,5 +227,10 @@ BuildConfiguration *PremakeBuildConfigurationFactory::restore(ProjectExplorer::T
 BuildConfiguration::BuildType PremakeBuildConfiguration::buildType() const
 {
     return Unknown;
+}
+
+QString PremakeBuildConfiguration::projectFileName() const
+{
+    return m_fileName;
 }
 

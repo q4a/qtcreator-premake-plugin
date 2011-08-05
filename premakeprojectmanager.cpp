@@ -42,27 +42,12 @@
 
 #include <QtDebug>
 
-extern "C" {
-#include "premake/src/host/premake.h"
-}
-
 using namespace PremakeProjectManager::Internal;
 
-int PremakeManager::writer(lua_State*, const void* p, size_t size, void*)
-{
-    return m_bytecodeWriteStream.writeRawData((const char *)p, size);
-}
-
-PremakeManager::PremakeManager() : m_bytecodeWriteStream(&m_bytecode, QIODevice::WriteOnly)
+PremakeManager::PremakeManager()
 {
     m_projectContext  = Core::Context(PremakeProjectManager::Constants::PROJECTCONTEXT);
     m_projectLanguage = Core::Context(ProjectExplorer::Constants::LANG_CXX);
-
-    // Load bridge code
-    QFile premakebridge(":/premakeproject/premakebridge.lua");
-    premakebridge.open(QIODevice::ReadOnly);
-    m_premakeBridge = QTextStream(&premakebridge).readAll().toUtf8();
-    premakebridge.close();
 }
 
 PremakeManager::~PremakeManager()
@@ -114,33 +99,4 @@ void PremakeManager::notifyChanged(const QString &fileName)
 //            project->refresh(PremakeProject::Configuration);
 //        }
     }
-}
-
-static void projectParseError(const QString &errorMessage)
-{
-    Core::ICore::instance()->messageManager()->printToOutputPanePopup("Premake error: " + errorMessage);
-}
-
-lua_State * PremakeManager::createPremakeLuaState(const QString &fileName) const
-{
-    lua_State *L = lua_open();
-    luaL_openlibs(L);
-
-    // Initialize Premake
-    QByteArray file = QFile::encodeName(QString("--file=").append(fileName));
-    const char *argv[3];
-    argv[0] = "";
-    argv[1] = file.data();
-    argv[2] = "_qtcreator";
-
-    if(premake_init(L, 3, argv) != 0){
-        projectParseError(lua_tostring(L, -1));
-    }
-
-    const char * lua_bridge_code = m_premakeBridge.constData();
-
-    if (luaL_dostring(L, lua_bridge_code) != 0) {
-        projectParseError(lua_tostring(L, -1));
-    }
-    return L;
 }

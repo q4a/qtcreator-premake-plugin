@@ -63,6 +63,8 @@ public:
 
     BuildType buildType() const;
 
+    QString projectFileName() const;
+
 protected:
     PremakeBuildConfiguration(PremakeTarget *parent, PremakeBuildConfiguration *source);
     PremakeBuildConfiguration(PremakeTarget *parent, const QString &id);
@@ -70,6 +72,7 @@ protected:
 
 private:
     QString m_buildDirectory;
+    QString m_fileName;
 };
 
 class PremakeBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurationFactory

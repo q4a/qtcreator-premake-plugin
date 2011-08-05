@@ -36,6 +36,7 @@
 #include "premaketarget.h"
 #include "ui_premakemakestep.h"
 #include "premakebuildconfiguration.h"
+#include "luamanager.h"
 
 #include <extensionsystem/pluginmanager.h>
 #include <projectexplorer/buildsteplist.h>
@@ -151,6 +152,10 @@ void PremakeMakeStep::run(QFutureInterface<bool> &fi)
 {
     emit addOutput(QString("premake4 %1").arg(allArguments()), BuildStep::MessageOutput);
     // TODO Generate makefiles here
+    lua_State *L = LuaManager::instance()->luaStateForGenerating(
+                premakeBuildConfiguration()->projectFileName(),
+                true,
+                premakeBuildConfiguration()->buildDirectory());
     emit addOutput("Premake exited normally.", BuildStep::MessageOutput);
     fi.reportResult(true);
 }

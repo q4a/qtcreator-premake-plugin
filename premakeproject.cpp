@@ -35,6 +35,7 @@
 #include "premakebuildconfiguration.h"
 #include "premakeprojectconstants.h"
 #include "premaketarget.h"
+#include "luamanager.h"
 
 #include <projectexplorer/buildenvironmentwidget.h>
 #include <projectexplorer/headerpath.h>
@@ -53,10 +54,6 @@
 #include <QtGui/QFormLayout>
 #include <QtGui/QMainWindow>
 #include <QtGui/QComboBox>
-
-extern "C" {
-#include "premake/src/host/premake.h"
-}
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
@@ -140,7 +137,7 @@ void PremakeProject::parseProject(RefreshOptions options)
 
     /// @todo Create a persistent lua state with all built-in scripts loaded
     /// and clone it before loading project
-    lua_State *L = m_manager->createPremakeLuaState(m_fileName);
+    lua_State *L = LuaManager::instance()->luaStateForParsing(m_fileName);
 
     if(call_premake_main(L) != 0){
         projectParseError(lua_tostring(L, -1));

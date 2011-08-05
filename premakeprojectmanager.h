@@ -35,9 +35,6 @@
 
 #include <projectexplorer/iprojectmanager.h>
 #include <coreplugin/icontext.h>
-#include <QtCore/QDataStream>
-
-struct lua_State;
 
 namespace PremakeProjectManager {
 namespace Internal {
@@ -63,19 +60,10 @@ public:
     void registerProject(PremakeProject *project);
     void unregisterProject(PremakeProject *project);
 
-    // return ready to use L
-    lua_State *createPremakeLuaState(const QString &fileName) const;
-
-
 private:
-    int writer(lua_State *L, const void *p, size_t size, void *u);
-
     Core::Context m_projectContext;
     Core::Context m_projectLanguage;
     QList<PremakeProject *> m_projects;
-    QByteArray m_premakeBridge;
-    QByteArray m_bytecode;
-    QDataStream m_bytecodeWriteStream;
 };
 
 } // namespace Internal
