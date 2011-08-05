@@ -168,6 +168,8 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
 
     t->addDeployConfiguration(t->deployConfigurationFactory()->create(t, ProjectExplorer::Constants::DEFAULT_DEPLOYCONFIGURATION_ID));
 
+    // Query project on executables
+
     // Add a runconfiguration. The CustomExecutableRC one will query the user
     // for its settings, so it is a good choice here.
     t->addRunConfiguration(new ProjectExplorer::CustomExecutableRunConfiguration(t));
@@ -184,8 +186,8 @@ PremakeTarget *PremakeTargetFactory::restore(ProjectExplorer::Project *parent, c
 {
     if (!canRestore(parent, map))
         return 0;
-    PremakeProject *genericproject = static_cast<PremakeProject *>(parent);
-    PremakeTarget *target = new PremakeTarget(genericproject);
+    PremakeProject *project = static_cast<PremakeProject *>(parent);
+    PremakeTarget *target = new PremakeTarget(project);
     if (target->fromMap(map))
         return target;
     delete target;
