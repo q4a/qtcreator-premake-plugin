@@ -154,10 +154,15 @@ void PremakeMakeStep::run(QFutureInterface<bool> &fi)
     // TODO Generate makefiles here
     lua_State *L = LuaManager::instance()->luaStateForGenerating(
                 premakeBuildConfiguration()->projectFileName(),
-                true,
+                false,
                 premakeBuildConfiguration()->buildDirectory());
-    emit addOutput("Premake exited normally.", BuildStep::MessageOutput);
-    fi.reportResult(true);
+    if(call_premake_main(L) != 0){
+        emit addOutput(lua_tostring(L, -1), BuildStep::ErrorMessageOutput);
+        fi.reportResult(false);
+    } else {
+        emit addOutput("Premake exited normally.", BuildStep::MessageOutput);
+        fi.reportResult(true);
+    }
 }
 
 ProjectExplorer::BuildStepConfigWidget *PremakeMakeStep::createConfigWidget()

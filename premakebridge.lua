@@ -99,6 +99,11 @@ newaction {
 newaction {
     trigger = '_qtcreator_generate',
     description = '',
+    shortname = "Qt Creator",
+    valid_kinds = premake.action.get("gmake").valid_kinds,
+    valid_languages = premake.action.get("gmake").valid_languages,
+    valid_tools = premake.action.get("gmake").valid_tools,
+
     execute = function()
         if not premake.option.get("to") then
             print "Injecting --to"
