@@ -35,6 +35,7 @@
 #include "premakebuildconfiguration.h"
 #include "premakeproject.h"
 #include "premakemakestep.h"
+#include "makestep.h"
 
 #include <projectexplorer/buildsteplist.h>
 #include <projectexplorer/customexecutablerunconfiguration.h>
@@ -147,20 +148,21 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
 {
     if (!canCreate(parent, id))
         return 0;
-    PremakeProject *genericproject = static_cast<PremakeProject *>(parent);
-    PremakeTarget *t = new PremakeTarget(genericproject);
+    PremakeProject *project = static_cast<PremakeProject *>(parent);
+    PremakeTarget *t = new PremakeTarget(project);
 
     // Set up BuildConfiguration:
     PremakeBuildConfiguration *bc = new PremakeBuildConfiguration(t);
     bc->setDisplayName("all");
 
     ProjectExplorer::BuildStepList *buildSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_BUILD);
-    PremakeMakeStep *makeStep = new PremakeMakeStep(buildSteps);
-    buildSteps->insertStep(0, makeStep);
+    PremakeMakeStep *premakeStep = new PremakeMakeStep(buildSteps);
+    buildSteps->insertStep(0, premakeStep);
+    premakeStep->setBuildTarget("all", /* on = */ true);
+    MakeStep *makeStep = new MakeStep(buildSteps);
+    buildSteps->insertStep(1, makeStep);
 
-    makeStep->setBuildTarget("all", /* on = */ true);
-
-    bc->setBuildDirectory(genericproject->projectDirectory());
+    bc->setBuildDirectory(project->projectDirectory());
 
     t->addBuildConfiguration(bc);
 
