@@ -35,7 +35,6 @@
 
 #include <texteditor/plaintexteditor.h>
 #include <texteditor/basetextdocument.h>
-#include <texteditor/normalindenter.h>
 
 #include <coreplugin/editormanager/ieditorfactory.h>
 
@@ -112,21 +111,6 @@ public:
 private:
     LuaEditorFactory *m_factory;
     TextEditor::TextEditorActionHandler *m_actionHandler;
-};
-
-class LuaIndenter : public TextEditor::NormalIndenter
-{
-public:
-    LuaIndenter();
-    virtual ~LuaIndenter();
-
-    virtual bool isElectricCharacter(const QChar &ch) const;
-
-    virtual void indentBlock(QTextDocument *doc,
-                             const QTextBlock &block,
-                             const QChar &typedChar,
-                             TextEditor::BaseTextEditorWidget *editor);
-
 };
 
 } // namespace Internal

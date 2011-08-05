@@ -31,7 +31,8 @@ HEADERS = premakeproject.h \
     premakemakestep.h \
     premakebuildconfiguration.h \
     luacompleter.h \
-    luaeditor.h
+    luaeditor.h \
+    luaindenter.h
 SOURCES = premakeproject.cpp \
     premakeprojectplugin.cpp \
     premaketarget.cpp \
@@ -41,7 +42,8 @@ SOURCES = premakeproject.cpp \
     premakemakestep.cpp \
     premakebuildconfiguration.cpp \
     luacompleter.cpp \
-    luaeditor.cpp
+    luaeditor.cpp \
+    luaindenter.cpp
 
 SOURCES += \
     premake/src/host/scripts.c \
@@ -144,6 +146,8 @@ PRE_TARGETDEPS += $$lua_highlight.target
         install_plugin \
         install_lua_highlight
 }
+
+
 
 
 
