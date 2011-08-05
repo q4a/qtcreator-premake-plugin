@@ -33,6 +33,7 @@
 #include "premakebuildconfiguration.h"
 
 #include "premakemakestep.h"
+#include "makestep.h"
 #include "premakeproject.h"
 #include "premaketarget.h"
 
@@ -185,9 +186,11 @@ BuildConfiguration *PremakeBuildConfigurationFactory::create(ProjectExplorer::Ta
 
     ProjectExplorer::BuildStepList *buildSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_BUILD);
     Q_ASSERT(buildSteps);
-    PremakeMakeStep *makeStep = new PremakeMakeStep(buildSteps);
-    buildSteps->insertStep(0, makeStep);
-    makeStep->setBuildTarget("all", /* on = */ true);
+    PremakeMakeStep *premakeStep = new PremakeMakeStep(buildSteps);
+    buildSteps->insertStep(0, premakeStep);
+    premakeStep->setBuildTarget("all", /* on = */ true);
+    MakeStep *makeStep = new MakeStep(buildSteps);
+    buildSteps->insertStep(1, makeStep);
 
     target->addBuildConfiguration(bc); // also makes the name unique...
     return bc;
@@ -232,5 +235,28 @@ BuildConfiguration::BuildType PremakeBuildConfiguration::buildType() const
 QString PremakeBuildConfiguration::projectFileName() const
 {
     return m_fileName;
+}
+
+QtSupport::BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
+{
+}
+
+void PremakeBuildConfiguration::setQtVersion(QtSupport::BaseQtVersion *)
+{
+}
+
+QString PremakeBuildConfiguration::makeCommand() const
+{
+    return QString("make");
+}
+
+QString PremakeBuildConfiguration::defaultMakeTarget() const
+{
+    return QString();
+}
+
+QString PremakeBuildConfiguration::makefile() const
+{
+    return QString("Makefile");
 }
 

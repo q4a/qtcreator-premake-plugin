@@ -33,7 +33,8 @@ HEADERS = premakeproject.h \
     luacompleter.h \
     luaeditor.h \
     luaindenter.h \
-    luamanager.h
+    luamanager.h \
+    makestep.h
 SOURCES = premakeproject.cpp \
     premakeprojectplugin.cpp \
     premaketarget.cpp \
@@ -45,7 +46,8 @@ SOURCES = premakeproject.cpp \
     luacompleter.cpp \
     luaeditor.cpp \
     luaindenter.cpp \
-    luamanager.cpp
+    luamanager.cpp \
+    makestep.cpp
 
 SOURCES += \
     premake/src/host/scripts.c \
@@ -94,7 +96,8 @@ SOURCES += \
     premake/src/host/os_copyfile.c \
     premake/src/host/os_chdir.c
 RESOURCES += premakeproject.qrc
-FORMS += premakemakestep.ui
+FORMS += premakemakestep.ui \
+    makestep.ui
 OTHER_FILES += premakebridge.lua
 
 unix:!macx {
@@ -148,6 +151,9 @@ PRE_TARGETDEPS += $$lua_highlight.target
         install_plugin \
         install_lua_highlight
 }
+
+
+
 
 
 

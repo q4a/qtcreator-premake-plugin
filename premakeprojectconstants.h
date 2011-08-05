@@ -44,7 +44,6 @@ namespace Constants {
 
 const char *const PROJECTCONTEXT     = "PremakeProject.ProjectContext";
 const char *const PREMAKEMIMETYPE    = "text/x-premake";
-const char *const MAKESTEP           = "PremakeProjectManager.MakeStep";
 
 // contexts
 const char *const C_LUAEDITOR      = "Lua Editor";

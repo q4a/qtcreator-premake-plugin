@@ -34,6 +34,7 @@
 #define PREMAKEBUILDCONFIGURATION_H
 
 #include <projectexplorer/buildconfiguration.h>
+#include <qtsupport/qtversionmanager.h>
 
 namespace PremakeProjectManager {
 namespace Internal {
@@ -64,6 +65,15 @@ public:
     BuildType buildType() const;
 
     QString projectFileName() const;
+
+    // returns the qtVersion
+    QtSupport::BaseQtVersion *qtVersion() const;
+    void setQtVersion(QtSupport::BaseQtVersion *);
+
+    QString makeCommand() const;
+    QString defaultMakeTarget() const;
+    QString makefile() const;
+
 
 protected:
     PremakeBuildConfiguration(PremakeTarget *parent, PremakeBuildConfiguration *source);

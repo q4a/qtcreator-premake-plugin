@@ -10,5 +10,6 @@
         <dependency name=\"ProjectExplorer\" version=\"$$QTCREATOR_VERSION\"/>
         <dependency name=\"CppTools\" version=\"$$QTCREATOR_VERSION\"/>
         <dependency name=\"Designer\" version=\"$$QTCREATOR_VERSION\" type=\"optional\"/>
+        <dependency name=\"QtSupport\" version=\"$$QTCREATOR_VERSION\"/>
     </dependencyList>
 </plugin>
