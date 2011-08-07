@@ -113,8 +113,12 @@ macx {
     DEFINES += LUA_USE_MACOSX
 }
 
-lua_highlight.target = $$QTC_SOURCE/share/qtcreator/generic-highlighter/lua.xml
-lua_highlight.commands = $$QMAKE_COPY generic-highlighter/lua.xml $$lua_highlight.target
+!macx {
+    lua_highlight.target = $$QTC_BUILD/share/qtcreator/generic-highlighter/lua.xml
+} else {
+    lua_highlight.target = $$IDE_DATA_PATH/generic-highlighter/lua.xml
+}
+lua_highlight.commands = $$QMAKE_COPY generic-highlighter/lua.xml \"$$lua_highlight.target\"
 QMAKE_EXTRA_TARGETS += lua_highlight
 PRE_TARGETDEPS += $$lua_highlight.target
 
@@ -143,8 +147,8 @@ PRE_TARGETDEPS += $$lua_highlight.target
             $$DESTDIR/lib$${TARGET}.dylib \
             $$DESTDIR/$${TARGET}.pluginspec
 
-        install_plugin.path = $$QTC_INSTALL_ROOT/Contents/PlugIns/Nokia
-        install_lua_highlight.path = $$QTC_INSTALL_ROOT/Contents/Resources/generic-highlighter
+        install_plugin.path = "$$QTC_INSTALL_ROOT/Contents/PlugIns/Nokia"
+        install_lua_highlight.path = "$$QTC_INSTALL_ROOT/Contents/Resources/generic-highlighter"
     }
 
 #win32:      install_plugin.files = $$DESTDIR/$${TARGET}.dll $$DESTDIR/$${TARGET}.pluginspec # ???
