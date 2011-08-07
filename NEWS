@@ -1,0 +1,16 @@
+PremakeProjectManager 0.1
+=========================
+
+First public release.
+
+Features:
+* premake4.lua files are opened as native project files. Visualization of
+  project file tree is available, and you may select and edit files, just like
+  with QMake or CMake projects.
+* Plugin brings more thorough support of Lua in text editor: syntax highlighting
+  on all platforms, indentation, and (very basic) autocompletion (e.g. pairs of
+  parentheses)
+* Plugin can build simple projects out of the box - just open premake4.lua and
+  click "Build All" or "Build project". I've tested it on Premake project.
+
+
