@@ -1,12 +1,12 @@
 #ifndef LUAINDENTER_H
 #define LUAINDENTER_H
 
-#include <texteditor/normalindenter.h>
+#include <texteditor/indenter.h>
 
 namespace PremakeProjectManager {
 namespace Internal {
 
-class LuaIndenter : public TextEditor::NormalIndenter
+class LuaIndenter : public TextEditor::Indenter
 {
 public:
     LuaIndenter();
