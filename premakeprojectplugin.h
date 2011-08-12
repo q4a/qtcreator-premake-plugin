@@ -38,9 +38,10 @@
 #include <QtCore/QObject>
 
 namespace PremakeProjectManager {
-namespace Internal {
 
 class LuaEditorFactory;
+
+namespace Internal {
 
 class PremakeProjectPlugin: public ExtensionSystem::IPlugin
 {
