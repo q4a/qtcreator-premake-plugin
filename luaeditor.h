@@ -43,9 +43,11 @@ class TextEditorActionHandler;
 }
 
 namespace PremakeProjectManager {
-namespace Internal {
 
+namespace Internal {
 class PremakeManager;
+}
+
 class LuaEditor;
 class LuaEditorWidget;
 class LuaDocument;
@@ -56,10 +58,10 @@ class LuaEditorFactory: public Core::IEditorFactory
     Q_OBJECT
 
 public:
-    LuaEditorFactory(PremakeManager *manager, TextEditor::TextEditorActionHandler *handler);
+    LuaEditorFactory(Internal::PremakeManager *manager, TextEditor::TextEditorActionHandler *handler);
     virtual ~LuaEditorFactory();
 
-    PremakeManager *manager() const;
+    Internal::PremakeManager *manager() const;
 
     virtual Core::IEditor *createEditor(QWidget *parent);
 
@@ -69,7 +71,7 @@ public:
     virtual Core::IFile *open(const QString &fileName);
 
 private:
-    PremakeManager *m_manager;
+    Internal::PremakeManager *m_manager;
     TextEditor::TextEditorActionHandler *m_actionHandler;
     QStringList m_mimeTypes;
 };
@@ -113,7 +115,6 @@ private:
     TextEditor::TextEditorActionHandler *m_actionHandler;
 };
 
-} // namespace Internal
 } // namespace PremakeProjectManager
 
 #endif // PREMAKEPROJECTFILESEDITOR_H

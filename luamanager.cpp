@@ -8,7 +8,6 @@
 #include <QtCore/QDebug>
 
 using namespace PremakeProjectManager;
-using namespace Internal;
 
 LuaManager::LuaManager() : m_bytecodeWriteStream(&m_bytecode, QIODevice::WriteOnly)
 {

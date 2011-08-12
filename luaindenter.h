@@ -4,7 +4,6 @@
 #include <texteditor/indenter.h>
 
 namespace PremakeProjectManager {
-namespace Internal {
 
 class LuaIndenter : public TextEditor::Indenter
 {
@@ -21,7 +20,6 @@ public:
 
 };
 
-} // namespace Internal
 } // namespace PremakeProjectManager
 
 #endif // LUAINDENTER_H

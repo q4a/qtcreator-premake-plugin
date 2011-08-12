@@ -4,7 +4,6 @@
 #include <QDebug>
 
 using namespace PremakeProjectManager;
-using namespace PremakeProjectManager::Internal;
 using namespace CPlusPlus;
 
 LuaCompleter::LuaCompleter()

@@ -4,7 +4,6 @@
 #include <texteditor/tabsettings.h>
 
 using namespace PremakeProjectManager;
-using namespace PremakeProjectManager::Internal;
 
 LuaIndenter::LuaIndenter()
 {}

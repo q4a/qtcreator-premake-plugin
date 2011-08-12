@@ -4,7 +4,6 @@
 #include <texteditor/autocompleter.h>
 
 namespace PremakeProjectManager {
-namespace Internal {
 
 class LuaCompleter : public TextEditor::AutoCompleter
 {
@@ -23,7 +22,6 @@ public:
     virtual QString insertParagraphSeparator(const QTextCursor &cursor) const;
 };
 
-}
 }
 
 #endif // LUACOMPLETER_H

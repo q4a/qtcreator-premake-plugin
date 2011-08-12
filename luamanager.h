@@ -9,7 +9,6 @@ extern "C" {
 }
 
 namespace PremakeProjectManager {
-namespace Internal {
 
 class LuaManager
 {
@@ -31,7 +30,6 @@ private:
     QDataStream m_bytecodeWriteStream;
 };
 
-}
 }
 
 #endif // LUAMANAGER_H
