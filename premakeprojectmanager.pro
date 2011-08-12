@@ -18,10 +18,11 @@ include($$QTC_SOURCE/src/qtcreatorplugin.pri)
 include($$QTC_SOURCE/src/plugins/projectexplorer/projectexplorer.pri)
 include($$QTC_SOURCE/src/plugins/cpptools/cpptools.pri)
 include($$QTC_SOURCE/src/plugins/texteditor/texteditor.pri)
+include(luasupport/luasupport.pri)
 
 INCLUDEPATH += . premake/src/host/lua-5.1.4/src
 DEFINES += PREMAKE_LIBRARY NDEBUG
-HEADERS = premakeproject.h \
+HEADERS += premakeproject.h \
     premakeprojectplugin.h \
     premaketarget.h \
     premakeprojectmanager.h \
@@ -30,12 +31,8 @@ HEADERS = premakeproject.h \
     premakeprojectwizard.h \
     premakemakestep.h \
     premakebuildconfiguration.h \
-    luacompleter.h \
-    luaeditor.h \
-    luaindenter.h \
-    luamanager.h \
     makestep.h
-SOURCES = premakeproject.cpp \
+SOURCES += premakeproject.cpp \
     premakeprojectplugin.cpp \
     premaketarget.cpp \
     premakeprojectmanager.cpp \
@@ -43,10 +40,6 @@ SOURCES = premakeproject.cpp \
     premakeprojectwizard.cpp \
     premakemakestep.cpp \
     premakebuildconfiguration.cpp \
-    luacompleter.cpp \
-    luaeditor.cpp \
-    luaindenter.cpp \
-    luamanager.cpp \
     makestep.cpp
 
 SOURCES += \
