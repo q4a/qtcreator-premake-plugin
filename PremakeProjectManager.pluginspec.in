@@ -4,7 +4,7 @@
     <license>LGPL 2.1</license>
     <category>Build Systems</category>
     <description>Premake support</description>
-    <url></url>
+    <url>https://gitorious.org/qtcreator-premake-plugin</url>
     <dependencyList>
         <dependency name=\"TextEditor\" version=\"$$QTCREATOR_VERSION\"/>
         <dependency name=\"ProjectExplorer\" version=\"$$QTCREATOR_VERSION\"/>
