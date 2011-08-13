@@ -67,6 +67,7 @@ PremakeProjectPlugin::~PremakeProjectPlugin()
 bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage)
 {
     using namespace Core;
+    using namespace TextEditor;
 
     ICore *core = ICore::instance();
     Core::MimeDatabase *mimeDB = core->mimeDatabase();
@@ -78,10 +79,11 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
 
     PremakeManager *manager = new PremakeManager;
 
-    TextEditor::TextEditorActionHandler *actionHandler =
-            new TextEditor::TextEditorActionHandler(Constants::C_LUAEDITOR,
-            TextEditor::TextEditorActionHandler::UnCommentSelection |
-            TextEditor::TextEditorActionHandler::Format);
+    TextEditorActionHandler *actionHandler =
+            new TextEditorActionHandler(Constants::C_LUAEDITOR,
+            TextEditorActionHandler::UnCommentSelection |
+            TextEditorActionHandler::Format |
+            TextEditorActionHandler::UnCollapseAll);
 
     m_luaEditorFactory = new LuaEditorFactory(manager, actionHandler);
     addObject(m_luaEditorFactory);
@@ -92,15 +94,20 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     addAutoReleasedObject(new PremakeProjectWizard);
     addAutoReleasedObject(new PremakeTargetFactory);
 
-    Core::ActionManager *am = core->actionManager();
-    Core::ActionContainer *contextMenu = am->createMenu(PremakeProjectManager::Constants::M_CONTEXT);
-    Core::Command *cmd;
-    Core::Context luaEditorContext = Core::Context(PremakeProjectManager::Constants::C_LUAEDITOR);
+
+    // Lua editor context menu
+    ActionManager *am = core->actionManager();
+    ActionContainer *contextMenu = am->createMenu(PremakeProjectManager::Constants::M_CONTEXT);
+    Command *cmd;
+    Context luaEditorContext = Core::Context(PremakeProjectManager::Constants::C_LUAEDITOR);
 
     QAction *separator = new QAction(this);
     separator->setSeparator(true);
     contextMenu->addAction(am->registerAction(separator,
-                  Core::Id(Constants::SEPARATOR), luaEditorContext));
+                  Id(Constants::SEPARATOR), luaEditorContext));
+
+    cmd = am->command(TextEditor::Constants::AUTO_INDENT_SELECTION);
+    contextMenu->addAction(cmd);
 
     cmd = am->command(TextEditor::Constants::UN_COMMENT_SELECTION);
     contextMenu->addAction(cmd);
