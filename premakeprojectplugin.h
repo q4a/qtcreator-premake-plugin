@@ -54,6 +54,9 @@ public:
     virtual bool initialize(const QStringList &arguments, QString *errorString);
     virtual void extensionsInitialized();
 
+public slots:
+    void jumpToFile();
+
 private:
     LuaEditorFactory *m_luaEditorFactory;
 };

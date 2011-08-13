@@ -106,6 +106,14 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     contextMenu->addAction(am->registerAction(separator,
                   Id(Constants::SEPARATOR), luaEditorContext));
 
+    QAction *jumpToFile = new QAction(tr("Jump to File Under Cursor"), this);
+    cmd = am->registerAction(jumpToFile,
+        PremakeProjectManager::Constants::JUMP_TO_FILE, luaEditorContext);
+    cmd->setDefaultKeySequence(QKeySequence(Qt::Key_F2));
+    connect(jumpToFile, SIGNAL(triggered()),
+            this, SLOT(jumpToFile()));
+    contextMenu->addAction(cmd);
+
     cmd = am->command(TextEditor::Constants::AUTO_INDENT_SELECTION);
     contextMenu->addAction(cmd);
 
@@ -117,5 +125,13 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
 
 void PremakeProjectPlugin::extensionsInitialized()
 { }
+
+void PremakeProjectManager::Internal::PremakeProjectPlugin::jumpToFile()
+{
+    Core::EditorManager *em = Core::EditorManager::instance();
+    LuaEditorWidget *editor = qobject_cast<LuaEditorWidget*>(em->currentEditor()->widget());
+    if (editor)
+        editor->jumpToFile();
+}
 
 Q_EXPORT_PLUGIN(PremakeProjectPlugin)

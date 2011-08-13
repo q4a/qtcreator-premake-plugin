@@ -53,6 +53,7 @@ const char * const M_CONTEXT = "LuaEditor.ContextMenu";
 
 // actions
 const char * const SEPARATOR           = "LuaEditor.Separator";
+const char * const JUMP_TO_FILE        = "LuaEditor.JumpToFile";
 
 // kinds
 const char *const PROJECT_KIND       = "Premake";
