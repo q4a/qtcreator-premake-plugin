@@ -108,11 +108,16 @@ public:
     LuaEditorFactory *factory() const;
     TextEditor::TextEditorActionHandler *actionHandler() const;
 
-    virtual TextEditor::BaseTextEditor *createEditor();
+    void unCommentSelection();
+
+protected:
+    TextEditor::BaseTextEditor *createEditor();
+    void contextMenuEvent(QContextMenuEvent *);
 
 private:
     LuaEditorFactory *m_factory;
     TextEditor::TextEditorActionHandler *m_actionHandler;
+    Utils::CommentDefinition m_commentDefinition;
 };
 
 } // namespace PremakeProjectManager

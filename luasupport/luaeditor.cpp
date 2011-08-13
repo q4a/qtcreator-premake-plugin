@@ -36,13 +36,17 @@
 #include "luacompleter.h"
 #include "luaindenter.h"
 
+#include <coreplugin/icore.h>
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/editormanager/editormanager.h>
 #include <coreplugin/fileiconprovider.h>
 #include <texteditor/fontsettings.h>
 #include <texteditor/texteditoractionhandler.h>
 #include <texteditor/texteditorsettings.h>
 
-#include <QDebug>
+#include <QtGui/QMenu>
+#include <QtCore/QDebug>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
@@ -157,6 +161,10 @@ LuaEditorWidget::LuaEditorWidget(QWidget *parent, LuaEditorFactory *factory,
     setDisplayName(QLatin1String(Constants::LUA_EDITOR_DISPLAY_NAME));
     setIndenter(new LuaIndenter);
     setAutoCompleter(new LuaCompleter);
+    m_commentDefinition.clearCommentStyles();
+    m_commentDefinition.setSingleLine(QLatin1String("-- "));
+    m_commentDefinition.setMultiLineStart(QLatin1String("--[["));
+    m_commentDefinition.setMultiLineEnd(QLatin1String("]]"));
 
     handler->setupActions(this);
 }
@@ -177,4 +185,26 @@ TextEditor::TextEditorActionHandler *LuaEditorWidget::actionHandler() const
 TextEditor::BaseTextEditor *LuaEditorWidget::createEditor()
 {
     return new LuaEditor(this);
+}
+
+void PremakeProjectManager::LuaEditorWidget::unCommentSelection()
+{
+    Utils::unCommentSelection(this, m_commentDefinition);
+}
+
+void PremakeProjectManager::LuaEditorWidget::contextMenuEvent(QContextMenuEvent *e)
+{
+    QMenu *menu = new QMenu();
+
+    Core::ActionManager *am = Core::ICore::instance()->actionManager();
+    Core::ActionContainer *mcontext = am->actionContainer(PremakeProjectManager::Constants::M_CONTEXT);
+    QMenu *contextMenu = mcontext->menu();
+
+    foreach (QAction *action, contextMenu->actions())
+        menu->addAction(action);
+
+    appendStandardContextMenuActions(menu);
+
+    menu->exec(e->globalPos());
+    delete menu;
 }

@@ -41,11 +41,15 @@
 
 #include <coreplugin/icore.h>
 #include <coreplugin/mimedatabase.h>
+#include <coreplugin/actionmanager/actionmanager.h>
+#include <coreplugin/actionmanager/actioncontainer.h>
 
 #include <texteditor/texteditoractionhandler.h>
+#include <texteditor/texteditorconstants.h>
 
 #include <QtCore/QtPlugin>
 #include <QtCore/QDebug>
+#include <QtGui/QAction>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
@@ -75,7 +79,9 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     PremakeManager *manager = new PremakeManager;
 
     TextEditor::TextEditorActionHandler *actionHandler =
-            new TextEditor::TextEditorActionHandler(Constants::C_LUAEDITOR);
+            new TextEditor::TextEditorActionHandler(Constants::C_LUAEDITOR,
+            TextEditor::TextEditorActionHandler::UnCommentSelection |
+            TextEditor::TextEditorActionHandler::Format);
 
     m_luaEditorFactory = new LuaEditorFactory(manager, actionHandler);
     addObject(m_luaEditorFactory);
@@ -85,6 +91,19 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     addAutoReleasedObject(new PremakeMakeStepFactory);
     addAutoReleasedObject(new PremakeProjectWizard);
     addAutoReleasedObject(new PremakeTargetFactory);
+
+    Core::ActionManager *am = core->actionManager();
+    Core::ActionContainer *contextMenu = am->createMenu(PremakeProjectManager::Constants::M_CONTEXT);
+    Core::Command *cmd;
+    Core::Context luaEditorContext = Core::Context(PremakeProjectManager::Constants::C_LUAEDITOR);
+
+    QAction *separator = new QAction(this);
+    separator->setSeparator(true);
+    contextMenu->addAction(am->registerAction(separator,
+                  Core::Id(Constants::SEPARATOR), luaEditorContext));
+
+    cmd = am->command(TextEditor::Constants::UN_COMMENT_SELECTION);
+    contextMenu->addAction(cmd);
 
     return true;
 }

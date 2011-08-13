@@ -48,6 +48,12 @@ const char *const PREMAKEMIMETYPE    = "text/x-premake";
 // contexts
 const char *const C_LUAEDITOR      = "Lua Editor";
 
+// menus
+const char * const M_CONTEXT = "LuaEditor.ContextMenu";
+
+// actions
+const char * const SEPARATOR           = "LuaEditor.Separator";
+
 // kinds
 const char *const PROJECT_KIND       = "Premake";
 
