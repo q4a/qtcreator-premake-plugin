@@ -260,7 +260,7 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
     const QString block = cursor.block().text();
 
     // check if the current position is commented out
-    // FIXME: chack for multiline comments!
+    // FIXME: check for multiline comments!
     const int hashPos = block.indexOf(QLatin1String("--"));
     if (hashPos >= 0 && hashPos < positionInBlock)
         return link;
