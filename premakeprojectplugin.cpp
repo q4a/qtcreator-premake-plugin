@@ -101,11 +101,6 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     Command *cmd;
     Context luaEditorContext = Core::Context(PremakeProjectManager::Constants::C_LUAEDITOR);
 
-    QAction *separator = new QAction(this);
-    separator->setSeparator(true);
-    contextMenu->addAction(am->registerAction(separator,
-                  Id(Constants::SEPARATOR), luaEditorContext));
-
     QAction *jumpToFile = new QAction(tr("Jump to File Under Cursor"), this);
     cmd = am->registerAction(jumpToFile,
         PremakeProjectManager::Constants::JUMP_TO_FILE, luaEditorContext);
@@ -113,6 +108,11 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     connect(jumpToFile, SIGNAL(triggered()),
             this, SLOT(jumpToFile()));
     contextMenu->addAction(cmd);
+
+    QAction *separator = new QAction(this);
+    separator->setSeparator(true);
+    contextMenu->addAction(am->registerAction(separator,
+                  Id(Constants::SEPARATOR), luaEditorContext));
 
     cmd = am->command(TextEditor::Constants::AUTO_INDENT_SELECTION);
     contextMenu->addAction(cmd);
