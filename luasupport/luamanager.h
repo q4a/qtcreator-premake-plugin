@@ -8,7 +8,7 @@ extern "C" {
 #include "premake/src/host/premake.h"
 }
 
-namespace PremakeProjectManager {
+namespace LuaSupport {
 
 class LuaManager
 {

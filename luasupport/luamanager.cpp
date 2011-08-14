@@ -7,7 +7,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 
-using namespace PremakeProjectManager;
+using namespace LuaSupport;
 
 LuaManager::LuaManager() : m_bytecodeWriteStream(&m_bytecode, QIODevice::WriteOnly)
 {

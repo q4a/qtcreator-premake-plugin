@@ -59,6 +59,7 @@
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
 using namespace ProjectExplorer;
+using namespace LuaSupport;
 
 namespace {
 const char * const TOOLCHAIN_KEY("PremakeProjectManager.PremakeProject.Toolchain");

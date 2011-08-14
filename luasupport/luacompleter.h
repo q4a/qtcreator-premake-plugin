@@ -3,7 +3,7 @@
 
 #include <texteditor/autocompleter.h>
 
-namespace PremakeProjectManager {
+namespace LuaSupport {
 
 class LuaCompleter : public TextEditor::AutoCompleter
 {

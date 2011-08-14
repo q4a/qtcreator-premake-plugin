@@ -37,9 +37,11 @@
 
 #include <QtCore/QObject>
 
-namespace PremakeProjectManager {
-
+namespace LuaSupport {
 class LuaEditorFactory;
+}
+
+namespace PremakeProjectManager {
 
 namespace Internal {
 
@@ -54,11 +56,8 @@ public:
     virtual bool initialize(const QStringList &arguments, QString *errorString);
     virtual void extensionsInitialized();
 
-public slots:
-    void jumpToFile();
-
 private:
-    LuaEditorFactory *m_luaEditorFactory;
+    LuaSupport::LuaEditorFactory *m_luaEditorFactory;
 };
 
 } // namespace Internal

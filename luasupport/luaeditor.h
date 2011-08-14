@@ -30,8 +30,8 @@
 **
 **************************************************************************/
 
-#ifndef PREMAKEPROJECTFILESEDITOR_H
-#define PREMAKEPROJECTFILESEDITOR_H
+#ifndef LUAEDITOR_H
+#define LUAEDITOR_H
 
 #include <texteditor/plaintexteditor.h>
 #include <texteditor/basetextdocument.h>
@@ -42,7 +42,7 @@ namespace TextEditor {
 class TextEditorActionHandler;
 }
 
-namespace PremakeProjectManager {
+namespace LuaSupport {
 
 class LuaEditor;
 class LuaEditorWidget;
@@ -63,6 +63,9 @@ public:
     virtual QString id() const;
     virtual QString displayName() const;
     virtual Core::IFile *open(const QString &fileName);
+
+public slots:
+    void jumpToFile();
 
 private:
     TextEditor::TextEditorActionHandler *m_actionHandler;
@@ -117,6 +120,6 @@ private:
     Utils::CommentDefinition m_commentDefinition;
 };
 
-} // namespace PremakeProjectManager
+} // namespace LuaSupport
 
-#endif // PREMAKEPROJECTFILESEDITOR_H
+#endif // LUAEDITOR_H

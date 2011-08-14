@@ -55,6 +55,7 @@
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
+using namespace LuaSupport;
 
 namespace {
 const char * const PREMAKE_MS_ID("PremakeProjectManager.PremakeMakeStep");

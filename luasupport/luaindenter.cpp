@@ -3,7 +3,7 @@
 #include "luaeditor.h"
 #include <texteditor/tabsettings.h>
 
-using namespace PremakeProjectManager;
+using namespace LuaSupport;
 
 LuaIndenter::LuaIndenter()
 {}

@@ -45,30 +45,14 @@ namespace Constants {
 const char *const PROJECTCONTEXT     = "PremakeProject.ProjectContext";
 const char *const PREMAKEMIMETYPE    = "text/x-premake";
 
-// contexts
-const char *const C_LUAEDITOR      = "Lua Editor";
-
-// menus
-const char * const M_CONTEXT = "LuaEditor.ContextMenu";
-
-// actions
-const char * const SEPARATOR           = "LuaEditor.Separator";
-const char * const JUMP_TO_FILE        = "LuaEditor.JumpToFile";
-
 // kinds
 const char *const PROJECT_KIND       = "Premake";
-
-const char *const LUA_EDITOR_ID    = "Premake.LuaEditor";
-const char *const LUA_EDITOR_DISPLAY_NAME = QT_TRANSLATE_NOOP("OpenWith::Editors", "Lua Editor");
-
-const char *const LUA_MIMETYPE     = "text/x-lua";
 
 // Project
 const char *const PREMAKEPROJECT_ID  = "PremakeProjectManager.PremakeProject";
 
 // ICONS
 const char * const ICON_PREMAKE   = ":/premakeproject/images/premake.png";
-const char * const ICON_LUA_FILE   = ":/premakeproject/images/lua_small.png";
 
 } // namespace Constants
 } // namespace PremakeProjectManager

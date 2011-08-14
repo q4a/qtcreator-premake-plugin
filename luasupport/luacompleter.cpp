@@ -3,7 +3,7 @@
 #include <cplusplus/MatchingText.h>
 #include <QDebug>
 
-using namespace PremakeProjectManager;
+using namespace LuaSupport;
 using namespace CPlusPlus;
 
 LuaCompleter::LuaCompleter()

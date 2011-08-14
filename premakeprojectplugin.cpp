@@ -75,7 +75,7 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
 
     PremakeManager *manager = new PremakeManager;
 
-    m_luaEditorFactory = new LuaEditorFactory(manager);
+    m_luaEditorFactory = new LuaSupport::LuaEditorFactory(manager);
     addObject(m_luaEditorFactory);
 
     addAutoReleasedObject(manager);
@@ -89,13 +89,5 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
 
 void PremakeProjectPlugin::extensionsInitialized()
 { }
-
-void PremakeProjectManager::Internal::PremakeProjectPlugin::jumpToFile()
-{
-    Core::EditorManager *em = Core::EditorManager::instance();
-    LuaEditorWidget *editor = qobject_cast<LuaEditorWidget*>(em->currentEditor()->widget());
-    if (editor)
-        editor->jumpToFile();
-}
 
 Q_EXPORT_PLUGIN(PremakeProjectPlugin)
