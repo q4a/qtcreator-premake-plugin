@@ -1,6 +1,9 @@
 #include "luacompleter.h"
 
 #include <cplusplus/MatchingText.h>
+
+#include <QtGui/QTextBlock>
+#include <QtGui/QTextCursor>
 #include <QDebug>
 
 using namespace LuaSupport;
@@ -37,6 +40,13 @@ bool LuaCompleter::contextAllowsElectricCharacters(const QTextCursor &cursor) co
 
 bool LuaCompleter::isInComment(const QTextCursor &cursor) const
 {
+    // FIXME: Join with luaeditor.cpp
+    // FIXME: Detect multiline comments
+    const QTextBlock block = cursor.block();
+    const int hashPos = block.text().indexOf(QLatin1String("--"));
+    if (hashPos >= 0 && hashPos < cursor.position() - block.position())
+        return true;
+
     return false;
 }
 
@@ -51,9 +61,3 @@ QString LuaCompleter::insertParagraphSeparator(const QTextCursor &cursor) const
     MatchingText m;
     return m.insertParagraphSeparator(cursor);
 }
-
-
-
-
-
-
