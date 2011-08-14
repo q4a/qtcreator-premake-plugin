@@ -31,7 +31,6 @@
 **************************************************************************/
 
 #include "luaeditor.h"
-#include "premakeprojectconstants.h"
 #include "luaconstants.h"
 #include "luacompleter.h"
 #include "luaindenter.h"
@@ -72,8 +71,7 @@ LuaEditorFactory::LuaEditorFactory(QObject *parent)
     FileIconProvider *iconProvider = FileIconProvider::instance();
     iconProvider->registerIconOverlayForSuffix(QIcon(QLatin1String(Constants::ICON_LUA_FILE)),
                                         QLatin1String("lua"));
-    m_mimeTypes << QLatin1String(Constants::LUA_MIMETYPE)
-                << QLatin1String(PremakeProjectManager::Constants::PREMAKEMIMETYPE);
+    m_mimeTypes << QLatin1String(Constants::LUA_MIMETYPE);
 
     m_actionHandler =
             new TextEditorActionHandler(Constants::C_LUAEDITOR,
