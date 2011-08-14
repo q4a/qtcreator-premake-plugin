@@ -44,9 +44,6 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 
-#include <texteditor/texteditoractionhandler.h>
-#include <texteditor/texteditorconstants.h>
-
 #include <QtCore/QtPlugin>
 #include <QtCore/QDebug>
 #include <QtGui/QAction>
@@ -67,7 +64,6 @@ PremakeProjectPlugin::~PremakeProjectPlugin()
 bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage)
 {
     using namespace Core;
-    using namespace TextEditor;
 
     ICore *core = ICore::instance();
     Core::MimeDatabase *mimeDB = core->mimeDatabase();
@@ -79,13 +75,7 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
 
     PremakeManager *manager = new PremakeManager;
 
-    TextEditorActionHandler *actionHandler =
-            new TextEditorActionHandler(Constants::C_LUAEDITOR,
-            TextEditorActionHandler::UnCommentSelection |
-            TextEditorActionHandler::Format |
-            TextEditorActionHandler::UnCollapseAll);
-
-    m_luaEditorFactory = new LuaEditorFactory(manager, actionHandler);
+    m_luaEditorFactory = new LuaEditorFactory(manager);
     addObject(m_luaEditorFactory);
 
     addAutoReleasedObject(manager);
@@ -93,32 +83,6 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     addAutoReleasedObject(new PremakeMakeStepFactory);
     addAutoReleasedObject(new PremakeProjectWizard);
     addAutoReleasedObject(new PremakeTargetFactory);
-
-
-    // Lua editor context menu
-    ActionManager *am = core->actionManager();
-    ActionContainer *contextMenu = am->createMenu(PremakeProjectManager::Constants::M_CONTEXT);
-    Command *cmd;
-    Context luaEditorContext = Core::Context(PremakeProjectManager::Constants::C_LUAEDITOR);
-
-    QAction *jumpToFile = new QAction(tr("Jump to File Under Cursor"), this);
-    cmd = am->registerAction(jumpToFile,
-        PremakeProjectManager::Constants::JUMP_TO_FILE, luaEditorContext);
-    cmd->setDefaultKeySequence(QKeySequence(Qt::Key_F2));
-    connect(jumpToFile, SIGNAL(triggered()),
-            this, SLOT(jumpToFile()));
-    contextMenu->addAction(cmd);
-
-    QAction *separator = new QAction(this);
-    separator->setSeparator(true);
-    contextMenu->addAction(am->registerAction(separator,
-                  Id(Constants::SEPARATOR), luaEditorContext));
-
-    cmd = am->command(TextEditor::Constants::AUTO_INDENT_SELECTION);
-    contextMenu->addAction(cmd);
-
-    cmd = am->command(TextEditor::Constants::UN_COMMENT_SELECTION);
-    contextMenu->addAction(cmd);
 
     return true;
 }

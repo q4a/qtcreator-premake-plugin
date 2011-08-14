@@ -43,43 +43,73 @@
 #include <coreplugin/fileiconprovider.h>
 #include <texteditor/fontsettings.h>
 #include <texteditor/texteditoractionhandler.h>
+#include <texteditor/texteditorconstants.h>
 #include <texteditor/texteditorsettings.h>
 
-#include <QtGui/QMenu>
-#include <QtGui/QTextBlock>
+
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+#include <QtGui/QAction>
+#include <QtGui/QMenu>
+#include <QtGui/QTextBlock>
+
 #include <QtCore/QDebug>
 
 
 using namespace PremakeProjectManager;
-using namespace PremakeProjectManager::Internal;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // ProjectFilesFactory
 ////////////////////////////////////////////////////////////////////////////////////////
 
-LuaEditorFactory::LuaEditorFactory(PremakeManager *manager,
-                                         TextEditor::TextEditorActionHandler *handler)
-    : Core::IEditorFactory(manager),
-      m_manager(manager),
-      m_actionHandler(handler)
+LuaEditorFactory::LuaEditorFactory(QObject *parent)
+    : Core::IEditorFactory(parent)
 {
-    Core::FileIconProvider *iconProvider = Core::FileIconProvider::instance();
+    using namespace Core;
+    using namespace TextEditor;
+
+    FileIconProvider *iconProvider = FileIconProvider::instance();
     iconProvider->registerIconOverlayForSuffix(QIcon(QLatin1String(Constants::ICON_LUA_FILE)),
                                         QLatin1String("lua"));
     m_mimeTypes << QLatin1String(Constants::LUA_MIMETYPE)
                 << QLatin1String(Constants::PREMAKEMIMETYPE);
+
+    m_actionHandler =
+            new TextEditorActionHandler(Constants::C_LUAEDITOR,
+            TextEditorActionHandler::UnCommentSelection |
+            TextEditorActionHandler::Format |
+            TextEditorActionHandler::UnCollapseAll);
+
+    // Lua editor context menu
+    ICore *core = ICore::instance();
+    ActionManager *am = core->actionManager();
+    ActionContainer *contextMenu = am->createMenu(Constants::M_CONTEXT);
+    Command *cmd;
+    Context luaEditorContext = Context(Constants::C_LUAEDITOR);
+
+    QAction *jumpToFile = new QAction(tr("Jump to File Under Cursor"), this);
+    cmd = am->registerAction(jumpToFile,
+        Constants::JUMP_TO_FILE, luaEditorContext);
+    cmd->setDefaultKeySequence(QKeySequence(Qt::Key_F2));
+    connect(jumpToFile, SIGNAL(triggered()),
+            this, SLOT(jumpToFile()));
+    contextMenu->addAction(cmd);
+
+    QAction *separator = new QAction(this);
+    separator->setSeparator(true);
+    contextMenu->addAction(am->registerAction(separator,
+                  Id(Constants::SEPARATOR), luaEditorContext));
+
+    cmd = am->command(TextEditor::Constants::AUTO_INDENT_SELECTION);
+    contextMenu->addAction(cmd);
+
+    cmd = am->command(TextEditor::Constants::UN_COMMENT_SELECTION);
+    contextMenu->addAction(cmd);
 }
 
 LuaEditorFactory::~LuaEditorFactory()
 {
-}
-
-PremakeManager *LuaEditorFactory::manager() const
-{
-    return m_manager;
 }
 
 Core::IEditor *LuaEditorFactory::createEditor(QWidget *parent)
@@ -201,7 +231,7 @@ void LuaEditorWidget::contextMenuEvent(QContextMenuEvent *e)
     QMenu *menu = new QMenu();
 
     Core::ActionManager *am = Core::ICore::instance()->actionManager();
-    Core::ActionContainer *mcontext = am->actionContainer(PremakeProjectManager::Constants::M_CONTEXT);
+    Core::ActionContainer *mcontext = am->actionContainer(Constants::M_CONTEXT);
     QMenu *contextMenu = mcontext->menu();
 
     foreach (QAction *action, contextMenu->actions())
@@ -276,8 +306,7 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
     return link;
 }
 
-void PremakeProjectManager::LuaEditorWidget::jumpToFile()
+void LuaEditorWidget::jumpToFile()
 {
-    qDebug() << Q_FUNC_INFO;
     openLink(findLinkAt(textCursor()));
 }
