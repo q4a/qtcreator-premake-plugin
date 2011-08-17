@@ -3,6 +3,10 @@
 
 #include <texteditor/indenter.h>
 
+namespace TextEditor {
+class BaseTextEditorWidget;
+}
+
 namespace LuaSupport {
 
 class LuaIndenter : public TextEditor::Indenter
