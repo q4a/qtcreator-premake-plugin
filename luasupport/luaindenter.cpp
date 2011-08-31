@@ -1,11 +1,18 @@
 #include "luaindenter.h"
 
 #include "luaeditor.h"
+
+#include <cpptools/cppcodeformatter.h>
+#include <cpptools/cppcodestylepreferences.h>
+#include <cpptools/cppcodestylesettings.h>
 #include <texteditor/tabsettings.h>
+
+#include <QtCore/QDebug>
 
 using namespace LuaSupport;
 
 LuaIndenter::LuaIndenter()
+    : m_luaCodeStylePreferences(0)
 {}
 
 LuaIndenter::~LuaIndenter()
@@ -24,7 +31,17 @@ bool LuaIndenter::isElectricCharacter(const QChar &ch) const
     return false;
 }
 
-void LuaIndenter::indentBlock(QTextDocument *doc, const QTextBlock &block, const QChar &typedChar, TextEditor::BaseTextEditorWidget *editor)
+void LuaIndenter::indentBlock(QTextDocument *doc, const QTextBlock &block,
+                              const QChar &typedChar,
+                              TextEditor::BaseTextEditorWidget *editor)
+{
+    indentBlock(doc, block, typedChar, editor->tabSettings());
+}
+
+void LuaIndenter::indentBlock(QTextDocument *doc,
+                         const QTextBlock &block,
+                         const QChar &typedChar,
+                         const TextEditor::TabSettings &ts)
 {
     const QString blockText = block.text();//.trimmed();
     if ((typedChar == 'd' && !blockText.endsWith("end"))
@@ -33,9 +50,6 @@ void LuaIndenter::indentBlock(QTextDocument *doc, const QTextBlock &block, const
     ) {
         return;
     }
-
-
-    const TextEditor::TabSettings &ts = editor->tabSettings();
 
     // At beginning: Leave as is.
     if (block == doc->begin())
@@ -79,4 +93,11 @@ void LuaIndenter::indentBlock(QTextDocument *doc, const QTextBlock &block, const
             || blockText.trimmed() == "}") {
         ts.reindentLine(block, -ts.m_indentSize);
     }
+}
+
+CppTools::CppCodeStyleSettings LuaIndenter::codeStyleSettings() const
+{
+    if (m_luaCodeStylePreferences)
+        return m_luaCodeStylePreferences->currentSettings();
+    return CppTools::CppCodeStyleSettings();
 }

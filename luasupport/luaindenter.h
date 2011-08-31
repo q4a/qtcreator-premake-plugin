@@ -7,21 +7,33 @@ namespace TextEditor {
 class BaseTextEditorWidget;
 }
 
+namespace CppTools {
+    class CppCodeStyleSettings;
+    class CppCodeStylePreferences;
+}
+
 namespace LuaSupport {
 
 class LuaIndenter : public TextEditor::Indenter
 {
 public:
     LuaIndenter();
-    virtual ~LuaIndenter();
+    ~LuaIndenter();
 
-    virtual bool isElectricCharacter(const QChar &ch) const;
+    bool isElectricCharacter(const QChar &ch) const;
 
-    virtual void indentBlock(QTextDocument *doc,
+    void indentBlock(QTextDocument *doc,
                              const QTextBlock &block,
                              const QChar &typedChar,
                              TextEditor::BaseTextEditorWidget *editor);
 
+    void indentBlock(QTextDocument *doc,
+                             const QTextBlock &block,
+                             const QChar &typedChar,
+                             const TextEditor::TabSettings &tabSettings);
+private:
+    CppTools::CppCodeStyleSettings codeStyleSettings() const;
+    CppTools::CppCodeStylePreferences *m_luaCodeStylePreferences;
 };
 
 }
