@@ -32,20 +32,52 @@
 
 #include "premakeprojectnodes.h"
 #include "premakeproject.h"
+#include "premakeprojectconstants.h"
 
+#include <coreplugin/fileiconprovider.h>
 #include <coreplugin/ifile.h>
 #include <projectexplorer/projectexplorer.h>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QFileInfo>
+#include <QtGui/QStyle>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
+
+struct PremakeNodeStaticData
+{
+    QIcon projectIcon;
+};
+
+static void clearPremakeNodeStaticData();
+
+// TODO: Add file type icons
+Q_GLOBAL_STATIC_WITH_INITIALIZER(PremakeNodeStaticData, qt4NodeStaticData, {
+    // Overlay the SP_DirIcon with the custom icons
+    const QSize desiredSize = QSize(16, 16);
+
+    // Project icon
+    const QIcon projectBaseIcon(Constants::ICON_PREMAKEPROJECT);
+    const QPixmap projectPixmap = Core::FileIconProvider::overlayIcon(QStyle::SP_DirIcon,
+                                                                  projectBaseIcon,
+                                                                  desiredSize);
+    x->projectIcon.addPixmap(projectPixmap);
+
+    qAddPostRoutine(clearPremakeNodeStaticData);
+})
+
+static void clearPremakeNodeStaticData()
+{
+    qt4NodeStaticData()->projectIcon = QIcon();
+}
 
 PremakeProjectNode::PremakeProjectNode(PremakeProject *project)
     : ProjectExplorer::ProjectNode(project->file()->fileName()),
       m_project(project)
 {
     setDisplayName(m_project->displayName());
+    setIcon(qt4NodeStaticData()->projectIcon);
 }
 
 PremakeProjectNode::~PremakeProjectNode()

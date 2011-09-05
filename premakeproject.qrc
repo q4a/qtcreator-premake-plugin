@@ -4,5 +4,6 @@
         <file>images/premake.png</file>
         <file>images/lua_small.png</file>
         <file>premakebridge.lua</file>
+        <file>images/premakeproject.png</file>
     </qresource>
 </RCC>

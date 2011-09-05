@@ -34,7 +34,7 @@
 #define PREMAKEPROJECTCONSTANTS_H
 
 #include <QtCore/QtGlobal>
-#include <ide_version.h>
+#include <coreplugin/ide_version.h>
 
 #define IDE_VERSION_CHECK(major, minor, patch) ((major<<16)|(minor<<8)|(patch))
 #define IDE_VER IDE_VERSION_CHECK(IDE_VERSION_MAJOR, IDE_VERSION_MINOR, IDE_VERSION_RELEASE)
@@ -53,6 +53,7 @@ const char *const PREMAKEPROJECT_ID  = "PremakeProjectManager.PremakeProject";
 
 // ICONS
 const char * const ICON_PREMAKE   = ":/premakeproject/images/premake.png";
+const char * const ICON_PREMAKEPROJECT   = ":/premakeproject/images/premakeproject.png";
 
 } // namespace Constants
 } // namespace PremakeProjectManager
