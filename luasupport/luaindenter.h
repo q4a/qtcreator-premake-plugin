@@ -31,6 +31,8 @@ public:
                              const QTextBlock &block,
                              const QChar &typedChar,
                              const TextEditor::TabSettings &tabSettings);
+
+    virtual void setCodeStylePreferences(TextEditor::IFallbackPreferences *preferences);
 private:
     CppTools::CppCodeStyleSettings codeStyleSettings() const;
     CppTools::CppCodeStylePreferences *m_luaCodeStylePreferences;

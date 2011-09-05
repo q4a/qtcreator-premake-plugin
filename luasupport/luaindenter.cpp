@@ -67,7 +67,6 @@ void LuaIndenter::indentBlock(QTextDocument *doc,
 
     int firstNonSpace = ts.firstNonSpace(previousText);
 
-
     // Just use previous line.
     ts.indentLine(block, ts.columnAt(previousText, firstNonSpace));
 
@@ -100,4 +99,14 @@ CppTools::CppCodeStyleSettings LuaIndenter::codeStyleSettings() const
     if (m_luaCodeStylePreferences)
         return m_luaCodeStylePreferences->currentSettings();
     return CppTools::CppCodeStyleSettings();
+}
+
+void LuaIndenter::setCodeStylePreferences(TextEditor::IFallbackPreferences *preferences)
+{
+    // TODO: do something useful
+    CppTools::CppCodeStylePreferences *luaCodeStylePreferences
+            = qobject_cast<CppTools::CppCodeStylePreferences *>(preferences);
+
+    if (luaCodeStylePreferences)
+        m_luaCodeStylePreferences = luaCodeStylePreferences;
 }
