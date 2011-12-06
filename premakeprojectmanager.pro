@@ -47,7 +47,7 @@ SOURCES += premakeproject.cpp \
     makestep.cpp
 
 SOURCES += \
-    premake/src/host/scripts.c \
+    scripts.c \
     premake/src/host/premake.c \
     premake/src/host/lua-5.1.4/src/lzio.c \
     premake/src/host/lua-5.1.4/src/lvm.c \
@@ -91,7 +91,8 @@ SOURCES += \
     premake/src/host/os_getversion.c \
     premake/src/host/os_getcwd.c \
     premake/src/host/os_copyfile.c \
-    premake/src/host/os_chdir.c
+    premake/src/host/os_chdir.c \
+    premake/src/host/os_stat.c
 RESOURCES += premakeproject.qrc
 FORMS += premakemakestep.ui \
     makestep.ui

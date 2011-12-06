@@ -1,0 +1,3 @@
+[submodule "premake"]
+	path = premake
+	url = git@github.com:annulen/premake-annulen.git
