@@ -4,9 +4,13 @@ TARGET = PremakeProjectManager
 isEmpty(QTC_SOURCE): QTC_SOURCE = ../qt-creator
 isEmpty(QTC_BUILD): QTC_BUILD = $$QTC_SOURCE
 
-!exists($$QTC_BUILD/src/plugins/coreplugin/ide_version.h) {
+exists($$QTC_BUILD/src/app/app_version.h) {
+    DEFINES += USE_APP_VERSION
+}
+!exists($$QTC_BUILD/src/plugins/coreplugin/ide_version.h):!exists($$QTC_BUILD/src/app/app_version.h) {
     error("Please set QTC_BUILD to build directory of Qt Creator")
 }
+
 
 message("Qt Creator source code: QTC_SOURCE=$$QTC_SOURCE")
 message("Qt Creator binaries: QTC_BUILD=$$QTC_BUILD")

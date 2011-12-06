@@ -64,6 +64,12 @@ QString PremakeManager::mimeType() const
 
 ProjectExplorer::Project *PremakeManager::openProject(const QString &fileName)
 {
+    return openProject(fileName, 0);
+}
+
+ProjectExplorer::Project *PremakeManager::openProject(const QString &fileName, QString *errorString)
+{
+    Q_UNUSED(errorString)
     if (!QFileInfo(fileName).isFile())
         return 0;
 

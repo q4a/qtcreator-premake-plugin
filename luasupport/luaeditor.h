@@ -33,6 +33,8 @@
 #ifndef LUAEDITOR_H
 #define LUAEDITOR_H
 
+#include "luaconstants.h"
+
 #include <texteditor/plaintexteditor.h>
 #include <texteditor/basetextdocument.h>
 
@@ -60,7 +62,13 @@ public:
     virtual Core::IEditor *createEditor(QWidget *parent);
 
     virtual QStringList mimeTypes() const;
+
+#if IDE_VER >= IDE_VERSION_CHECK(2, 3, 80)
+    virtual Core::Id id() const;
+#else
     virtual QString id() const;
+#endif
+
     virtual QString displayName() const;
     virtual Core::IFile *open(const QString &fileName);
 
@@ -79,7 +87,6 @@ class LuaEditor : public TextEditor::PlainTextEditor
 public:
     LuaEditor(LuaEditorWidget *editorWidget);
     virtual ~LuaEditor();
-
     virtual Core::Context context() const;
     virtual QString id() const;
 

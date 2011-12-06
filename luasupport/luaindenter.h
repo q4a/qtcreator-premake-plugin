@@ -2,6 +2,7 @@
 #define LUAINDENTER_H
 
 #include <texteditor/indenter.h>
+#include <texteditor/tabsettings.h>
 
 namespace TextEditor {
 class BaseTextEditorWidget;
@@ -26,16 +27,10 @@ public:
                              const QTextBlock &block,
                              const QChar &typedChar,
                              TextEditor::BaseTextEditorWidget *editor);
-
     void indentBlock(QTextDocument *doc,
                              const QTextBlock &block,
                              const QChar &typedChar,
                              const TextEditor::TabSettings &tabSettings);
-
-    virtual void setCodeStylePreferences(TextEditor::IFallbackPreferences *preferences);
-private:
-    CppTools::CppCodeStyleSettings codeStyleSettings() const;
-    CppTools::CppCodeStylePreferences *m_luaCodeStylePreferences;
 };
 
 }

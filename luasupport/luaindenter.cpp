@@ -12,7 +12,6 @@
 using namespace LuaSupport;
 
 LuaIndenter::LuaIndenter()
-    : m_luaCodeStylePreferences(0)
 {}
 
 LuaIndenter::~LuaIndenter()
@@ -94,6 +93,9 @@ void LuaIndenter::indentBlock(QTextDocument *doc,
     }
 }
 
+/*
+TODO: do something useful
+
 CppTools::CppCodeStyleSettings LuaIndenter::codeStyleSettings() const
 {
     if (m_luaCodeStylePreferences)
@@ -101,12 +103,14 @@ CppTools::CppCodeStyleSettings LuaIndenter::codeStyleSettings() const
     return CppTools::CppCodeStyleSettings();
 }
 
-void LuaIndenter::setCodeStylePreferences(TextEditor::IFallbackPreferences *preferences)
+
+void LuaIndenter::setCodeStylePreferences(TextEditor::ICodeStylePreferences *preferences)
 {
-    // TODO: do something useful
     CppTools::CppCodeStylePreferences *luaCodeStylePreferences
             = qobject_cast<CppTools::CppCodeStylePreferences *>(preferences);
 
     if (luaCodeStylePreferences)
         m_luaCodeStylePreferences = luaCodeStylePreferences;
 }
+*/
+

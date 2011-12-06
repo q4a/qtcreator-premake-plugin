@@ -122,10 +122,17 @@ QStringList LuaEditorFactory::mimeTypes() const
     return m_mimeTypes;
 }
 
+#if IDE_VER >= IDE_VERSION_CHECK(2, 3, 80)
+Core::Id LuaEditorFactory::id() const
+{
+    return Core::Id(Constants::LUA_EDITOR_ID);
+}
+#else
 QString LuaEditorFactory::id() const
 {
     return QLatin1String(Constants::LUA_EDITOR_ID);
 }
+#endif
 
 QString LuaEditorFactory::displayName() const
 {
