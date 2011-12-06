@@ -22,7 +22,14 @@
 		projects  = true,
 		__configs = true,
 	}
-	
+
+-- do not cascade these fields from projects to configurations
+
+	local nocascade = 
+	{
+		makesettings = true,
+	}
+		
 -- leave these paths as absolute, rather than converting to project relative
 
 	local keeprelative =
@@ -116,14 +123,22 @@
 --
 
 	local function adjustpaths(location, obj)
+		function adjustpathlist(list)
+			for i, p in ipairs(list) do
+				list[i] = path.getrelative(location, p) 
+			end
+		end
+		
 		for name, value in pairs(obj) do
 			local field = premake.fields[name]
 			if field and value and not keeprelative[name] then
 				if field.kind == "path" then
 					obj[name] = path.getrelative(location, value) 
 				elseif field.kind == "dirlist" or field.kind == "filelist" then
-					for i, p in ipairs(value) do
-						value[i] = path.getrelative(location, p) 
+					adjustpathlist(value)
+				elseif field.kind == "keypath" then
+					for k,v in pairs(value) do
+						adjustpathlist(v)
 					end
 				end
 			end
@@ -142,11 +157,16 @@
 --    The source object, containing the settings to added to the destination.
 --
 
-	local function mergefield(kind, dest, src)
+	local function mergefield(kind, dest, src, nodedup)
 		local tbl = dest or { }
-		if kind == "keyvalue" then
+		if kind == "keyvalue" or kind == "keypath" then
 			for key, value in pairs(src) do
-				tbl[key] = value
+				tbl[key] = mergefield("list", tbl[key], value)
+			end
+		elseif nodedup then
+			for _, item in ipairs(src) do
+				table.insert(tbl, item)
+				tbl[item] = item
 			end
 		else
 			for _, item in ipairs(src) do
@@ -171,7 +191,7 @@
 				local field = premake.fields[fieldname]
 				if field then
 					if type(value) == "table" then
-						dest[fieldname] = mergefield(field.kind, dest[fieldname], value)
+						dest[fieldname] = mergefield(field.kind, dest[fieldname], value, field.nodedup)
 					else
 						dest[fieldname] = value
 					end

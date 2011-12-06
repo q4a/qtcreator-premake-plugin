@@ -4,13 +4,14 @@
 -- Copyright (c) 2002-2011 Jason Perkins and the Premake project
 --
 
+	premake.fields = {}
 
 --
 -- Here I define all of the getter/setter functions as metadata. The actual
 -- functions are built programmatically below.
 --
 	
-	premake.fields = 
+	local mainfields =
 	{
 		basedir =
 		{
@@ -54,6 +55,12 @@
 			scope = "config",
 		},
 
+		debugenvs  = 
+		{
+			kind = "list",
+			scope = "config",
+		},
+		
 		defines =
 		{
 			kind  = "list",
@@ -88,6 +95,8 @@
 			allowed = function(value)
 			
 				local allowed_flags = {
+					DebugEnvsDontMerge = 1,
+					DebugEnvsInherit = 1,
 					EnableSSE = 1,
 					EnableSSE2 = 1,
 					ExtraWarnings = 1,
@@ -253,6 +262,68 @@
 			kind  = "path",
 			scope = "container",
 		},
+
+		makeprjclean =
+		{
+			kind = "list",
+			scope = "config",
+			nodedup = true
+		},
+
+		makeprjconfig =
+		{
+			kind = "list",
+			scope = "config",
+			nodedup = true
+		},
+
+		makeprjheader =
+		{
+			kind = "list",
+			scope = "config",
+			nodedup = true
+		},
+
+		makeprjfooter =
+		{
+			kind = "list",
+			scope = "config",
+			nodedup = true
+		},
+
+		makeslnclean =
+		{
+			kind = "list",
+			scope = "solution",
+			nodedup = true
+		},
+
+		makeslnconfig =
+		{
+			kind = "list",
+			scope = "config",
+			nodedup = true
+		},
+
+		makeslnheader =
+		{
+			kind = "list",
+			scope = "solution",
+			nodedup = true
+		},
+
+		makeslnfooter =
+		{
+			kind = "list",
+			scope = "solution",
+			nodedup = true
+		},
+		
+		makesettings =
+		{
+			kind = "list",
+			scope = "config",
+		},
 		
 		objdir =
 		{
@@ -381,7 +452,7 @@
 		
 		vpaths = 
 		{
-			kind = "keyvalue",
+			kind = "keypath",
 			scope = "container",
 		},
 
@@ -458,8 +529,8 @@
 		
 		return container, msg
 	end
-	
-	
+
+
 	
 --
 -- Adds values to an array field of a solution/project/configuration. `ctype`
@@ -542,36 +613,30 @@
 -- specifies the container type (see premake.getobject) for the field.
 --
 
-	function premake.setkeyvalue(ctype, fieldname, value)
+	function premake.setkeyvalue(ctype, fieldname, values)
 		local container, err = premake.getobject(ctype)
 		if not container then
 			error(err, 4)
 		end
 		
 		if not container[fieldname] then
-			container[fieldname] = { }
+			container[fieldname] = {}
 		end
 
-		if type(value) ~= "table" then
+		if type(values) ~= "table" then
 			error("invalid value; table expected", 4)
 		end
 		
-		local result = container[fieldname]
+		local field = container[fieldname]
 		
-		local function doinsert(tbl, errordepth)
-			for key,value in pairs(tbl) do
-				if type(value) == "table" then
-					doinsert(value, errordepth + 1)
-				elseif type(key) == "string" and type(value) == "string" then
-					result[key] = value
-				else
-					error("invalid value; both key and value must be a string", errordepth)
-				end
+		for key,value in pairs(values) do
+			if not field[key] then
+				field[key] = {}
 			end
+			table.insertflat(field[key], value)
 		end
-		
-		doinsert(value, 4)		
-		return container[fieldname]
+
+		return field
 	end
 
 	
@@ -628,23 +693,39 @@
 			return premake.setdirarray(scope, name, value)
 		elseif kind == "filelist" then
 			return premake.setfilearray(scope, name, value)
-		elseif kind == "keyvalue" then
+		elseif kind == "keyvalue" or kind == "keypath" then
 			return premake.setkeyvalue(scope, name, value)
 		end
 	end
 
+--
+-- Builds accessor function from given metadata.
+--
+function newapi(field)
+	premake.fields[field.name] = field
+	_G[field.name] = function(value)
+		return accessor(field.name, value)
+	end
+end
+
+--
+-- Builds getter/setter functions from given metadata.
+--
+function newapis(fields)
+
+	for name, field in pairs(fields) do
+		premake.fields[name] = field
+		_G[name] = function(value)
+			return accessor(name, value)
+		end
+	end
+end
 
 
 --
 -- Build all of the getter/setter functions from the metadata above.
 --
-	
-	for name,_ in pairs(premake.fields) do
-		_G[name] = function(value)
-			return accessor(name, value)
-		end
-	end
-	
+newapis(mainfields)
 
 
 --
