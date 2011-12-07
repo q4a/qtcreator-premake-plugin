@@ -78,20 +78,16 @@ end
 newaction {
     trigger = '_qtcreator',
     description = '',
-    execute = function()
-        _qtcreator_scriptdepends = premake.scriptdepends
-        for sln in premake.solution.each()  do
-            for _, prj in ipairs(sln.projects) do
-                for _,file in ipairs(premake.getconfig(prj).files) do
-                    table.insert(_qtcreator_files, path.getabsolute(path.join(prj.location, file)))
-                end
-                for _,def in ipairs(premake.getconfig(prj).defines) do
-                    table.insert(_qtcreator_defines, def)
-                end
-                for _,idir in ipairs(premake.getconfig(prj).includedirs) do
-                    table.insert(_qtcreator_includes, idir)
-                end
-            end
+    onproject = function(prj)
+        -- FIXME: use active configuration
+        for _,file in ipairs(premake.getconfig(prj).files) do
+            table.insert(_qtcreator_files, path.getabsolute(path.join(prj.location, file)))
+        end
+        for _,def in ipairs(premake.getconfig(prj).defines) do
+            table.insert(_qtcreator_defines, def)
+        end
+        for _,idir in ipairs(premake.getconfig(prj).includedirs) do
+            table.insert(_qtcreator_includes, idir)
         end
     end
 }
