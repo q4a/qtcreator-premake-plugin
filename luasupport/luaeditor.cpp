@@ -316,6 +316,18 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
         link.begin = cursor.position() - positionInBlock + beginPos + 1;
         link.end = cursor.position() - positionInBlock + endPos;
     }
+
+    // require "fileName"
+    // TODO: Support custom module paths
+    // TODO: Check if it's really 'require'
+    fileName.append(".lua");
+    fi.setFile(fileName);
+    if (fi.exists()) {
+        link.fileName = fileName;
+        link.begin = cursor.position() - positionInBlock + beginPos + 1;
+        link.end = cursor.position() - positionInBlock + endPos;
+    }
+
     return link;
 }
 
