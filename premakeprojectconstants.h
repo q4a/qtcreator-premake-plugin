@@ -47,7 +47,7 @@ namespace PremakeProjectManager {
 namespace Constants {
 
 const char *const PROJECTCONTEXT     = "PremakeProject.ProjectContext";
-const char *const PREMAKEMIMETYPE    = "text/x-premake";
+const char *const PREMAKEMIMETYPE    = "application/vnd.premake";
 
 // kinds
 const char *const PROJECT_KIND       = "Premake";

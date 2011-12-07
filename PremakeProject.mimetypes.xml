@@ -10,7 +10,7 @@
     </magic>
     <glob pattern="*.lua"/>
   </mime-type>
-  <mime-type type="text/x-premake">
+  <mime-type type="application/vnd.premake">
     <sub-class-of type="text/x-lua"/>
     <comment>Premake 4 Project file</comment>
     <glob pattern="premake4.lua"/>
