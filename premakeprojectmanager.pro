@@ -111,14 +111,21 @@ macx {
     DEFINES += LUA_USE_MACOSX
 }
 
+win32 {
+    DEFINES += _CRT_SECURE_NO_WARNINGS
+    LIBS += -luser32
+}
+
 !macx {
     lua_highlight.target = $$QTC_BUILD/share/qtcreator/generic-highlighter/lua.xml
 } else {
     lua_highlight.target = $$IDE_DATA_PATH/generic-highlighter/lua.xml
 }
-lua_highlight.commands = $$QMAKE_COPY generic-highlighter/lua.xml \"$$lua_highlight.target\"
-QMAKE_EXTRA_TARGETS += lua_highlight
-PRE_TARGETDEPS += $$lua_highlight.target
+!win32 {
+    lua_highlight.commands = $$QMAKE_COPY generic-highlighter/lua.xml \"$$lua_highlight.target\"
+    QMAKE_EXTRA_TARGETS += lua_highlight
+    PRE_TARGETDEPS += $$lua_highlight.target
+}
 
 ## Installation ##
 !isEmpty(QTC_INSTALL_ROOT) {
