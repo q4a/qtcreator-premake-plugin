@@ -113,7 +113,7 @@ macx {
 
 win32 {
     DEFINES += _CRT_SECURE_NO_WARNINGS
-    LIBS += -luser32
+    LIBS += -luser32 -lole32
 }
 
 !macx {

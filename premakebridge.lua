@@ -77,7 +77,7 @@ end
 
 newaction {
     trigger = '_qtcreator',
-    description = '',
+    isinternal = true,
     onproject = function(prj)
         -- FIXME: use active configuration
         for _,file in ipairs(premake.getconfig(prj).files) do
