@@ -9,6 +9,7 @@
         <dependency name=\"TextEditor\" version=\"$$QTCREATOR_VERSION\"/>
         <dependency name=\"ProjectExplorer\" version=\"$$QTCREATOR_VERSION\"/>
         <dependency name=\"CppTools\" version=\"$$QTCREATOR_VERSION\"/>
+        <dependency name=\"QtSupport\" version=\"$$QTCREATOR_VERSION\"/>
         <dependency name=\"Designer\" version=\"$$QTCREATOR_VERSION\" type=\"optional\"/>
     </dependencyList>
 </plugin>

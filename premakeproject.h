@@ -150,10 +150,6 @@ public:
     PremakeProjectFile(PremakeProject *parent, QString fileName);
     virtual ~PremakeProjectFile();
 
-#if IDE_VER < IDE_VERSION_CHECK(2,2,80)
-    virtual bool save(const QString &fileName = QString()) { return save(0, fileName); }
-    virtual void reload(ReloadFlag flag, ChangeType type) { reload(0, flag, type); }
-#endif
     virtual bool save(QString *errorString, const QString &fileName = QString(), bool autoSave = false);
     virtual QString fileName() const;
 

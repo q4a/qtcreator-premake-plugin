@@ -43,12 +43,8 @@
 #include <projectexplorer/projectexplorer.h>
 #include <projectexplorer/projectexplorerconstants.h>
 #include <extensionsystem/pluginmanager.h>
+#include <qtsupport/qtparser.h>
 #include <utils/qtcprocess.h>
-#if IDE_VER >= IDE_VERSION_CHECK(2,2,80)
-    #include <qtsupport/qtparser.h>
-#else
-    #include <qt4projectmanager/qtparser.h>
-#endif
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
