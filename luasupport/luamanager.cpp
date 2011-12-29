@@ -78,10 +78,10 @@ lua_State * LuaManager::luaStateForGenerating(const QString &fileName,
     argv[1] = file.data();
     if(shadowBuild) {
         argv[2] = to.data();
-        argv[3] = "_qtcreator_generate";
+        argv[3] = "gmake";
         argc = 4;
     } else {
-        argv[2] = "_qtcreator_generate";
+        argv[2] = "gmake";
         argc = 3;
     }
 

@@ -78,6 +78,7 @@ end
 newaction {
     trigger = '_qtcreator',
     isinternal = true,
+    depends = { 'qt' },
     onproject = function(prj)
         -- FIXME: use active configuration
         for _,file in ipairs(premake.getconfig(prj).files) do
@@ -92,15 +93,3 @@ newaction {
     end
 }
 
-newaction {
-    trigger = '_qtcreator_generate',
-    description = '',
-    shortname = "Qt Creator",
-    valid_kinds = premake.action.get("gmake").valid_kinds,
-    valid_languages = premake.action.get("gmake").valid_languages,
-    valid_tools = premake.action.get("gmake").valid_tools,
-
-    execute = function()
-        premake.action.call("gmake")
-    end
-}
