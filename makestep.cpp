@@ -203,20 +203,18 @@ bool MakeStep::init()
     setEnabled(true);
     pp->setArguments(args);
 
-//    ProjectExplorer::IOutputParser *parser = 0;
-//    if (bc->qtVersion())
-//        parser = bc->qtVersion()->createOutputParser();
-//    if (parser)
-//        parser->appendOutputParser(new QtSupport::QtParser);
-//    else
-//        parser = new QtSupport::QtParser;
-//    if (toolchain)
-//        parser->appendOutputParser(toolchain->outputParser());
+    ProjectExplorer::IOutputParser *parser = 0;
+    if (bc->qtVersion())
+        parser = bc->qtVersion()->createOutputParser();
+    if (parser)
+        parser->appendOutputParser(new QtSupport::QtParser);
+    else
+        parser = new QtSupport::QtParser;
+    if (toolchain)
+        parser->appendOutputParser(toolchain->outputParser());
 
-//    parser->setWorkingDirectory(workingDirectory);
-
-//    setOutputParser(parser);
-
+    parser->setWorkingDirectory(workingDirectory);
+    setOutputParser(parser);
     return AbstractProcessStep::init();
 }
 

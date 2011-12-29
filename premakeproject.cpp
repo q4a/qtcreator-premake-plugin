@@ -477,6 +477,10 @@ void PremakeBuildSettingsWidget::updateToolChainList()
         m_toolChainChooser->setCurrentIndex(0);
     }
     foreach (ToolChain *tc, tcs) {
+        // We don't support MSVC yet
+        if (tc->id().startsWith(ProjectExplorer::Constants::MSVC_TOOLCHAIN_ID))
+            continue;
+
         m_toolChainChooser->addItem(tc->displayName(), qVariantFromValue(static_cast<void *>(tc)));
         if (m_target->premakeProject()->toolChain()
                 && m_target->premakeProject()->toolChain()->id() == tc->id())

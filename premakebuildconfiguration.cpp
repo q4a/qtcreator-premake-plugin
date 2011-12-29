@@ -44,9 +44,11 @@
 
 #include <QtGui/QInputDialog>
 
+using namespace ProjectExplorer;
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
 using ProjectExplorer::BuildConfiguration;
+using namespace QtSupport;
 
 namespace {
 const char * const PREMAKE_BC_ID("PremakeProjectManager.PremakeBuildConfiguration");
@@ -248,8 +250,23 @@ QString PremakeBuildConfiguration::projectFileName() const
     return m_fileName;
 }
 
-QtSupport::BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
+BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
 {
+    QtSupport::QtVersionManager *vm = QtVersionManager::instance();
+    foreach (BaseQtVersion *ver, vm->validVersions()) {
+        foreach (Abi abi, ver->qtAbis()) {
+            qDebug() << Q_FUNC_INFO << "ABI" << abi.toString();
+            if ((abi.osFlavor() == Abi::WindowsMsvc2005Flavor)
+              || (abi.osFlavor() == Abi::WindowsMsvc2008Flavor)
+              || (abi.osFlavor() == Abi::WindowsMsvc2010Flavor))
+            {
+                qDebug() << "Skipping" << abi.toString();
+            } else {
+                return ver;
+            }
+        }
+    }
+
     return 0;
 }
 
@@ -259,7 +276,8 @@ void PremakeBuildConfiguration::setQtVersion(QtSupport::BaseQtVersion *)
 
 QString PremakeBuildConfiguration::makeCommand() const
 {
-    return QString("make");
+    ToolChain *tc = toolChain();
+    return tc ? tc->makeCommand() : "make";
 }
 
 QString PremakeBuildConfiguration::defaultMakeTarget() const
