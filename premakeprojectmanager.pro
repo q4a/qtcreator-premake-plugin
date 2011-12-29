@@ -3,6 +3,7 @@ TARGET = PremakeProjectManager
 
 isEmpty(QTC_SOURCE): QTC_SOURCE = ../qt-creator
 isEmpty(QTC_BUILD): QTC_BUILD = $$QTC_SOURCE
+macx:isEmpty(QTC_INSTALL_ROOT): QTC_INSTALL_ROOT = "$$QTC_BUILD/bin/Qt Creator.app"
 
 exists($$QTC_BUILD/src/app/app_version.h) {
     DEFINES += USE_APP_VERSION
