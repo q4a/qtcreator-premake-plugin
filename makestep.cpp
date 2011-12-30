@@ -40,6 +40,8 @@
 
 #include <projectexplorer/toolchain.h>
 #include <projectexplorer/buildsteplist.h>
+#include <projectexplorer/gcctoolchain.h>
+#include <projectexplorer/gcctoolchainfactories.h>
 #include <projectexplorer/projectexplorer.h>
 #include <projectexplorer/projectexplorerconstants.h>
 #include <extensionsystem/pluginmanager.h>
@@ -199,6 +201,15 @@ bool MakeStep::init()
             && toolchain->targetAbi().binaryFormat() != ProjectExplorer::Abi::PEFormat
             && m_makeCmd.isEmpty())
         Utils::QtcProcess::addArg(&args, QLatin1String("-w"));
+
+    if (toolchain) {
+         ProjectExplorer::GccToolChain *gcctc = dynamic_cast<ProjectExplorer::GccToolChain *>(toolchain);
+         if (gcctc) {
+             const QString cc = gcctc->compilerPath().replace(QRegExp("g\\+\\+$"), "gcc");
+             Utils::QtcProcess::addArg(&args, QLatin1String("CC=") + cc);
+             Utils::QtcProcess::addArg(&args, QLatin1String("CXX=") + gcctc->compilerPath());
+         }
+    }
 
     setEnabled(true);
     pp->setArguments(args);
