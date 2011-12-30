@@ -111,6 +111,11 @@ public:
     ProjectExplorer::BuildConfiguration *restore(ProjectExplorer::Target *parent, const QVariantMap &map);
 };
 
-} // namespace PremakeProjectManager
 } // namespace Internal
+} // namespace PremakeProjectManager
+
+
+// Helper function
+bool abiIsMsvc(ProjectExplorer::Abi abi);
+
 #endif // PREMAKEBUILDCONFIGURATION_H

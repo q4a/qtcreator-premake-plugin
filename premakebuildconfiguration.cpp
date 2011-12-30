@@ -256,14 +256,10 @@ BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
     foreach (BaseQtVersion *ver, vm->validVersions()) {
         foreach (Abi abi, ver->qtAbis()) {
             qDebug() << Q_FUNC_INFO << "ABI" << abi.toString();
-            if ((abi.osFlavor() == Abi::WindowsMsvc2005Flavor)
-              || (abi.osFlavor() == Abi::WindowsMsvc2008Flavor)
-              || (abi.osFlavor() == Abi::WindowsMsvc2010Flavor))
-            {
+            if (abiIsMsvc(abi))
                 qDebug() << "Skipping" << abi.toString();
-            } else {
+            else
                 return ver;
-            }
         }
     }
 
@@ -299,5 +295,16 @@ void PremakeBuildConfiguration::setShadowBuildEnabled(bool enabled)
 {
     m_shadowBuildEnabled = enabled;
     emit shadowBuildChanged();
+}
+
+bool abiIsMsvc(ProjectExplorer::Abi abi)
+{
+    if ((abi.osFlavor() == Abi::WindowsMsvc2005Flavor)
+      || (abi.osFlavor() == Abi::WindowsMsvc2008Flavor)
+      || (abi.osFlavor() == Abi::WindowsMsvc2010Flavor))
+    {
+        return true;
+    }
+    return false;
 }
 
