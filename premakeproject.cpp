@@ -363,24 +363,35 @@ bool PremakeProject::fromMap(const QVariantMap &map)
     if (targets().isEmpty()) {
         PremakeTargetFactory *factory =
                 ExtensionSystem::PluginManager::instance()->getObject<PremakeTargetFactory>();
-        addTarget(factory->create(this, QLatin1String(PREMAKE_DESKTOP_TARGET_ID)));
+        Target *t = factory->create(this, QLatin1String(PREMAKE_DESKTOP_TARGET_ID));
+
+        QString id = map.value(QLatin1String(TOOLCHAIN_KEY)).toString();
+        const ToolChainManager *toolChainManager = ToolChainManager::instance();
+
+        if (!id.isNull()) {
+            t->activeBuildConfiguration()->setToolChain(toolChainManager->findToolChain(id));
+        } else {
+            ProjectExplorer::Abi abi = ProjectExplorer::Abi::hostAbi();
+            abi = ProjectExplorer::Abi(abi.architecture(), abi.os(),  ProjectExplorer::Abi::UnknownFlavor,
+                                       abi.binaryFormat(), abi.wordWidth() == 32 ? 32 : 0);
+            QList<ToolChain *> tcs = toolChainManager->findToolChains(abi);
+            if (tcs.isEmpty())
+                tcs = toolChainManager->toolChains();
+            if (!tcs.isEmpty()) {
+                foreach (ToolChain *tc, tcs) {
+                    // We don't support MSVC yet
+                    if (abiIsMsvc(tc->targetAbi()))
+                        continue;
+
+                    t->activeBuildConfiguration()->setToolChain(tc);
+                }
+            }
+        }
+        addTarget(t);
     }
 
-    QString id = map.value(QLatin1String(TOOLCHAIN_KEY)).toString();
-    const ToolChainManager *toolChainManager = ToolChainManager::instance();
 
-    if (!id.isNull()) {
-        setToolChain(toolChainManager->findToolChain(id));
-    } else {
-        ProjectExplorer::Abi abi = ProjectExplorer::Abi::hostAbi();
-        abi = ProjectExplorer::Abi(abi.architecture(), abi.os(),  ProjectExplorer::Abi::UnknownFlavor,
-                                   abi.binaryFormat(), abi.wordWidth() == 32 ? 32 : 0);
-        QList<ToolChain *> tcs = toolChainManager->findToolChains(abi);
-        if (tcs.isEmpty())
-            tcs = toolChainManager->toolChains();
-        if (!tcs.isEmpty())
-            setToolChain(tcs.at(0));
-    }
+
 
     setIncludePaths(allIncludePaths());
 
@@ -453,7 +464,7 @@ void PremakeBuildSettingsWidget::toolChainSelected(int index)
     using namespace ProjectExplorer;
 
     ToolChain *tc = static_cast<ToolChain *>(m_toolChainChooser->itemData(index).value<void *>());
-    m_target->premakeProject()->setToolChain(tc);
+    m_target->activeBuildConfiguration()->setToolChain(tc);
 }
 
 void PremakeBuildSettingsWidget::toolChainChanged(ProjectExplorer::ToolChain *tc)
@@ -472,7 +483,7 @@ void PremakeBuildSettingsWidget::updateToolChainList()
     m_toolChainChooser->clear();
 
     QList<ToolChain *> tcs = ToolChainManager::instance()->toolChains();
-    if (!m_target->premakeProject()->toolChain()) {
+    if (!m_target->activeBuildConfiguration()->toolChain()) {
         m_toolChainChooser->addItem(tr("<Invalid tool chain>"), qVariantFromValue(static_cast<void *>(0)));
         m_toolChainChooser->setCurrentIndex(0);
     }
@@ -482,9 +493,11 @@ void PremakeBuildSettingsWidget::updateToolChainList()
             continue;
 
         m_toolChainChooser->addItem(tc->displayName(), qVariantFromValue(static_cast<void *>(tc)));
-        if (m_target->premakeProject()->toolChain()
-                && m_target->premakeProject()->toolChain()->id() == tc->id())
+        if (m_target->activeBuildConfiguration()->toolChain()
+                && m_target->activeBuildConfiguration()->toolChain()->id() == tc->id())
             m_toolChainChooser->setCurrentIndex(m_toolChainChooser->count() - 1);
+        if (!m_target->activeBuildConfiguration()->toolChain())
+            m_target->activeBuildConfiguration()->setToolChain(tc);
     }
 }
 

@@ -126,7 +126,7 @@ PremakeTarget *PremakeBuildConfiguration::premakeTarget() const
 
 ProjectExplorer::IOutputParser *PremakeBuildConfiguration::createOutputParser() const
 {
-    ProjectExplorer::ToolChain *tc = premakeTarget()->premakeProject()->toolChain();
+    ProjectExplorer::ToolChain *tc = toolChain();
     if (tc)
         return tc->outputParser();
     return 0;
