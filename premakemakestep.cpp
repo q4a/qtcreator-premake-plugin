@@ -81,7 +81,6 @@ PremakeMakeStep::PremakeMakeStep(ProjectExplorer::BuildStepList *parent, const Q
 
 PremakeMakeStep::PremakeMakeStep(ProjectExplorer::BuildStepList *parent, PremakeMakeStep *bs) :
     BuildStep(parent, bs),
-    m_buildTargets(bs->m_buildTargets),
     m_premakeArguments(bs->m_premakeArguments)
 {
     ctor();
@@ -127,8 +126,6 @@ bool PremakeMakeStep::init()
 QVariantMap PremakeMakeStep::toMap() const
 {
     QVariantMap map(BuildStep::toMap());
-
-    map.insert(QLatin1String(BUILD_TARGETS_KEY), m_buildTargets);
     map.insert(QLatin1String(MAKE_ARGUMENTS_KEY), m_premakeArguments);
     return map;
 }
@@ -184,21 +181,6 @@ bool PremakeMakeStep::immutable() const
     return false;
 }
 
-bool PremakeMakeStep::buildsTarget(const QString &target) const
-{
-    return m_buildTargets.contains(target);
-}
-
-void PremakeMakeStep::setBuildTarget(const QString &target, bool on)
-{
-    QStringList old = m_buildTargets;
-    if (on && !old.contains(target))
-         old << target;
-    else if(!on && old.contains(target))
-        old.removeOne(target);
-
-    m_buildTargets = old;
-}
 
 //
 // PremakeMakeStepConfigWidget

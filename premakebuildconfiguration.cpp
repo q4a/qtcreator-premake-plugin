@@ -202,7 +202,6 @@ PremakeBuildConfiguration *PremakeBuildConfigurationFactory::createBuildConfigur
     Q_ASSERT(cleanSteps);
     PremakeMakeStep *premakeStep = new PremakeMakeStep(buildSteps);
     buildSteps->insertStep(0, premakeStep);
-    premakeStep->setBuildTarget("all", /* on = */ true);
 
     MakeStep *makeStep = new MakeStep(buildSteps);
     buildSteps->insertStep(1, makeStep);

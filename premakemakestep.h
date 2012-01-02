@@ -68,8 +68,6 @@ public:
 
     virtual ProjectExplorer::BuildStepConfigWidget *createConfigWidget();
     virtual bool immutable() const;
-    bool buildsTarget(const QString &target) const;
-    void setBuildTarget(const QString &target, bool on);
     QString allArguments() const;
 
     QVariantMap toMap() const;
