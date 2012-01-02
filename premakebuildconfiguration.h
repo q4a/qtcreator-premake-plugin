@@ -109,6 +109,7 @@ public:
     ProjectExplorer::BuildConfiguration *clone(ProjectExplorer::Target *parent, ProjectExplorer::BuildConfiguration *source);
     bool canRestore(ProjectExplorer::Target *parent, const QVariantMap &map) const;
     ProjectExplorer::BuildConfiguration *restore(ProjectExplorer::Target *parent, const QVariantMap &map);
+    PremakeBuildConfiguration *createBuildConfiguration(PremakeTarget *parent, const QString &name);
 };
 
 } // namespace Internal

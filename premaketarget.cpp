@@ -152,22 +152,8 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
     PremakeTarget *t = new PremakeTarget(project);
 
     // Set up BuildConfiguration:
-    PremakeBuildConfiguration *bc = new PremakeBuildConfiguration(t);
-    bc->setDisplayName("all");
-
-    ProjectExplorer::BuildStepList *buildSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_BUILD);
-    ProjectExplorer::BuildStepList *cleanSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_CLEAN);
-
-    PremakeMakeStep *premakeStep = new PremakeMakeStep(buildSteps);
-    buildSteps->insertStep(0, premakeStep);
-    premakeStep->setBuildTarget("all", /* on = */ true);
-    MakeStep *makeStep = new MakeStep(buildSteps);
-    buildSteps->insertStep(1, makeStep);
-
-    MakeStep* cleanStep = new MakeStep(cleanSteps);
-    cleanStep->setClean(true);
-    cleanStep->setUserArguments("clean");
-    cleanSteps->insertStep(0, cleanStep);
+    PremakeBuildConfiguration *bc = static_cast<PremakeBuildConfiguration *>
+            (t->buildConfigurationFactory()->createBuildConfiguration(t, "all"));
 
     bc->setBuildDirectory(project->projectDirectory());
 

@@ -51,14 +51,12 @@ using ProjectExplorer::BuildConfiguration;
 using namespace QtSupport;
 
 namespace {
-const char * const PREMAKE_BC_ID("PremakeProjectManager.PremakeBuildConfiguration");
-
 const char * const BUILD_DIRECTORY_KEY("PremakeProjectManager.PremakeBuildConfiguration.BuildDirectory");
 const char * const SHADOW_BUILD_KEY("PremakeProjectManager.PremakeBuildConfiguration.ShadowBuild");
 }
 
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
-    : BuildConfiguration(parent, QLatin1String(PREMAKE_BC_ID))
+    : BuildConfiguration(parent, QLatin1String(Constants::PREMAKE_BC_ID))
     , m_fileName(parent->premakeProject()->file()->fileName())
 {
 }
@@ -150,12 +148,12 @@ QStringList PremakeBuildConfigurationFactory::availableCreationIds(ProjectExplor
 {
     if (!qobject_cast<PremakeTarget *>(parent))
         return QStringList();
-    return QStringList() << QLatin1String(PREMAKE_BC_ID);
+    return QStringList() << QLatin1String(Constants::PREMAKE_BC_ID);
 }
 
 QString PremakeBuildConfigurationFactory::displayNameForId(const QString &id) const
 {
-    if (id == QLatin1String(PREMAKE_BC_ID))
+    if (id == QLatin1String(Constants::PREMAKE_BC_ID))
         return tr("Build");
     return QString();
 }
@@ -164,7 +162,7 @@ bool PremakeBuildConfigurationFactory::canCreate(ProjectExplorer::Target *parent
 {
     if (!qobject_cast<PremakeTarget *>(parent))
         return false;
-    if (id == QLatin1String(PREMAKE_BC_ID))
+    if (id == QLatin1String(Constants::PREMAKE_BC_ID))
         return true;
     return false;
 }
@@ -173,7 +171,6 @@ BuildConfiguration *PremakeBuildConfigurationFactory::create(ProjectExplorer::Ta
 {
     if (!canCreate(parent, id))
         return 0;
-    PremakeTarget *target(static_cast<PremakeTarget *>(parent));
 
     //TODO asking for name is duplicated everywhere, but maybe more
     // wizards will show up, that incorporate choosing the name
@@ -186,8 +183,18 @@ BuildConfiguration *PremakeBuildConfigurationFactory::create(ProjectExplorer::Ta
                           &ok);
     if (!ok || buildConfigurationName.isEmpty())
         return false;
-    PremakeBuildConfiguration *bc = new PremakeBuildConfiguration(target);
-    bc->setDisplayName(buildConfigurationName);
+
+    PremakeBuildConfiguration *bc = createBuildConfiguration(static_cast<PremakeTarget *>(parent),
+                                                             buildConfigurationName);
+    parent->addBuildConfiguration(bc); // also makes the name unique...
+    return bc;
+}
+
+PremakeBuildConfiguration *PremakeBuildConfigurationFactory::createBuildConfiguration(PremakeTarget *parent,
+                                                                                      const QString &name)
+{
+    PremakeBuildConfiguration *bc = new PremakeBuildConfiguration(parent);
+    bc->setDisplayName(name);
 
     ProjectExplorer::BuildStepList *buildSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_BUILD);
     ProjectExplorer::BuildStepList *cleanSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_CLEAN);
@@ -205,7 +212,6 @@ BuildConfiguration *PremakeBuildConfigurationFactory::create(ProjectExplorer::Ta
     cleanStep->setUserArguments("clean");
     cleanSteps->insertStep(0, cleanStep);
 
-    target->addBuildConfiguration(bc); // also makes the name unique...
     return bc;
 }
 

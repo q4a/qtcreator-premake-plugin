@@ -54,6 +54,7 @@ const char *const PROJECT_KIND       = "Premake";
 
 // Project
 const char *const PREMAKEPROJECT_ID  = "PremakeProjectManager.PremakeProject";
+const char *const PREMAKE_BC_ID = "PremakeProjectManager.PremakeBuildConfiguration";
 
 // ICONS
 const char * const ICON_PREMAKE   = ":/premakeproject/images/premake.png";

@@ -48,7 +48,7 @@ namespace PremakeProjectManager {
 
 namespace Internal {
 
-const char * const PREMAKE_DESKTOP_TARGET_ID("PremakeProjectManager.PremakeTarget");
+const char * const PREMAKE_DESKTOP_TARGET_ID = "PremakeProjectManager.Target.DesktopTarget";
 
 class PremakeProject;
 class PremakeRunConfiguration;
