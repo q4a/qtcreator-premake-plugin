@@ -137,6 +137,9 @@ void PremakeProject::parseProject(RefreshOptions options)
 {
     qDebug() << Q_FUNC_INFO;
 
+    const QHash<QString,QString> qtInfo
+            = activeTarget()->activeBuildConfiguration()->qtVersion()->versionInfo();
+
     /// @todo Create a persistent lua state with all built-in scripts loaded
     /// and clone it before loading project
     lua_State *L = LuaManager::instance()->luaStateForParsing(m_fileName);
@@ -167,6 +170,7 @@ void PremakeProject::parseProject(RefreshOptions options)
 
     if (options & Files) {
         getLuaTable(L, "_qtcreator_files", m_files);
+        getLuaTable(L, "_qtcreator_generated_files", m_generated);
         getLuaTable(L, "_qtcreator_scriptdepends", m_scriptDepends);
         m_scriptDepends.removeDuplicates();
         foreach(const QString &file, m_files) {
@@ -176,13 +180,20 @@ void PremakeProject::parseProject(RefreshOptions options)
 
     if (options & Configuration) {
         getLuaTable(L, "_qtcreator_includes", m_includePaths);
-        qWarning() << m_includePaths;
+        m_includePaths.removeDuplicates();
+        for (int i=0; i<m_includePaths.size(); ++i) {
+            m_includePaths[i].replace("$(QT_INCLUDE)", qtInfo.value("QT_INSTALL_HEADERS"));
+            m_includePaths[i].replace("$(QT_LIB)", qtInfo.value("QT_INSTALL_LIBS"));
+        }
+//        qDebug() << Q_FUNC_INFO << "m_includePaths=" << m_includePaths;
+
         QStringList defines;
         getLuaTable(L, "_qtcreator_defines", defines);
+        defines.removeDuplicates();
         m_defines.clear();
         foreach(const QString &def, defines)
             m_defines += QString("#define %1\n").arg(def).replace('=', ' ').toLocal8Bit();
-        qWarning() << m_defines;
+//        qWarning() << m_defines;
     }
 
     if (options & Files)
@@ -207,12 +218,14 @@ void PremakeProject::refresh(RefreshOptions options)
 
     if (modelManager) {
         CPlusPlus::CppModelManagerInterface::ProjectInfo pinfo = modelManager->projectInfo(this);
+//        qDebug() << Q_FUNC_INFO << "pinfo.sourceFiles=" << pinfo.sourceFiles;
 
-        if (m_toolChain) {
-            pinfo.defines = m_toolChain->predefinedMacros();
+        ToolChain *tc = activeTarget()->activeBuildConfiguration()->toolChain();
+        if (tc) {
+            pinfo.defines = tc->predefinedMacros();
             pinfo.defines += '\n';
 
-            foreach (const HeaderPath &headerPath, m_toolChain->systemHeaderPaths()) {
+            foreach (const HeaderPath &headerPath, tc->systemHeaderPaths()) {
                 if (headerPath.kind() == HeaderPath::FrameworkHeaderPath)
                     pinfo.frameworkPaths.append(headerPath.path());
                 else
@@ -231,7 +244,7 @@ void PremakeProject::refresh(RefreshOptions options)
 
         if (options & Configuration) {
             filesToUpdate = pinfo.sourceFiles;
-            filesToUpdate.append(QLatin1String("<configuration>")); // XXX don't hardcode configuration file name
+            filesToUpdate.prepend(QLatin1String("<configuration>")); // XXX don't hardcode configuration file name
             // Full update, if there's a code model update, cancel it
             m_codeModelFuture.cancel();
         } else if (options & Files) {
@@ -264,8 +277,8 @@ QStringList PremakeProject::files() const
 QStringList PremakeProject::scriptDepends() const
 { return m_scriptDepends; }
 
-//QStringList PremakeProject::generated() const
-//{ return m_generated; }
+QStringList PremakeProject::generated() const
+{ return m_generated; }
 
 QStringList PremakeProject::includePaths() const
 { return m_includePaths; }

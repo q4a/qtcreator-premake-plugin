@@ -302,6 +302,18 @@ void PremakeBuildConfiguration::setShadowBuildEnabled(bool enabled)
     emit shadowBuildChanged();
 }
 
+Utils::Environment PremakeBuildConfiguration::baseEnvironment() const
+{
+    Utils::Environment env = BuildConfiguration::baseEnvironment();
+    if (qtVersion())
+        qtVersion()->addToEnvironment(env);
+
+    ToolChain *tc = toolChain();
+    if (tc)
+        tc->addToEnvironment(env);
+    return env;
+}
+
 bool abiIsMsvc(ProjectExplorer::Abi abi)
 {
     if ((abi.osFlavor() == Abi::WindowsMsvc2005Flavor)

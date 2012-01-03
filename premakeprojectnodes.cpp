@@ -143,7 +143,8 @@ void PremakeProjectNode::refresh()
         QList<FileNode *> fileNodes;
         foreach (const QString &file, filesInPath.value(filePath)) {
             FileType fileType = SourceType; // ### FIXME
-            FileNode *fileNode = new FileNode(file, fileType, /*generated = */ false);
+            const bool generated = m_project->generated().contains(baseDir.relativeFilePath(file));
+            FileNode *fileNode = new FileNode(file, fileType, generated);
             fileNodes.append(fileNode);
         }
 

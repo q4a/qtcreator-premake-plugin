@@ -111,12 +111,12 @@ public:
     QByteArray defines() const;
     QStringList allIncludePaths() const;
     QStringList files() const;
+    QStringList generated() const;
     QStringList scriptDepends() const;
     ProjectExplorer::ToolChain *toolChain() const;
     void setToolChain(ProjectExplorer::ToolChain *tc);
 
     QVariantMap toMap() const;
-
 
 signals:
     void toolChainChanged(ProjectExplorer::ToolChain *);
@@ -133,6 +133,7 @@ private:
     QString m_projectName;
 
     QStringList m_files;
+    QStringList m_generated;
     QStringList m_scriptDepends;
     QStringList m_includePaths;
     QByteArray m_defines;

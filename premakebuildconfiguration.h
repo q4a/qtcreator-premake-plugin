@@ -78,6 +78,7 @@ public:
     bool shadowBuildEnabled() const;
     void setShadowBuildEnabled(bool enabled);
 
+    Utils::Environment baseEnvironment() const;
 signals:
     void shadowBuildChanged();
 

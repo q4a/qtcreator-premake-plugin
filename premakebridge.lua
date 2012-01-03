@@ -29,6 +29,7 @@
 --
 
 _qtcreator_files = {}
+_qtcreator_generated_files = {}
 _qtcreator_includes = {}
 _qtcreator_defines = {}
 _qtcreator_scriptdepends = {}
@@ -80,14 +81,38 @@ newaction {
     isinternal = true,
     depends = { 'qt' },
     onproject = function(prj)
+        print("Starting project " .. prj.name)
+        -- TODO: Query Makefile variable values directly
+
+        -- Uses first configuration
         -- FIXME: use active configuration
-        for _,file in ipairs(premake.getconfig(prj).files) do
-            table.insert(_qtcreator_files, path.getabsolute(path.join(prj.location, file)))
+        local cfgname = prj.solution.configurations[1]
+        local cfg = premake.getconfig(prj, cfgname, "Native")
+        print(cfg.objectsdir)
+        local mocdir = cfg.mocdir or cfg.objectsdir
+        local uidir = cfg.uidir or cfg.objectsdir
+        local rccdir = cfg.rccdir or cfg.objectsdir
+        local qmdir = cfg.qmdir or cfg.objectsdir
+        print("Dirs:", mocdir, uidir, rccdir, qmdir)
+        for _,file in ipairs(prj.files) do
+            local f = path.getabsolute(path.join(prj.location, file))
+            if prj.qt_generated_files_keys[f] then
+                print(cfg.mocdir or cfg.objectsdir)
+                f = f:gsub("%$%(MOCDIR%)", mocdir)
+                f = f:gsub("%$%(UIDIR%)", uidir)
+                f = f:gsub("%$%(RCCDIR%)", rccdir)
+                f = f:gsub("%$%(QMDIR%)", qmdir)
+                table.insert(_qtcreator_generated_files, f)
+            end
+            table.insert(_qtcreator_files, f)
         end
-        for _,def in ipairs(premake.getconfig(prj).defines) do
+        for _,def in ipairs(cfg.defines) do
             table.insert(_qtcreator_defines, def)
         end
-        for _,idir in ipairs(premake.getconfig(prj).includedirs) do
+        for _,idir in ipairs(cfg.includedirs) do
+            idir = idir:gsub("%$%(MOCDIR%)", mocdir)
+            idir = idir:gsub("%$%(UIDIR%)", uidir)
+            print("Include:", idir)
             table.insert(_qtcreator_includes, idir)
         end
     end
