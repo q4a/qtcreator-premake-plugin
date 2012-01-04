@@ -94,6 +94,8 @@ newaction {
         local rccdir = cfg.rccdir or cfg.objectsdir
         local qmdir = cfg.qmdir or cfg.objectsdir
         print("Dirs:", mocdir, uidir, rccdir, qmdir)
+
+        prj.qt_generated_files_keys = prj.qt_generated_files_keys or {}
         for _,file in ipairs(prj.files) do
             local f = path.getabsolute(path.join(prj.location, file))
             if prj.qt_generated_files_keys[f] then
