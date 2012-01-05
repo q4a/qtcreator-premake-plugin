@@ -122,7 +122,7 @@ static void getLuaTable(lua_State *L, const char *tablename, QStringList &to)
     for(int i=0; i<n_elements; ++i) {
         lua_pushinteger(L, i+1); // Lua index starts from 1
         lua_gettable(L, -2);
-        QString filename(lua_tolstring(L, -1, 0));
+        QString filename = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
         lua_pop(L, 1);
         to << filename; //m_rootDir.absoluteFilePath(filename);
     }
