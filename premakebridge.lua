@@ -1,9 +1,9 @@
 --
 -- This file is part of Qt Creator
 --
--- Copyright (c) 2011 Nokia Corporation and/or its subsidiary(-ies).
+-- Copyright (c) 2011 Konstantin Tokarev <annulen@yandex.ru>
 --
--- Contact: Nokia Corporation (info@qt.nokia.com)
+-- Partially based on code of Qt Creator by Nokia Corporation
 --
 --
 -- GNU Lesser General Public License Usage
