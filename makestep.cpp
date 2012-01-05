@@ -205,7 +205,10 @@ bool MakeStep::init()
     if (toolchain) {
          ProjectExplorer::GccToolChain *gcctc = dynamic_cast<ProjectExplorer::GccToolChain *>(toolchain);
          if (gcctc) {
-             const QString cc = gcctc->compilerPath().replace(QRegExp("g\\+\\+$"), "gcc");
+             QString cc = gcctc->compilerPath().replace(QRegExp("g\\+\\+$"), "gcc");
+#ifdef Q_OS_WIN32
+             cc.replace(QRegExp("g\\+\\+\\.exe$"), "gcc.exe");
+#endif
              Utils::QtcProcess::addArg(&args, QLatin1String("CC=") + cc);
              Utils::QtcProcess::addArg(&args, QLatin1String("CXX=") + gcctc->compilerPath());
          }

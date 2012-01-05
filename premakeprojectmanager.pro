@@ -114,6 +114,7 @@ macx {
 }
 
 win32 {
+    DEFINES -= UNICODE
     DEFINES += _CRT_SECURE_NO_WARNINGS
     LIBS += -luser32 -lole32
 }
