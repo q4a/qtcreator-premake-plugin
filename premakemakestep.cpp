@@ -157,9 +157,10 @@ QString PremakeMakeStep::allArguments() const
 void PremakeMakeStep::run(QFutureInterface<bool> &fi)
 {
     emit addOutput(QString("premake4 %1").arg(allArguments()), BuildStep::MessageOutput);
-    // TODO Generate makefiles here
-    lua_State *L = LuaManager::instance()->luaStateForGenerating(
+
+    lua_State *L = LuaManager::instance()->initLuaState(
                 premakeBuildConfiguration()->projectFileName(),
+                "gmake",
                 premakeBuildConfiguration()->shadowBuildEnabled(),
                 premakeBuildConfiguration()->buildDirectory());
     if(call_premake_main(L) != 0){

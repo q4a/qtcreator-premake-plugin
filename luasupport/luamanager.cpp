@@ -37,35 +37,11 @@ static void projectParseError(const QString &errorMessage)
     Core::ICore::instance()->messageManager()->printToOutputPanePopup("Premake error: " + errorMessage);
 }
 
-lua_State * LuaManager::luaStateForParsing(const QString &fileName) const
+lua_State * LuaManager::initLuaState(const QString &fileName,
+                                     const QByteArray &action,
+                                     bool shadowBuild,
+                                     const QString &buildDir) const
 {
-    lua_State *L = lua_open();
-    luaL_openlibs(L);
-
-    // Initialize Premake
-    QByteArray file = QFile::encodeName(QString("--file=").append(fileName));
-    const char *argv[3];
-    argv[0] = "";
-    argv[1] = file.data();
-    argv[2] = "_qtcreator";
-
-    if(premake_init(L, 3, argv) != 0){
-        projectParseError(lua_tostring(L, -1));
-    }
-
-    const char * lua_bridge_code = m_premakeBridge.constData();
-
-    if (luaL_dostring(L, lua_bridge_code) != 0) {
-        projectParseError(lua_tostring(L, -1));
-    }
-    return L;
-}
-
-lua_State * LuaManager::luaStateForGenerating(const QString &fileName,
-                                                  bool shadowBuild,
-                                                  const QString &buildDir) const
-{
-    qDebug() << Q_FUNC_INFO << fileName << buildDir;
     lua_State *L = lua_open();
     luaL_openlibs(L);
 
@@ -78,14 +54,14 @@ lua_State * LuaManager::luaStateForGenerating(const QString &fileName,
     argv[1] = file.data();
     if(shadowBuild) {
         argv[2] = to.data();
-        argv[3] = "gmake";
+        argv[3] = action.data();
         argc = 4;
     } else {
-        argv[2] = "gmake";
+        argv[2] = action.data();
         argc = 3;
     }
 
-    if(premake_init(L, argc, argv) != 0){
+    if(premake_init(L, argc, argv) != 0) {
         projectParseError(lua_tostring(L, -1));
     }
 

@@ -16,9 +16,8 @@ public:
     static LuaManager *instance();
 
     // return ready to use L
-    lua_State *luaStateForParsing(const QString &fileName) const;
-    lua_State *luaStateForGenerating(const QString &fileName, bool shadowBuild,
-                                     const QString &buildDir) const;
+    lua_State *initLuaState(const QString &fileName, const QByteArray &action,
+                                  bool shadowBuild, const QString &buildDir) const;
 
 private:
     LuaManager();

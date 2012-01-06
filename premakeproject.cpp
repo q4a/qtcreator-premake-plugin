@@ -137,12 +137,16 @@ void PremakeProject::parseProject(RefreshOptions options)
 {
     qDebug() << Q_FUNC_INFO;
 
+    const PremakeBuildConfiguration *conf = activeTarget()->activeBuildConfiguration();
+
     const QHash<QString,QString> qtInfo
-            = activeTarget()->activeBuildConfiguration()->qtVersion()->versionInfo();
+            = conf->qtVersion()->versionInfo();
 
     /// @todo Create a persistent lua state with all built-in scripts loaded
     /// and clone it before loading project
-    lua_State *L = LuaManager::instance()->luaStateForParsing(m_fileName);
+    lua_State *L = LuaManager::instance()->initLuaState(m_fileName, "_qtcreator",
+                                                        conf->shadowBuildEnabled(),
+                                                        conf->buildDirectory());
 
     if(call_premake_main(L) != 0){
         projectParseError(lua_tostring(L, -1));

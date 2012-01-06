@@ -88,18 +88,17 @@ newaction {
         -- FIXME: use active configuration
         local cfgname = prj.solution.configurations[1]
         local cfg = premake.getconfig(prj, cfgname, "Native")
-        print(cfg.objectsdir)
-        local mocdir = cfg.mocdir or cfg.objectsdir
-        local uidir = cfg.uidir or cfg.objectsdir
-        local rccdir = cfg.rccdir or cfg.objectsdir
-        local qmdir = cfg.qmdir or cfg.objectsdir
+
+        local mocdir = path.join(prj.location, cfg.mocdir or cfg.objectsdir)
+        local uidir = path.join(prj.location, cfg.uidir or cfg.objectsdir)
+        local rccdir = path.join(prj.location, cfg.rccdir or cfg.objectsdir)
+        local qmdir = path.join(prj.location, cfg.qmdir or cfg.objectsdir)
         print("Dirs:", mocdir, uidir, rccdir, qmdir)
 
         prj.qt_generated_files_keys = prj.qt_generated_files_keys or {}
         for _,file in ipairs(prj.files) do
             local f = path.getabsolute(path.join(prj.location, file))
             if prj.qt_generated_files_keys[f] then
-                print(cfg.mocdir or cfg.objectsdir)
                 f = f:gsub("%$%(MOCDIR%)", mocdir)
                 f = f:gsub("%$%(UIDIR%)", uidir)
                 f = f:gsub("%$%(RCCDIR%)", rccdir)
@@ -114,6 +113,7 @@ newaction {
         for _,idir in ipairs(cfg.includedirs) do
             idir = idir:gsub("%$%(MOCDIR%)", mocdir)
             idir = idir:gsub("%$%(UIDIR%)", uidir)
+            idir = path.getabsolute(path.join(prj.location, idir))
             print("Include:", idir)
             table.insert(_qtcreator_includes, idir)
         end
