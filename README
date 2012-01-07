@@ -1,19 +1,29 @@
 Prerequisites
 =============
 
-Qt Creator 2.2 or higher
-Source code of your Qt Creator
+Qt Creator 2.3.1 or 2.4.0
+Source code of your Qt Creator version
+Linux, Mac OS X (>=10.5), or Windows (XP or higher)
 
-Note: plugin was tested only on Linux and Mac OS X, but should also work on
-Windows and Unix-like systems.
+Note: plugin may also work on other Unix-like systems, earlier versions of
+Windows, and Mac OS X 10.4, however they were not tested.
 
-Compilation
-===========
+Building on Linux or Mac OS X
+=============================
 
-Clone this project into the same directory where Qt Creator sources are
-located, than execute
+1. Get the source code of Qt Creator 2.3.1, or 2.4.0, or 2.4 git branch (master
+won't work). We will assume you've unpacked/cloned it to ~/src/qt-creator
 
-  qmake
+2. Create ~/src/build-qtc and run
+  qmake ../qt-creator
+in that directory
+
+3. Build Qt Creator with "make" command OR install the same version from
+binaries
+
+4. Run in source tree of this project:
+
+  qmake QTC_SOURCE=~/src/qt-creator QTC_BUILD=~/src/build-qtc
   make
 
 If you have Qt Creator sources in different localiton, execute make with
@@ -25,4 +35,10 @@ Execution of qmake and make will "install" plugin inside source tree of Qt
 Creator like it's done for other plugins during Qt Creator build. You may
 need to copy resulting library into your Qt Creator installation directory.
 
-"make install" target against installed Qt Creator binary is not supported yet.
+
+Installation (Linux)
+====================
+When running qmake, set QTC_INSTALL_ROOT variable to installation prefix of
+Qt Creator. Than you will be able to run "make install" to install plugin into
+your production copy of Qt Creator.
+
