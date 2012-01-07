@@ -34,7 +34,6 @@
 
 #include "premakebuildconfiguration.h"
 #include "premakeproject.h"
-#include "premakemakestep.h"
 #include "makestep.h"
 
 #include <projectexplorer/buildsteplist.h>

@@ -35,7 +35,7 @@
 #include "premakeprojectwizard.h"
 #include "premakeprojectconstants.h"
 #include "luaeditor.h"
-#include "premakemakestep.h"
+#include "premakestep.h"
 #include "makestep.h"
 #include "premaketarget.h"
 
@@ -80,7 +80,7 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
 
     addAutoReleasedObject(manager);
     addAutoReleasedObject(new MakeStepFactory);
-    addAutoReleasedObject(new PremakeMakeStepFactory);
+    addAutoReleasedObject(new PremakeStepFactory);
     addAutoReleasedObject(new PremakeProjectWizard);
     addAutoReleasedObject(new PremakeTargetFactory);
 

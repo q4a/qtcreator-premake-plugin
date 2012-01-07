@@ -30,11 +30,12 @@
 **
 **************************************************************************/
 
-#include "premakemakestep.h"
+#include "premakestep.h"
+
 #include "premakeprojectconstants.h"
 #include "premakeproject.h"
 #include "premaketarget.h"
-#include "ui_premakemakestep.h"
+#include "ui_premakestep.h"
 #include "premakebuildconfiguration.h"
 #include "luamanager.h"
 
@@ -67,41 +68,41 @@ const char * const MAKE_ARGUMENTS_KEY("PremakeProjectManager.PremakeMakeStep.Mak
 const char * const MAKE_COMMAND_KEY("PremakeProjectManager.PremakeMakeStep.MakeCommand");
 }
 
-PremakeMakeStep::PremakeMakeStep(ProjectExplorer::BuildStepList *parent) :
+PremakeStep::PremakeStep(ProjectExplorer::BuildStepList *parent) :
     BuildStep(parent, QLatin1String(PREMAKE_MS_ID))
 {
     ctor();
 }
 
-PremakeMakeStep::PremakeMakeStep(ProjectExplorer::BuildStepList *parent, const QString &id) :
+PremakeStep::PremakeStep(ProjectExplorer::BuildStepList *parent, const QString &id) :
     BuildStep(parent, id)
 {
     ctor();
 }
 
-PremakeMakeStep::PremakeMakeStep(ProjectExplorer::BuildStepList *parent, PremakeMakeStep *bs) :
+PremakeStep::PremakeStep(ProjectExplorer::BuildStepList *parent, PremakeStep *bs) :
     BuildStep(parent, bs),
     m_premakeArguments(bs->m_premakeArguments)
 {
     ctor();
 }
 
-void PremakeMakeStep::ctor()
+void PremakeStep::ctor()
 {
     setDefaultDisplayName(QCoreApplication::translate("PremakeProjectManager::Internal::PremakeMakeStep",
                                                       PREMAKE_MS_DISPLAY_NAME));
 }
 
-PremakeMakeStep::~PremakeMakeStep()
+PremakeStep::~PremakeStep()
 {
 }
 
-PremakeBuildConfiguration *PremakeMakeStep::premakeBuildConfiguration() const
+PremakeBuildConfiguration *PremakeStep::premakeBuildConfiguration() const
 {
     return static_cast<PremakeBuildConfiguration *>(buildConfiguration());
 }
 
-bool PremakeMakeStep::init()
+bool PremakeStep::init()
 {
     qDebug() << Q_FUNC_INFO << m_premakeArguments;
 //    PremakeBuildConfiguration *bc = premakeBuildConfiguration();
@@ -123,14 +124,14 @@ bool PremakeMakeStep::init()
     return true;
 }
 
-QVariantMap PremakeMakeStep::toMap() const
+QVariantMap PremakeStep::toMap() const
 {
     QVariantMap map(BuildStep::toMap());
     map.insert(QLatin1String(MAKE_ARGUMENTS_KEY), m_premakeArguments);
     return map;
 }
 
-bool PremakeMakeStep::fromMap(const QVariantMap &map)
+bool PremakeStep::fromMap(const QVariantMap &map)
 {
     m_buildTargets = map.value(QLatin1String(BUILD_TARGETS_KEY)).toStringList();
     m_premakeArguments = map.value(QLatin1String(MAKE_ARGUMENTS_KEY)).toString();
@@ -138,7 +139,7 @@ bool PremakeMakeStep::fromMap(const QVariantMap &map)
     return BuildStep::fromMap(map);
 }
 
-QString PremakeMakeStep::allArguments() const
+QString PremakeStep::allArguments() const
 {
     QString args = m_premakeArguments;
     if (premakeBuildConfiguration()->shadowBuildEnabled()) {
@@ -154,7 +155,7 @@ QString PremakeMakeStep::allArguments() const
     return args;
 }
 
-void PremakeMakeStep::run(QFutureInterface<bool> &fi)
+void PremakeStep::run(QFutureInterface<bool> &fi)
 {
     emit addOutput(QString("premake4 %1").arg(allArguments()), BuildStep::MessageOutput);
 
@@ -172,12 +173,12 @@ void PremakeMakeStep::run(QFutureInterface<bool> &fi)
     }
 }
 
-ProjectExplorer::BuildStepConfigWidget *PremakeMakeStep::createConfigWidget()
+ProjectExplorer::BuildStepConfigWidget *PremakeStep::createConfigWidget()
 {
-    return new PremakeMakeStepConfigWidget(this);
+    return new PremakeStepConfigWidget(this);
 }
 
-bool PremakeMakeStep::immutable() const
+bool PremakeStep::immutable() const
 {
     return false;
 }
@@ -187,10 +188,10 @@ bool PremakeMakeStep::immutable() const
 // PremakeMakeStepConfigWidget
 //
 
-PremakeMakeStepConfigWidget::PremakeMakeStepConfigWidget(PremakeMakeStep *makeStep)
-    : m_makeStep(makeStep)
+PremakeStepConfigWidget::PremakeStepConfigWidget(PremakeStep *step)
+    : m_step(step)
 {
-    m_ui = new Ui::PremakeMakeStep;
+    m_ui = new Ui::PremakeStep;
     m_ui->setupUi(this);
     init();
 
@@ -206,23 +207,23 @@ PremakeMakeStepConfigWidget::PremakeMakeStepConfigWidget(PremakeMakeStep *makeSt
             this, SLOT(makeArgumentsLineEditTextEdited()));
     connect(ProjectExplorer::ProjectExplorerPlugin::instance(), SIGNAL(settingsChanged()),
             this, SLOT(updateDetails()));
-    connect(makeStep->buildConfiguration(), SIGNAL(buildDirectoryChanged()),
+    connect(step->buildConfiguration(), SIGNAL(buildDirectoryChanged()),
             this, SLOT(updateDetails()));
-    connect(makeStep->buildConfiguration(), SIGNAL(shadowBuildChanged()),
+    connect(step->buildConfiguration(), SIGNAL(shadowBuildChanged()),
             this, SLOT(updateDetails()));
 }
 
-QString PremakeMakeStepConfigWidget::displayName() const
+QString PremakeStepConfigWidget::displayName() const
 {
     return tr("Premake", "PremakeMake step display name.");
 }
 
-void PremakeMakeStepConfigWidget::init()
+void PremakeStepConfigWidget::init()
 {
 //    updateMakeOverrrideLabel();
 
 //    m_ui->makeLineEdit->setText(m_makeStep->m_makeCommand);
-    m_ui->makeArgumentsLineEdit->setText(m_makeStep->m_premakeArguments);
+    m_ui->makeArgumentsLineEdit->setText(m_step->m_premakeArguments);
 
     // Disconnect to make the changes to the items
 //    disconnect(m_ui->targetsList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
@@ -238,21 +239,21 @@ void PremakeMakeStepConfigWidget::init()
 //    connect(m_ui->targetsList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
 }
 
-void PremakeMakeStepConfigWidget::updateDetails()
+void PremakeStepConfigWidget::updateDetails()
 {
-    m_summaryText = QString("<b>Premake:</b> premake4 %1 %2 %3").arg(m_makeStep->allArguments())
-            .arg(tr("in")).arg(m_makeStep->buildConfiguration()->buildDirectory());
+    m_summaryText = QString("<b>Premake:</b> premake4 %1 %2 %3").arg(m_step->allArguments())
+            .arg(tr("in")).arg(m_step->buildConfiguration()->buildDirectory());
     emit updateSummary();
 }
 
-QString PremakeMakeStepConfigWidget::summaryText() const
+QString PremakeStepConfigWidget::summaryText() const
 {
     return m_summaryText;
 }
 
-void PremakeMakeStepConfigWidget::makeArgumentsLineEditTextEdited()
+void PremakeStepConfigWidget::makeArgumentsLineEditTextEdited()
 {
-    m_makeStep->m_premakeArguments = m_ui->makeArgumentsLineEdit->text();
+    m_step->m_premakeArguments = m_ui->makeArgumentsLineEdit->text();
     updateDetails();
 }
 
@@ -260,16 +261,16 @@ void PremakeMakeStepConfigWidget::makeArgumentsLineEditTextEdited()
 // PremakeMakeStepFactory
 //
 
-PremakeMakeStepFactory::PremakeMakeStepFactory(QObject *parent) :
+PremakeStepFactory::PremakeStepFactory(QObject *parent) :
     ProjectExplorer::IBuildStepFactory(parent)
 {
 }
 
-PremakeMakeStepFactory::~PremakeMakeStepFactory()
+PremakeStepFactory::~PremakeStepFactory()
 {
 }
 
-bool PremakeMakeStepFactory::canCreate(ProjectExplorer::BuildStepList *parent,
+bool PremakeStepFactory::canCreate(ProjectExplorer::BuildStepList *parent,
                                        const QString &id) const
 {
     if (parent->target()->project()->id() != QLatin1String(Constants::PREMAKEPROJECT_ID))
@@ -277,58 +278,58 @@ bool PremakeMakeStepFactory::canCreate(ProjectExplorer::BuildStepList *parent,
     return id == QLatin1String(PREMAKE_MS_ID);
 }
 
-ProjectExplorer::BuildStep *PremakeMakeStepFactory::create(ProjectExplorer::BuildStepList *parent,
+ProjectExplorer::BuildStep *PremakeStepFactory::create(ProjectExplorer::BuildStepList *parent,
                                                            const QString &id)
 {
     if (!canCreate(parent, id))
         return 0;
-    return new PremakeMakeStep(parent);
+    return new PremakeStep(parent);
 }
 
-bool PremakeMakeStepFactory::canClone(ProjectExplorer::BuildStepList *parent,
+bool PremakeStepFactory::canClone(ProjectExplorer::BuildStepList *parent,
                                       ProjectExplorer::BuildStep *source) const
 {
     const QString id(source->id());
     return canCreate(parent, id);
 }
 
-ProjectExplorer::BuildStep *PremakeMakeStepFactory::clone(ProjectExplorer::BuildStepList *parent,
+ProjectExplorer::BuildStep *PremakeStepFactory::clone(ProjectExplorer::BuildStepList *parent,
                                                           ProjectExplorer::BuildStep *source)
 {
     if (!canClone(parent, source))
         return 0;
-    PremakeMakeStep *old(qobject_cast<PremakeMakeStep *>(source));
+    PremakeStep *old(qobject_cast<PremakeStep *>(source));
     Q_ASSERT(old);
-    return new PremakeMakeStep(parent, old);
+    return new PremakeStep(parent, old);
 }
 
-bool PremakeMakeStepFactory::canRestore(ProjectExplorer::BuildStepList *parent,
+bool PremakeStepFactory::canRestore(ProjectExplorer::BuildStepList *parent,
                                         const QVariantMap &map) const
 {
     QString id(ProjectExplorer::idFromMap(map));
     return canCreate(parent, id);
 }
 
-ProjectExplorer::BuildStep *PremakeMakeStepFactory::restore(ProjectExplorer::BuildStepList *parent,
+ProjectExplorer::BuildStep *PremakeStepFactory::restore(ProjectExplorer::BuildStepList *parent,
                                                             const QVariantMap &map)
 {
     if (!canRestore(parent, map))
         return 0;
-    PremakeMakeStep *bs(new PremakeMakeStep(parent));
+    PremakeStep *bs(new PremakeStep(parent));
     if (bs->fromMap(map))
         return bs;
     delete bs;
     return 0;
 }
 
-QStringList PremakeMakeStepFactory::availableCreationIds(ProjectExplorer::BuildStepList *parent) const
+QStringList PremakeStepFactory::availableCreationIds(ProjectExplorer::BuildStepList *parent) const
 {
     if (parent->target()->project()->id() != QLatin1String(Constants::PREMAKEPROJECT_ID))
         return QStringList();
     return QStringList() << QLatin1String(PREMAKE_MS_ID);
 }
 
-QString PremakeMakeStepFactory::displayNameForId(const QString &id) const
+QString PremakeStepFactory::displayNameForId(const QString &id) const
 {
     if (id == QLatin1String(PREMAKE_MS_ID))
         return QCoreApplication::translate("PremakeProjectManager::Internal::PremakeMakeStep",

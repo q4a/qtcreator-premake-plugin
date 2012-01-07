@@ -32,7 +32,7 @@
 
 #include "premakebuildconfiguration.h"
 
-#include "premakemakestep.h"
+#include "premakestep.h"
 #include "makestep.h"
 #include "premakeproject.h"
 #include "premaketarget.h"
@@ -200,7 +200,7 @@ PremakeBuildConfiguration *PremakeBuildConfigurationFactory::createBuildConfigur
     ProjectExplorer::BuildStepList *cleanSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_CLEAN);
     Q_ASSERT(buildSteps);
     Q_ASSERT(cleanSteps);
-    PremakeMakeStep *premakeStep = new PremakeMakeStep(buildSteps);
+    PremakeStep *premakeStep = new PremakeStep(buildSteps);
     buildSteps->insertStep(0, premakeStep);
 
     MakeStep *makeStep = new MakeStep(buildSteps);

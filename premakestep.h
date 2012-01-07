@@ -30,8 +30,8 @@
 **
 **************************************************************************/
 
-#ifndef PREMAKEMAKESTEP_H
-#define PREMAKEMAKESTEP_H
+#ifndef PREMAKESTEP_H
+#define PREMAKESTEP_H
 
 #include <projectexplorer/buildstep.h>
 
@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE
 class QListWidgetItem;
 
 namespace Ui {
-class PremakeMakeStep;
+class PremakeStep;
 }
 QT_END_NAMESPACE
 
@@ -47,18 +47,18 @@ namespace PremakeProjectManager {
 namespace Internal {
 
 class PremakeBuildConfiguration;
-class PremakeMakeStepConfigWidget;
-class PremakeMakeStepFactory;
+class PremakeStepConfigWidget;
+class PremakeStepFactory;
 
-class PremakeMakeStep : public ProjectExplorer::BuildStep
+class PremakeStep : public ProjectExplorer::BuildStep
 {
     Q_OBJECT
-    friend class PremakeMakeStepConfigWidget; // TODO remove again?
-    friend class PremakeMakeStepFactory;
+    friend class PremakeStepConfigWidget; // TODO remove again?
+    friend class PremakeStepFactory;
 
 public:
-    PremakeMakeStep(ProjectExplorer::BuildStepList *parent);
-    virtual ~PremakeMakeStep();
+    PremakeStep(ProjectExplorer::BuildStepList *parent);
+    virtual ~PremakeStep();
 
     PremakeBuildConfiguration *premakeBuildConfiguration() const;
 
@@ -73,8 +73,8 @@ public:
     QVariantMap toMap() const;
 
 protected:
-    PremakeMakeStep(ProjectExplorer::BuildStepList *parent, PremakeMakeStep *bs);
-    PremakeMakeStep(ProjectExplorer::BuildStepList *parent, const QString &id);
+    PremakeStep(ProjectExplorer::BuildStepList *parent, PremakeStep *bs);
+    PremakeStep(ProjectExplorer::BuildStepList *parent, const QString &id);
     virtual bool fromMap(const QVariantMap &map);
 
 private:
@@ -84,11 +84,11 @@ private:
     QString m_premakeArguments;
 };
 
-class PremakeMakeStepConfigWidget :public ProjectExplorer::BuildStepConfigWidget
+class PremakeStepConfigWidget : public ProjectExplorer::BuildStepConfigWidget
 {
     Q_OBJECT
 public:
-    PremakeMakeStepConfigWidget(PremakeMakeStep *makeStep);
+    PremakeStepConfigWidget(PremakeStep *step);
     virtual QString displayName() const;
     void init();
     virtual QString summaryText() const;
@@ -96,18 +96,18 @@ private slots:
     void makeArgumentsLineEditTextEdited();
     void updateDetails();
 private:
-    Ui::PremakeMakeStep *m_ui;
-    PremakeMakeStep *m_makeStep;
+    Ui::PremakeStep *m_ui;
+    PremakeStep *m_step;
     QString m_summaryText;
 };
 
-class PremakeMakeStepFactory : public ProjectExplorer::IBuildStepFactory
+class PremakeStepFactory : public ProjectExplorer::IBuildStepFactory
 {
     Q_OBJECT
 
 public:
-    explicit PremakeMakeStepFactory(QObject *parent = 0);
-    virtual ~PremakeMakeStepFactory();
+    explicit PremakeStepFactory(QObject *parent = 0);
+    virtual ~PremakeStepFactory();
 
     virtual bool canCreate(ProjectExplorer::BuildStepList *parent,
                            const QString &id) const;
@@ -129,4 +129,4 @@ public:
 } // namespace Internal
 } // namespace PremakeProjectManager
 
-#endif // PREMAKEMAKESTEP_H
+#endif // PREMAKESTEP_H

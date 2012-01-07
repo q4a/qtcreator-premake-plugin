@@ -68,7 +68,7 @@ namespace Internal {
 class PremakeBuildConfiguration;
 class PremakeProject;
 class PremakeTarget;
-class PremakeMakeStep;
+class PremakeStep;
 class PremakeProjectFile;
 
 class PremakeProject : public ProjectExplorer::Project

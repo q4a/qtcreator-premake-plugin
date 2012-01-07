@@ -35,7 +35,7 @@ HEADERS += premakeproject.h \
     premakeprojectconstants.h \
     premakeprojectnodes.h \
     premakeprojectwizard.h \
-    premakemakestep.h \
+    premakestep.h \
     premakebuildconfiguration.h \
     makestep.h
 SOURCES += premakeproject.cpp \
@@ -44,7 +44,7 @@ SOURCES += premakeproject.cpp \
     premakeprojectmanager.cpp \
     premakeprojectnodes.cpp \
     premakeprojectwizard.cpp \
-    premakemakestep.cpp \
+    premakestep.cpp \
     premakebuildconfiguration.cpp \
     makestep.cpp
 
@@ -96,7 +96,7 @@ SOURCES += \
     premake/src/host/os_chdir.c \
     premake/src/host/os_stat.c
 RESOURCES += premakeproject.qrc
-FORMS += premakemakestep.ui \
+FORMS += premakestep.ui \
     makestep.ui
 OTHER_FILES += premakebridge.lua \
     PremakeProject.mimetypes.xml \
