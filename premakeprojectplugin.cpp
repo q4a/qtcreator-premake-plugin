@@ -81,8 +81,9 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     addAutoReleasedObject(manager);
     addAutoReleasedObject(new MakeStepFactory);
     addAutoReleasedObject(new PremakeStepFactory);
-    addAutoReleasedObject(new PremakeProjectWizard);
     addAutoReleasedObject(new PremakeTargetFactory);
+    // TODO: Uncomment when ready to use
+//    addAutoReleasedObject(new PremakeProjectWizard);
 
     return true;
 }

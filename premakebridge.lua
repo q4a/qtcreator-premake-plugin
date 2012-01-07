@@ -19,14 +19,6 @@
 -- rights. These rights are described in the Nokia Qt LGPL Exception
 -- version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 --
--- Other Usage
---
--- Alternatively, this file may be used in accordance with the terms and
--- conditions contained in a signed written agreement between you and Nokia.
---
--- If you have questions regarding the use of this file, please contact
--- Nokia at qt-info@nokia.com.
---
 
 _qtcreator_files = {}
 _qtcreator_generated_files = {}
@@ -93,7 +85,6 @@ newaction {
         local uidir = path.join(prj.location, cfg.uidir or cfg.objectsdir)
         local rccdir = path.join(prj.location, cfg.rccdir or cfg.objectsdir)
         local qmdir = path.join(prj.location, cfg.qmdir or cfg.objectsdir)
-        print("Dirs:", mocdir, uidir, rccdir, qmdir)
 
         prj.qt_generated_files_keys = prj.qt_generated_files_keys or {}
         for _,file in ipairs(prj.files) do
@@ -114,7 +105,6 @@ newaction {
             idir = idir:gsub("%$%(MOCDIR%)", mocdir)
             idir = idir:gsub("%$%(UIDIR%)", uidir)
             idir = path.getabsolute(path.join(prj.location, idir))
-            print("Include:", idir)
             table.insert(_qtcreator_includes, idir)
         end
     end

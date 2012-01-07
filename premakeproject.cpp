@@ -222,7 +222,6 @@ void PremakeProject::refresh(RefreshOptions options)
 
     if (modelManager) {
         CPlusPlus::CppModelManagerInterface::ProjectInfo pinfo = modelManager->projectInfo(this);
-//        qDebug() << Q_FUNC_INFO << "pinfo.sourceFiles=" << pinfo.sourceFiles;
 
         ToolChain *tc = activeTarget()->activeBuildConfiguration()->toolChain();
         if (tc) {

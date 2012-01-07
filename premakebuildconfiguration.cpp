@@ -260,7 +260,6 @@ BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
     QtSupport::QtVersionManager *vm = QtVersionManager::instance();
     foreach (BaseQtVersion *ver, vm->validVersions()) {
         foreach (Abi abi, ver->qtAbis()) {
-            qDebug() << Q_FUNC_INFO << "ABI" << abi.toString();
             if (abiIsMsvc(abi))
                 qDebug() << "Skipping" << abi.toString();
             else
