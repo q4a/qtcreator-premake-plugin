@@ -1,4 +1,4 @@
-<plugin name=\"PremakeProjectManager\" version=\"0.1\" compatVersion=\"$$QTCREATOR_VERSION\">
+<plugin name=\"PremakeProjectManager\" version=\"0.2\" compatVersion=\"$$QTCREATOR_VERSION\">
     <vendor>Konstantin Tokarev</vendor>
     <copyright>(C) 2011 Konstantin Tokarev</copyright>
     <license>LGPL 2.1</license>
