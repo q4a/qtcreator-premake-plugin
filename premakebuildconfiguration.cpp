@@ -95,9 +95,12 @@ bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 
 QString PremakeBuildConfiguration::buildDirectory() const
 {
-    // Convert to absolute path when necessary
-    const QDir projectDir(target()->project()->projectDirectory());
-    return projectDir.absoluteFilePath(m_buildDirectory);
+    const QString projectDir = target()->project()->projectDirectory();
+    if (m_shadowBuildEnabled)
+        // Convert to absolute path when necessary
+        return QDir(projectDir).absoluteFilePath(m_buildDirectory);
+    else
+        return projectDir;
 }
 
 /**
@@ -115,6 +118,8 @@ void PremakeBuildConfiguration::setBuildDirectory(const QString &buildDirectory)
         return;
     m_buildDirectory = buildDirectory;
     emit buildDirectoryChanged();
+    emit environmentChanged();
+    premakeTarget()->premakeProject()->refresh(PremakeProject::Everything);
 }
 
 PremakeTarget *PremakeBuildConfiguration::premakeTarget() const
@@ -298,7 +303,9 @@ bool PremakeBuildConfiguration::shadowBuildEnabled() const
 void PremakeBuildConfiguration::setShadowBuildEnabled(bool enabled)
 {
     m_shadowBuildEnabled = enabled;
+    emit environmentChanged();
     emit shadowBuildChanged();
+    premakeTarget()->premakeProject()->refresh(PremakeProject::Everything);
 }
 
 Utils::Environment PremakeBuildConfiguration::baseEnvironment() const

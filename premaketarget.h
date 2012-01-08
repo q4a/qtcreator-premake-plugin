@@ -52,7 +52,7 @@ const char * const PREMAKE_DESKTOP_TARGET_ID = "PremakeProjectManager.Target.Des
 
 class PremakeProject;
 class PremakeRunConfiguration;
-
+class PremakeBuildConfigurationFactory;
 class PremakeTargetFactory;
 
 class PremakeTarget : public ProjectExplorer::Target

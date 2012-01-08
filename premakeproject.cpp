@@ -436,7 +436,6 @@ PremakeBuildSettingsWidget::PremakeBuildSettingsWidget(PremakeTarget *target)
 
     // Shadow build
     m_shadowBuild = new QCheckBox;
-    m_shadowBuild->setChecked(true);
     fl->addRow(tr("Shadow build:"), m_shadowBuild);
     connect(m_shadowBuild, SIGNAL(toggled(bool)), this, SLOT(shadowBuildToggled(bool)));
 
@@ -466,6 +465,7 @@ QString PremakeBuildSettingsWidget::displayName() const
 void PremakeBuildSettingsWidget::init(BuildConfiguration *bc)
 {
     m_buildConfiguration = static_cast<PremakeBuildConfiguration *>(bc);
+    m_shadowBuild->setChecked(m_buildConfiguration->shadowBuildEnabled());
     m_pathChooser->setPath(m_buildConfiguration->rawBuildDirectory());
     m_pathChooser->setEnabled(m_buildConfiguration->shadowBuildEnabled());
 }
@@ -481,6 +481,7 @@ void PremakeBuildSettingsWidget::toolChainSelected(int index)
 
     ToolChain *tc = static_cast<ToolChain *>(m_toolChainChooser->itemData(index).value<void *>());
     m_target->activeBuildConfiguration()->setToolChain(tc);
+    m_target->premakeProject()->refresh(PremakeProject::Everything);
 }
 
 void PremakeBuildSettingsWidget::toolChainChanged(ProjectExplorer::ToolChain *tc)
