@@ -203,15 +203,31 @@ bool MakeStep::init()
         Utils::QtcProcess::addArg(&args, QLatin1String("-w"));
 
     if (toolchain) {
-         ProjectExplorer::GccToolChain *gcctc = dynamic_cast<ProjectExplorer::GccToolChain *>(toolchain);
-         if (gcctc) {
-             QString cc = gcctc->compilerPath().replace(QRegExp("g\\+\\+$"), "gcc");
+        ProjectExplorer::GccToolChain *gcctc = dynamic_cast<ProjectExplorer::GccToolChain *>(toolchain);
+        if (gcctc) {
+            QString cc;
+            QString cxx;
+            typedef QPair<QRegExp, QString> Rx;
+            QList<Rx> replacements = QList<Rx>()
+                << qMakePair(QRegExp("icpc$"), QString("icc"))
+                << qMakePair(QRegExp("clang\\+\\+"), QString("clang"))
+                << qMakePair(QRegExp("g\\+\\+$"), QString("gcc"));
 #ifdef Q_OS_WIN32
-             cc.replace(QRegExp("g\\+\\+\\.exe$"), "gcc.exe");
+            replacements
+                << qMakePair(QRegExp("clang\\+\\+\\.exe$"), QString("clang.exe"))
+                << qMakePair(QRegExp("g\\+\\+\\.exe$"), QString("gcc.exe"));
 #endif
-             Utils::QtcProcess::addArg(&args, QLatin1String("CC=") + cc);
-             Utils::QtcProcess::addArg(&args, QLatin1String("CXX=") + gcctc->compilerPath());
-         }
+            foreach (const Rx r, replacements)
+            {
+                cxx = gcctc->compilerPath();
+                if (cxx.contains(r.first)) {
+                    cc = cxx.replace(r.first, r.second);
+                    break;
+                }
+            }
+            Utils::QtcProcess::addArg(&args, QLatin1String("CC=") + cc);
+            Utils::QtcProcess::addArg(&args, QLatin1String("CXX=") + gcctc->compilerPath());
+        }
     }
 
     setEnabled(true);
