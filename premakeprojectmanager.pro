@@ -97,7 +97,8 @@ SOURCES += \
     premake/src/host/os_stat.c
 RESOURCES += premakeproject.qrc
 FORMS += premakestep.ui \
-    makestep.ui
+    makestep.ui \
+    premakeprojectconfigwidget.ui
 OTHER_FILES += premakebridge.lua \
     PremakeProject.mimetypes.xml \
     README
