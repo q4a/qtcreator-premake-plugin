@@ -58,11 +58,15 @@ const char * const SHADOW_BUILD_KEY("PremakeProjectManager.PremakeBuildConfigura
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
     : BuildConfiguration(parent, QLatin1String(Constants::PREMAKE_BC_ID))
     , m_fileName(parent->premakeProject()->file()->fileName())
+    , m_buildDirectory(target()->project()->projectDirectory() + "/build")
+    , m_shadowBuildEnabled(true)
 {
 }
 
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent, const QString &id)
     : BuildConfiguration(parent, id)
+    , m_buildDirectory(target()->project()->projectDirectory() + "/build")
+    , m_shadowBuildEnabled(true)
 {
 }
 
@@ -87,8 +91,25 @@ QVariantMap PremakeBuildConfiguration::toMap() const
 
 bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 {
-    m_buildDirectory = map.value(QLatin1String(BUILD_DIRECTORY_KEY), target()->project()->projectDirectory()).toString();
-    m_shadowBuildEnabled = map.value(QLatin1String(SHADOW_BUILD_KEY), target()->project()->projectDirectory()).toBool();
+    m_buildDirectory = map.value(QLatin1String(BUILD_DIRECTORY_KEY),
+                                 target()->project()->projectDirectory() + "/build").toString();
+    m_shadowBuildEnabled = map.value(QLatin1String(SHADOW_BUILD_KEY),
+                                     true).toBool();
+
+    if (!toolChain()) {
+//        QList<ProjectExplorer::ToolChain *> list = ProjectExplorer::ToolChainManager::instance()->toolChains();
+//#ifdef Q_OS_WIN
+//            QString toolChainId = ProjectExplorer::Constants::MINGW_TOOLCHAIN_ID;
+//#else
+//            QString toolChainId = ProjectExplorer::Constants::GCC_TOOLCHAIN_ID;
+//#endif
+//            foreach (ProjectExplorer::ToolChain *tc, list) {
+//                if (tc->id().startsWith(toolChainId)) {
+//                    setToolChain(tc);
+//                    break;
+//                }
+//            }
+    }
 
     return BuildConfiguration::fromMap(map);
 }
@@ -116,6 +137,7 @@ void PremakeBuildConfiguration::setBuildDirectory(const QString &buildDirectory)
 {
     if (m_buildDirectory == buildDirectory)
         return;
+
     m_buildDirectory = buildDirectory;
     emit buildDirectoryChanged();
     emit environmentChanged();

@@ -135,8 +135,6 @@ static void projectParseError(const QString &errorMessage)
 
 void PremakeProject::parseProject(RefreshOptions options)
 {
-    qDebug() << Q_FUNC_INFO;
-
     const PremakeBuildConfiguration *conf = activeTarget()->activeBuildConfiguration();
 
     const QHash<QString,QString> qtInfo

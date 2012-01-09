@@ -153,9 +153,6 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
     // Set up BuildConfiguration:
     PremakeBuildConfiguration *bc = static_cast<PremakeBuildConfiguration *>
             (t->buildConfigurationFactory()->createBuildConfiguration(t, "all"));
-
-    bc->setBuildDirectory(project->projectDirectory());
-
     t->addBuildConfiguration(bc);
 
     t->addDeployConfiguration(t->deployConfigurationFactory()->create(t, ProjectExplorer::Constants::DEFAULT_DEPLOYCONFIGURATION_ID));
