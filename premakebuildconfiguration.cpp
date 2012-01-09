@@ -92,7 +92,7 @@ QVariantMap PremakeBuildConfiguration::toMap() const
 bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 {
     m_buildDirectory = map.value(QLatin1String(BUILD_DIRECTORY_KEY),
-                                 target()->project()->projectDirectory() + "/build").toString();
+                                 target()->project()->projectDirectory().append("/build")).toString();
     m_shadowBuildEnabled = map.value(QLatin1String(SHADOW_BUILD_KEY),
                                      true).toBool();
 
