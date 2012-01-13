@@ -174,10 +174,17 @@ Core::Context LuaEditor::context() const
     return m_context;
 }
 
+#if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+Core::Id LuaEditor::id() const
+{
+    return Core::Id(Constants::LUA_EDITOR_ID);
+}
+#else
 QString LuaEditor::id() const
 {
     return QLatin1String(Constants::LUA_EDITOR_ID);
 }
+#endif
 
 bool LuaEditor::duplicateSupported() const
 {

@@ -115,7 +115,11 @@ Core::BaseFileWizardParameters PremakeProjectWizard::parameters()
     parameters.setId(QLatin1String("Y.Premake"));
     parameters.setDescription(tr("New Premake project"));
     parameters.setCategory(QLatin1String(ProjectExplorer::Constants::PROJECT_WIZARD_CATEGORY));
+#if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+    parameters.setDisplayCategory(QCoreApplication::translate("ProjectExplorer", ProjectExplorer::Constants::PROJECT_WIZARD_CATEGORY_DISPLAY));
+#else
     parameters.setDisplayCategory(QCoreApplication::translate("ProjectExplorer", ProjectExplorer::Constants::PROJECT_WIZARD_TR_CATEGORY));
+#endif
     return parameters;
 }
 

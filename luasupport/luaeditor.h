@@ -88,7 +88,11 @@ public:
     LuaEditor(LuaEditorWidget *editorWidget);
     virtual ~LuaEditor();
     virtual Core::Context context() const;
+#if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+    virtual Core::Id id() const;
+#else
     virtual QString id() const;
+#endif
 
     virtual bool duplicateSupported() const;
     virtual Core::IEditor *duplicate(QWidget *parent);
