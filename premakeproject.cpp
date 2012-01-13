@@ -48,6 +48,7 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/messagemanager.h>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QProcessEnvironment>
 
@@ -130,7 +131,12 @@ static void getLuaTable(lua_State *L, const char *tablename, QStringList &to)
 
 static void projectParseError(const QString &errorMessage)
 {
-    Core::ICore::instance()->messageManager()->printToOutputPanePopup("Premake error: " + errorMessage);
+    Core::ICore::instance()->messageManager()->printToOutputPanePopup(
+            QCoreApplication::translate("PremakeProject", "Premake error: ") + errorMessage);
+}
+static void projectParseError(const char *errorMessage)
+{
+    projectParseError(QString::fromLocal8Bit(errorMessage));
 }
 
 void PremakeProject::parseProject(RefreshOptions options)
@@ -155,7 +161,7 @@ void PremakeProject::parseProject(RefreshOptions options)
         if(lua_pcall(L, 0, 1, 0) != 0) {
             projectParseError(lua_tostring(L, -1));
         } else {
-            m_projectName = lua_tostring(L, -1);
+            m_projectName = QString::fromLocal8Bit(lua_tostring(L, -1));
             m_rootNode->setDisplayName(m_projectName);
         }
         lua_pop(L, 1);
@@ -166,7 +172,7 @@ void PremakeProject::parseProject(RefreshOptions options)
         if(lua_pcall(L, 0, 1, 0) != 0)
             projectParseError(lua_tostring(L, -1));
         else
-            m_rootNode->setPath(lua_tostring(L, -1));
+            m_rootNode->setPath(QString::fromLocal8Bit(lua_tostring(L, -1)));
         lua_pop(L, 1);
     }
 
@@ -184,8 +190,8 @@ void PremakeProject::parseProject(RefreshOptions options)
         getLuaTable(L, "_qtcreator_includes", m_includePaths);
         m_includePaths.removeDuplicates();
         for (int i=0; i<m_includePaths.size(); ++i) {
-            m_includePaths[i].replace("$(QT_INCLUDE)", qtInfo.value("QT_INSTALL_HEADERS"));
-            m_includePaths[i].replace("$(QT_LIB)", qtInfo.value("QT_INSTALL_LIBS"));
+            m_includePaths[i].replace(QLatin1String("$(QT_INCLUDE)"), qtInfo.value(QLatin1String("QT_INSTALL_HEADERS")));
+            m_includePaths[i].replace(QLatin1String("$(QT_LIB)"), qtInfo.value(QLatin1String("QT_INSTALL_LIBS")));
         }
 //        qDebug() << Q_FUNC_INFO << "m_includePaths=" << m_includePaths;
 
@@ -194,7 +200,7 @@ void PremakeProject::parseProject(RefreshOptions options)
         defines.removeDuplicates();
         m_defines.clear();
         foreach(const QString &def, defines)
-            m_defines += QString("#define %1\n").arg(def).replace('=', ' ').toLocal8Bit();
+            m_defines += QString::fromLatin1("#define %1\n").arg(def).replace(QLatin1Char('='), QLatin1Char(' ')).toLocal8Bit();
 //        qWarning() << m_defines;
     }
 
@@ -558,7 +564,7 @@ QString PremakeProjectFile::suggestedFileName() const
 
 QString PremakeProjectFile::mimeType() const
 {
-    return Constants::PREMAKEMIMETYPE;
+    return QLatin1String(Constants::PREMAKEMIMETYPE);
 }
 
 bool PremakeProjectFile::isModified() const

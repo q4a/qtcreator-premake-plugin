@@ -27,7 +27,7 @@ include($$QTC_SOURCE/src/plugins/qtsupport/qtsupport.pri)
 include(luasupport/luasupport.pri)
 
 INCLUDEPATH += . premake/src/host/lua-5.1.4/src
-DEFINES += PREMAKE_LIBRARY NDEBUG
+DEFINES += PREMAKE_LIBRARY NDEBUG QT_NO_CAST_FROM_ASCII
 HEADERS += premakeproject.h \
     premakeprojectplugin.h \
     premaketarget.h \

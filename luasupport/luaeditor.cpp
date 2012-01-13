@@ -284,7 +284,7 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
     int beginPos = positionInBlock - 1;
     while (beginPos >= 0) {
         QChar c = block.at(beginPos);
-        if (c != '\"') {
+        if (c != QLatin1Char('\"')) {
             buffer.prepend(c);
             beginPos--;
         } else {
@@ -296,7 +296,7 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
     int endPos = positionInBlock;
     while (endPos < block.count()) {
         QChar c = block.at(endPos);
-        if (c != '\"') {
+        if (c != QLatin1Char('\"')) {
             buffer.append(c);
             endPos++;
         } else {
@@ -327,7 +327,7 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
     // require "fileName"
     // TODO: Support custom module paths
     // TODO: Check if it's really 'require'
-    fileName.append(".lua");
+    fileName.append(QLatin1String(".lua"));
     fi.setFile(fileName);
     if (fi.exists()) {
         link.fileName = fileName;

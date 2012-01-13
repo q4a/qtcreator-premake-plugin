@@ -152,10 +152,11 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
 
     // Set up BuildConfiguration:
     PremakeBuildConfiguration *bc = static_cast<PremakeBuildConfiguration *>
-            (t->buildConfigurationFactory()->createBuildConfiguration(t, "all"));
+            (t->buildConfigurationFactory()->createBuildConfiguration(t, QLatin1String("all")));
     t->addBuildConfiguration(bc);
 
-    t->addDeployConfiguration(t->deployConfigurationFactory()->create(t, ProjectExplorer::Constants::DEFAULT_DEPLOYCONFIGURATION_ID));
+    t->addDeployConfiguration(t->deployConfigurationFactory()->create(t,
+                QLatin1String(ProjectExplorer::Constants::DEFAULT_DEPLOYCONFIGURATION_ID)));
 
     // Query project on executables
 

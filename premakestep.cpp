@@ -147,28 +147,28 @@ QString PremakeStep::allArguments() const
                                     ->projectFileName()).dir();
 
         if (projectDir.absolutePath() != premakeBuildConfiguration()->buildDirectory()) {
-            args += QString(" --to=%1")
+            args += QString::fromLatin1(" --to=%1")
                     .arg(projectDir.relativeFilePath(premakeBuildConfiguration()->buildDirectory()));
         }
     }
-    args += " gmake";
+    args += QLatin1String(" gmake");
     return args;
 }
 
 void PremakeStep::run(QFutureInterface<bool> &fi)
 {
-    emit addOutput(QString("premake4 %1").arg(allArguments()), BuildStep::MessageOutput);
+    emit addOutput(QString::fromLatin1("premake4 %1").arg(allArguments()), BuildStep::MessageOutput);
 
     lua_State *L = LuaManager::instance()->initLuaState(
                 premakeBuildConfiguration()->projectFileName(),
-                "gmake",
+                QByteArray("gmake"),
                 premakeBuildConfiguration()->shadowBuildEnabled(),
                 premakeBuildConfiguration()->buildDirectory());
     if(call_premake_main(L) != 0){
-        emit addOutput(lua_tostring(L, -1), BuildStep::ErrorMessageOutput);
+        emit addOutput(QString::fromLocal8Bit(lua_tostring(L, -1)), BuildStep::ErrorMessageOutput);
         fi.reportResult(false);
     } else {
-        emit addOutput("Premake exited normally.", BuildStep::MessageOutput);
+        emit addOutput(tr("Premake exited normally."), BuildStep::MessageOutput);
         fi.reportResult(true);
     }
 }
@@ -241,7 +241,7 @@ void PremakeStepConfigWidget::init()
 
 void PremakeStepConfigWidget::updateDetails()
 {
-    m_summaryText = QString("<b>Premake:</b> premake4 %1 %2 %3").arg(m_step->allArguments())
+    m_summaryText = tr("<b>Premake:</b> premake4 %1 %2 %3").arg(m_step->allArguments())
             .arg(tr("in")).arg(m_step->buildConfiguration()->buildDirectory());
     emit updateSummary();
 }

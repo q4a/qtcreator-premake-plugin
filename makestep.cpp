@@ -182,7 +182,7 @@ bool MakeStep::init()
             Utils::QtcProcess::addArg(&args, bc->makefile());
             m_makeFileToCheck = QDir(workingDirectory).filePath(bc->makefile());
         } else {
-            m_makeFileToCheck = QDir(workingDirectory).filePath("Makefile");
+            m_makeFileToCheck = QDir(workingDirectory).filePath(QLatin1String("Makefile"));
         }
 //    }
 
@@ -207,15 +207,15 @@ bool MakeStep::init()
         if (gcctc) {
             QString cc;
             QString cxx;
-            typedef QPair<QRegExp, QString> Rx;
+            typedef QPair<QRegExp, QLatin1String> Rx;
             QList<Rx> replacements = QList<Rx>()
-                << qMakePair(QRegExp("icpc$"), QString("icc"))
-                << qMakePair(QRegExp("clang\\+\\+"), QString("clang"))
-                << qMakePair(QRegExp("g\\+\\+$"), QString("gcc"));
+                << qMakePair(QRegExp(QLatin1String("icpc$")), QLatin1String("icc"))
+                << qMakePair(QRegExp(QLatin1String("clang\\+\\+")), QLatin1String("clang"))
+                << qMakePair(QRegExp(QLatin1String("g\\+\\+$")), QLatin1String("gcc"));
 #ifdef Q_OS_WIN32
             replacements
-                << qMakePair(QRegExp("clang\\+\\+\\.exe$"), QString("clang.exe"))
-                << qMakePair(QRegExp("g\\+\\+\\.exe$"), QString("gcc.exe"));
+                << qMakePair(QRegExp(QLatin1String("clang\\+\\+\\.exe$")), QLatin1String("clang.exe"))
+                << qMakePair(QRegExp(QLatin1String("g\\+\\+\\.exe$")), QLatin1String("gcc.exe"));
 #endif
             foreach (const Rx r, replacements)
             {

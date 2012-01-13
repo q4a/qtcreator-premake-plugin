@@ -43,9 +43,9 @@ void LuaIndenter::indentBlock(QTextDocument *doc,
                          const TextEditor::TabSettings &ts)
 {
     const QString blockText = block.text();//.trimmed();
-    if ((typedChar == 'd' && !blockText.endsWith("end"))
-     || (typedChar == 'e' && !blockText.endsWith("else"))
-     || (typedChar == 'l' && !blockText.endsWith("until"))
+    if ((typedChar == QLatin1Char('d') && !blockText.endsWith(QLatin1String("end")))
+     || (typedChar == QLatin1Char('e') && !blockText.endsWith(QLatin1String("else")))
+     || (typedChar == QLatin1Char('l') && !blockText.endsWith(QLatin1String("until")))
     ) {
         return;
     }
@@ -71,24 +71,24 @@ void LuaIndenter::indentBlock(QTextDocument *doc,
 
     // Increase indent after lines that start a block:
     // 'function', 'if', 'for', 'while', 'repeat', 'else', 'elseif', '{'
-    int midx = previousText.indexOf(QRegExp("^\\s*\\b(if|for|while|repeat|else|elseif|do|then)\\b"));
+    int midx = previousText.indexOf(QRegExp(QLatin1String("^\\s*\\b(if|for|while|repeat|else|elseif|do|then)\\b")));
     if (midx == -1) {
-        midx = previousText.indexOf(QRegExp("\\{\\s*$"));
+        midx = previousText.indexOf(QRegExp(QLatin1String("\\{\\s*$")));
         if (midx == -1) {
-            midx = previousText.indexOf(QRegExp("\\bfunction\\b\\s*"));
+            midx = previousText.indexOf(QRegExp(QLatin1String("\\bfunction\\b\\s*")));
         }
     }
     if(midx != -1) {
         // Increase indent if what we found previously is not in a comment and
         // an "end" or "until" is not present on the same line.
-        if (!previousText.contains(QRegExp("\\b(end|until)\\b"))) {
+        if (!previousText.contains(QRegExp(QLatin1String("\\b(end|until)\\b")))) {
             ts.reindentLine(block, ts.m_indentSize);
         }
     }
 
     // Decrease indent on end, else (and elseif), until and '}'
-    if (blockText.contains(QRegExp("^\\s*\\b(end|else|until)\\b"))
-            || blockText.trimmed() == "}") {
+    if (blockText.contains(QRegExp(QLatin1String("^\\s*\\b(end|else|until)\\b")))
+            || blockText.trimmed() == QLatin1String("}")) {
         ts.reindentLine(block, -ts.m_indentSize);
     }
 }

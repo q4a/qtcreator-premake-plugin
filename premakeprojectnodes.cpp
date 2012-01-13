@@ -53,12 +53,12 @@ struct PremakeNodeStaticData
 static void clearPremakeNodeStaticData();
 
 // TODO: Add file type icons
-Q_GLOBAL_STATIC_WITH_INITIALIZER(PremakeNodeStaticData, qt4NodeStaticData, {
+Q_GLOBAL_STATIC_WITH_INITIALIZER(PremakeNodeStaticData, premakeNodeStaticData, {
     // Overlay the SP_DirIcon with the custom icons
     const QSize desiredSize = QSize(16, 16);
 
     // Project icon
-    const QIcon projectBaseIcon(Constants::ICON_PREMAKEPROJECT);
+    const QIcon projectBaseIcon(QLatin1String(Constants::ICON_PREMAKEPROJECT));
     const QPixmap projectPixmap = Core::FileIconProvider::overlayIcon(QStyle::SP_DirIcon,
                                                                   projectBaseIcon,
                                                                   desiredSize);
@@ -69,7 +69,7 @@ Q_GLOBAL_STATIC_WITH_INITIALIZER(PremakeNodeStaticData, qt4NodeStaticData, {
 
 static void clearPremakeNodeStaticData()
 {
-    qt4NodeStaticData()->projectIcon = QIcon();
+    premakeNodeStaticData()->projectIcon = QIcon();
 }
 
 PremakeProjectNode::PremakeProjectNode(PremakeProject *project)
@@ -77,7 +77,7 @@ PremakeProjectNode::PremakeProjectNode(PremakeProject *project)
       m_project(project)
 {
     setDisplayName(m_project->displayName());
-    setIcon(qt4NodeStaticData()->projectIcon);
+    setIcon(premakeNodeStaticData()->projectIcon);
 }
 
 PremakeProjectNode::~PremakeProjectNode()

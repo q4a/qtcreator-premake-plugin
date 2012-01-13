@@ -58,14 +58,14 @@ const char * const SHADOW_BUILD_KEY("PremakeProjectManager.PremakeBuildConfigura
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
     : BuildConfiguration(parent, QLatin1String(Constants::PREMAKE_BC_ID))
     , m_fileName(parent->premakeProject()->file()->fileName())
-    , m_buildDirectory(target()->project()->projectDirectory() + "/build")
+    , m_buildDirectory(target()->project()->projectDirectory() + QLatin1String("/build"))
     , m_shadowBuildEnabled(true)
 {
 }
 
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent, const QString &id)
     : BuildConfiguration(parent, id)
-    , m_buildDirectory(target()->project()->projectDirectory() + "/build")
+    , m_buildDirectory(target()->project()->projectDirectory() + QLatin1String("/build"))
     , m_shadowBuildEnabled(true)
 {
 }
@@ -92,7 +92,7 @@ QVariantMap PremakeBuildConfiguration::toMap() const
 bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 {
     m_buildDirectory = map.value(QLatin1String(BUILD_DIRECTORY_KEY),
-                                 target()->project()->projectDirectory().append("/build")).toString();
+        target()->project()->projectDirectory().append(QLatin1String("/build"))).toString();
     m_shadowBuildEnabled = map.value(QLatin1String(SHADOW_BUILD_KEY),
                                      true).toBool();
 
@@ -223,8 +223,8 @@ PremakeBuildConfiguration *PremakeBuildConfigurationFactory::createBuildConfigur
     PremakeBuildConfiguration *bc = new PremakeBuildConfiguration(parent);
     bc->setDisplayName(name);
 
-    ProjectExplorer::BuildStepList *buildSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_BUILD);
-    ProjectExplorer::BuildStepList *cleanSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_CLEAN);
+    ProjectExplorer::BuildStepList *buildSteps = bc->stepList(QLatin1String(ProjectExplorer::Constants::BUILDSTEPS_BUILD));
+    ProjectExplorer::BuildStepList *cleanSteps = bc->stepList(QLatin1String(ProjectExplorer::Constants::BUILDSTEPS_CLEAN));
     Q_ASSERT(buildSteps);
     Q_ASSERT(cleanSteps);
     PremakeStep *premakeStep = new PremakeStep(buildSteps);
@@ -235,7 +235,7 @@ PremakeBuildConfiguration *PremakeBuildConfigurationFactory::createBuildConfigur
 
     MakeStep* cleanStep = new MakeStep(cleanSteps);
     cleanStep->setClean(true);
-    cleanStep->setUserArguments("clean");
+    cleanStep->setUserArguments(QLatin1String("clean"));
     cleanSteps->insertStep(0, cleanStep);
 
     return bc;
@@ -304,7 +304,7 @@ void PremakeBuildConfiguration::setQtVersion(QtSupport::BaseQtVersion *)
 QString PremakeBuildConfiguration::makeCommand() const
 {
     ToolChain *tc = toolChain();
-    return tc ? tc->makeCommand() : "make";
+    return tc ? tc->makeCommand() : QLatin1String("make");
 }
 
 QString PremakeBuildConfiguration::defaultMakeTarget() const
@@ -314,7 +314,7 @@ QString PremakeBuildConfiguration::defaultMakeTarget() const
 
 QString PremakeBuildConfiguration::makefile() const
 {
-    return QString("Makefile");
+    return QLatin1String("Makefile");
 }
 
 bool PremakeBuildConfiguration::shadowBuildEnabled() const

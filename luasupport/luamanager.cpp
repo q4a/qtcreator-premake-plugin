@@ -3,6 +3,7 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/messagemanager.h>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
@@ -12,7 +13,7 @@ using namespace LuaSupport;
 LuaManager::LuaManager() : m_bytecodeWriteStream(&m_bytecode, QIODevice::WriteOnly)
 {
     // Load bridge code
-    QFile premakebridge(":/premakeproject/premakebridge.lua");
+    QFile premakebridge(QLatin1String(":/premakeproject/premakebridge.lua"));
     premakebridge.open(QIODevice::ReadOnly);
     m_premakeBridge = QTextStream(&premakebridge).readAll().toUtf8();
     premakebridge.close();
@@ -34,7 +35,8 @@ LuaManager * LuaManager::instance()
 
 static void projectParseError(const QString &errorMessage)
 {
-    Core::ICore::instance()->messageManager()->printToOutputPanePopup("Premake error: " + errorMessage);
+    Core::ICore::instance()->messageManager()->printToOutputPanePopup(
+            QCoreApplication::translate("LuaManager", "Premake error: ") + errorMessage);
 }
 
 lua_State * LuaManager::initLuaState(const QString &fileName,
@@ -46,8 +48,8 @@ lua_State * LuaManager::initLuaState(const QString &fileName,
     luaL_openlibs(L);
 
     // Initialize Premake
-    QByteArray file = QFile::encodeName(QString("--file=").append(fileName));
-    QByteArray to = QFile::encodeName(QString("--to=").append(buildDir));
+    QByteArray file = QFile::encodeName(QString::fromLatin1("--file=").append(fileName));
+    QByteArray to = QFile::encodeName(QString::fromLatin1("--to=").append(buildDir));
     const char *argv[4];
     int argc;
     argv[0] = "";
@@ -62,13 +64,13 @@ lua_State * LuaManager::initLuaState(const QString &fileName,
     }
 
     if(premake_init(L, argc, argv) != 0) {
-        projectParseError(lua_tostring(L, -1));
+        projectParseError(QString::fromLocal8Bit(lua_tostring(L, -1)));
     }
 
     const char * lua_bridge_code = m_premakeBridge.constData();
 
     if (luaL_dostring(L, lua_bridge_code) != 0) {
-        projectParseError(lua_tostring(L, -1));
+        projectParseError(QString::fromLocal8Bit(lua_tostring(L, -1)));
     }
     return L;
 }

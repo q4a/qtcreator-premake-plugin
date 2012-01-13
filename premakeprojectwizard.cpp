@@ -108,7 +108,7 @@ Core::BaseFileWizardParameters PremakeProjectWizard::parameters()
         QPixmap icon(22, 22);
         icon.fill(Qt::transparent);
         QPainter p(&icon);
-        p.drawPixmap(0, 0, 22, 22, QPixmap(Constants::ICON_PREMAKE));
+        p.drawPixmap(0, 0, 22, 22, QPixmap(QLatin1String(Constants::ICON_PREMAKE)));
         parameters.setIcon(icon);
     }
     parameters.setDisplayName(tr("Premake Project"));
