@@ -8,13 +8,12 @@ class QComboBox;
 class QCheckBox;
 QT_END_NAMESPACE
 
-namespace ProjectExplorer {
-class ToolChain;
-}
+QT_BEGIN_NAMESPACE
+namespace Ui { class PremakeProjectConfigWidget; }
+QT_END_NAMESPACE
 
-namespace Utils {
-class PathChooser;
-}
+namespace ProjectExplorer { class ToolChain; }
+namespace Utils { class PathChooser; }
 
 namespace PremakeProjectManager {
 namespace Internal {
@@ -39,14 +38,15 @@ private Q_SLOTS:
     void toolChainSelected(int index);
     void toolChainChanged(ProjectExplorer::ToolChain *);
     void updateToolChainList();
+    void updateQtVersionList();
     void shadowBuildToggled(bool);
+    void manageQtVersions();
+    void manageToolChains();
 
 private:
     PremakeTarget *m_target;
-    Utils::PathChooser *m_pathChooser;
-    QComboBox *m_toolChainChooser;
-    QCheckBox *m_shadowBuild;
     PremakeBuildConfiguration *m_buildConfiguration;
+    Ui::PremakeProjectConfigWidget *m_ui;
 };
 
 } // namespace Internal

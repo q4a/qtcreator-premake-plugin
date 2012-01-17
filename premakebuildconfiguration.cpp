@@ -284,7 +284,7 @@ QString PremakeBuildConfiguration::projectFileName() const
 
 BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
 {
-    QtSupport::QtVersionManager *vm = QtVersionManager::instance();
+    QtVersionManager *vm = QtVersionManager::instance();
     foreach (BaseQtVersion *ver, vm->validVersions()) {
         foreach (Abi abi, ver->qtAbis()) {
             if (abiIsMsvc(abi))
