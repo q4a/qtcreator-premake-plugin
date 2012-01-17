@@ -33,6 +33,7 @@
 #include "premaketarget.h"
 
 #include "premakebuildconfiguration.h"
+#include "premakebuildsettingswidget.h"
 #include "premakeproject.h"
 #include "makestep.h"
 
