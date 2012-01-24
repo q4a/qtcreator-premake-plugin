@@ -69,7 +69,7 @@ public:
 
     // returns the qtVersion
     QtSupport::BaseQtVersion *qtVersion() const;
-    void setQtVersion(QtSupport::BaseQtVersion *);
+    void setQtVersion(QtSupport::BaseQtVersion *ver);
 
     QString makeCommand() const;
     QString defaultMakeTarget() const;
@@ -91,6 +91,7 @@ private:
     QString m_buildDirectory;
     QString m_fileName;
     bool m_shadowBuildEnabled;
+    mutable QtSupport::BaseQtVersion *m_qtVersion;
 };
 
 class PremakeBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurationFactory

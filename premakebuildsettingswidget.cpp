@@ -43,6 +43,8 @@ PremakeBuildSettingsWidget::PremakeBuildSettingsWidget(PremakeTarget *target)
     m_ui->warningLabel->hide();
 
     connect(m_ui->toolChainComboBox, SIGNAL(activated(int)), this, SLOT(toolChainSelected(int)));
+    connect(m_ui->qtVersionComboBox, SIGNAL(activated(int)), this, SLOT(qtVersionSelected(int)));
+
     connect(m_target->premakeProject(), SIGNAL(toolChainChanged(ToolChain*)),
             this, SLOT(toolChainChanged(ToolChain*)));
     connect(ToolChainManager::instance(), SIGNAL(toolChainAdded(ToolChain*)),
@@ -78,10 +80,15 @@ void PremakeBuildSettingsWidget::buildDirectoryChanged()
 
 void PremakeBuildSettingsWidget::toolChainSelected(int index)
 {
-    using namespace ProjectExplorer;
-
     ToolChain *tc = static_cast<ToolChain *>(m_ui->toolChainComboBox->itemData(index).value<void *>());
     m_target->activeBuildConfiguration()->setToolChain(tc);
+    m_target->premakeProject()->refresh(PremakeProject::Everything);
+}
+
+void PremakeBuildSettingsWidget::qtVersionSelected(int index)
+{
+    BaseQtVersion *ver = static_cast<BaseQtVersion *>(m_ui->qtVersionComboBox->itemData(index).value<void *>());
+    m_target->activeBuildConfiguration()->setQtVersion(ver);
     m_target->premakeProject()->refresh(PremakeProject::Everything);
 }
 
@@ -130,6 +137,9 @@ void PremakeBuildSettingsWidget::updateQtVersionList()
         if (tc && ver->qtAbis().contains(tc->targetAbi())) {
             m_ui->qtVersionComboBox->addItem(ver->displayName(),
                                              qVariantFromValue(static_cast<void *>(ver)));
+
+            if (ver->uniqueId() == m_target->activeBuildConfiguration()->qtVersion()->uniqueId())
+                m_ui->qtVersionComboBox->setCurrentIndex(m_ui->qtVersionComboBox->count() - 1);
         }
     }
 }

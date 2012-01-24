@@ -221,6 +221,9 @@ void PremakeProject::refresh(RefreshOptions options)
     if (modelManager) {
         CPlusPlus::CppModelManagerInterface::ProjectInfo pinfo = modelManager->projectInfo(this);
 
+        pinfo.frameworkPaths.clear();
+        pinfo.includePaths.clear();
+
         ToolChain *tc = activeTarget()->activeBuildConfiguration()->toolChain();
         if (tc) {
             pinfo.defines = tc->predefinedMacros();

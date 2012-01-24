@@ -53,6 +53,7 @@ using namespace QtSupport;
 namespace {
 const char * const BUILD_DIRECTORY_KEY("PremakeProjectManager.PremakeBuildConfiguration.BuildDirectory");
 const char * const SHADOW_BUILD_KEY("PremakeProjectManager.PremakeBuildConfiguration.ShadowBuild");
+const char * const QT_VERSION_ID_KEY("PremakeProjectManager.PremakeBuildConfiguration.QtVersionId");
 }
 
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
@@ -60,6 +61,7 @@ PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
     , m_fileName(parent->premakeProject()->file()->fileName())
     , m_buildDirectory(target()->project()->projectDirectory() + QLatin1String("/build"))
     , m_shadowBuildEnabled(true)
+    , m_qtVersion(0)
 {
 }
 
@@ -86,6 +88,7 @@ QVariantMap PremakeBuildConfiguration::toMap() const
     QVariantMap map(BuildConfiguration::toMap());
     map.insert(QLatin1String(BUILD_DIRECTORY_KEY), m_buildDirectory);
     map.insert(QLatin1String(SHADOW_BUILD_KEY), m_shadowBuildEnabled);
+    map.insert(QLatin1String(QT_VERSION_ID_KEY), m_qtVersion ? m_qtVersion->uniqueId() : 0);
     return map;
 }
 
@@ -95,6 +98,12 @@ bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
         target()->project()->projectDirectory().append(QLatin1String("/build"))).toString();
     m_shadowBuildEnabled = map.value(QLatin1String(SHADOW_BUILD_KEY),
                                      true).toBool();
+    const int qtVersionId = map.value(QLatin1String(QT_VERSION_ID_KEY)).toInt();
+    m_qtVersion = QtSupport::QtVersionManager::instance()->version(qtVersionId);
+
+//    Should qtVersion support PremakeProjectManager.Target.DesktopTarget?
+//    if (m_qtVersion && !m_qtVersion->supportsTargetId(target()->id()))
+//        m_qtVersion = 0;
 
     if (!toolChain()) {
 //        QList<ProjectExplorer::ToolChain *> list = ProjectExplorer::ToolChainManager::instance()->toolChains();
@@ -284,21 +293,25 @@ QString PremakeBuildConfiguration::projectFileName() const
 
 BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
 {
-    QtVersionManager *vm = QtVersionManager::instance();
-    foreach (BaseQtVersion *ver, vm->validVersions()) {
-        foreach (Abi abi, ver->qtAbis()) {
-            if (abiIsMsvc(abi))
-                qDebug() << "Skipping" << abi.toString();
-            else
-                return ver;
+    if (!m_qtVersion) {
+        QtVersionManager *vm = QtVersionManager::instance();
+        foreach (BaseQtVersion *ver, vm->validVersions()) {
+            foreach (Abi abi, ver->qtAbis()) {
+                if (abiIsMsvc(abi)) {
+                    qDebug() << "Skipping" << abi.toString();
+                } else {
+                    m_qtVersion = ver;
+                    return m_qtVersion;
+                }
+            }
         }
     }
-
-    return 0;
+    return m_qtVersion;
 }
 
-void PremakeBuildConfiguration::setQtVersion(QtSupport::BaseQtVersion *)
+void PremakeBuildConfiguration::setQtVersion(QtSupport::BaseQtVersion *ver)
 {
+    m_qtVersion = ver;
 }
 
 QString PremakeBuildConfiguration::makeCommand() const

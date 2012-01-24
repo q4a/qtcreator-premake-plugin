@@ -36,6 +36,7 @@ public:
 private Q_SLOTS:
     void buildDirectoryChanged();
     void toolChainSelected(int index);
+    void qtVersionSelected(int index);
     void toolChainChanged(ProjectExplorer::ToolChain *);
     void updateToolChainList();
     void updateQtVersionList();
