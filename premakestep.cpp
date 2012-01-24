@@ -163,7 +163,13 @@ void PremakeStep::run(QFutureInterface<bool> &fi)
                 premakeBuildConfiguration()->projectFileName(),
                 QByteArray("gmake"),
                 premakeBuildConfiguration()->shadowBuildEnabled(),
-                premakeBuildConfiguration()->buildDirectory());
+                premakeBuildConfiguration()->buildDirectory(),
+                true,
+                premakeBuildConfiguration()->qtVersion()->qmakeCommand()
+    #if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+                .toString()
+    #endif
+                );
     if(call_premake_main(L) != 0){
         emit addOutput(QString::fromLocal8Bit(lua_tostring(L, -1)), BuildStep::ErrorMessageOutput);
         fi.reportResult(false);

@@ -42,7 +42,9 @@ static void projectParseError(const QString &errorMessage)
 lua_State * LuaManager::initLuaState(const QString &fileName,
                                      const QByteArray &action,
                                      bool shadowBuild,
-                                     const QString &buildDir) const
+                                     const QString &buildDir,
+                                     bool usesQt,
+                                     const QString &qmakePath) const
 {
     lua_State *L = lua_open();
     luaL_openlibs(L);
@@ -50,22 +52,22 @@ lua_State * LuaManager::initLuaState(const QString &fileName,
     // Initialize Premake
     QByteArray file = QFile::encodeName(QString::fromLatin1("--file=").append(fileName));
     QByteArray to = QFile::encodeName(QString::fromLatin1("--to=").append(buildDir));
-    const char *argv[4];
-    int argc;
-    argv[0] = "";
-    argv[1] = file.data();
-    if(shadowBuild) {
-        argv[2] = to.data();
-        argv[3] = action.data();
-        argc = 4;
-    } else {
-        argv[2] = action.data();
-        argc = 3;
-    }
+    QByteArray qmake = QFile::encodeName(QString::fromLatin1("--qt-qmake=").append(qmakePath));
+    const char *argv[5];
+    int argc = 0;
+    argv[argc++] = "";
+    argv[argc++] = file.data();
 
-    if(premake_init(L, argc, argv) != 0) {
+    if (shadowBuild)
+        argv[argc++] = to.data();
+
+    if (usesQt)
+        argv[argc++] = qmake.data();
+
+    argv[argc++] = action.data();
+
+    if(premake_init(L, argc, argv) != 0)
         projectParseError(QString::fromLocal8Bit(lua_tostring(L, -1)));
-    }
 
     const char * lua_bridge_code = m_premakeBridge.constData();
 

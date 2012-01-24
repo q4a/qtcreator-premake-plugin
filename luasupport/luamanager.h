@@ -17,7 +17,9 @@ public:
 
     // return ready to use L
     lua_State *initLuaState(const QString &fileName, const QByteArray &action,
-                                  bool shadowBuild, const QString &buildDir) const;
+                                  bool shadowBuild, const QString &buildDir,
+                                  bool usesQt = false,
+                                  const QString &qmakePath = QString()) const;
 
 private:
     LuaManager();
