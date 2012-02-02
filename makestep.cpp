@@ -203,8 +203,10 @@ bool MakeStep::init()
         Utils::QtcProcess::addArg(&args, QLatin1String("-w"));
 
     if (toolchain) {
+#if IDE_VER < IDE_VERSION_CHECK(2, 4, 80)
         ProjectExplorer::GccToolChain *gcctc = dynamic_cast<ProjectExplorer::GccToolChain *>(toolchain);
         if (gcctc) {
+#endif
             QString cc;
             QString cxx;
             typedef QPair<QRegExp, QLatin1String> Rx;
@@ -219,15 +221,22 @@ bool MakeStep::init()
 #endif
             foreach (const Rx r, replacements)
             {
+#if IDE_VER < IDE_VERSION_CHECK(2, 4, 80)
                 cxx = gcctc->compilerPath();
+#else
+                cxx = toolchain->compilerCommand().toString();
+#endif
                 if (cxx.contains(r.first)) {
-                    cc = cxx.replace(r.first, r.second);
+                    cc = cxx;
+                    cc.replace(r.first, r.second);
                     break;
                 }
             }
             Utils::QtcProcess::addArg(&args, QLatin1String("CC=") + cc);
-            Utils::QtcProcess::addArg(&args, QLatin1String("CXX=") + gcctc->compilerPath());
+            Utils::QtcProcess::addArg(&args, QLatin1String("CXX=") + cxx);
+#if IDE_VER < IDE_VERSION_CHECK(2, 4, 80)
         }
+#endif
     }
 
     setEnabled(true);
