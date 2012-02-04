@@ -123,6 +123,40 @@ static void getLuaTable(lua_State *L, const char *tablename, QStringList &to)
     }
 }
 
+static void tableToStringList(lua_State *L, const QByteArray &tablename, QStringList &to)
+{
+    const QList<QByteArray> fields = tablename.split('.');
+    Q_ASSERT(fields.size() > 0);
+
+    // bring target table on stack
+    lua_checkstack(L, fields.size());
+    lua_getglobal(L, fields.first().data());
+    for (int i = 1; i < fields.size(); ++i) {
+        lua_getfield(L, -1, fields.at(i).data());
+    }
+
+    // get "getn" entry
+//    lua_pushstring(L, "getn");
+//    lua_gettable(L, -2);
+//    // call it and get result
+//    lua_pushvalue(L, -3); // -3 is our table
+//    if(lua_pcall(L, 1, 1, 0) != 0)
+//        qWarning() << lua_tostring(L, -1);
+    int n_elements = lua_objlen(L, -1); //lua_tonumber(L, -1);
+//    lua_pop(L, 2);
+    to.clear();
+    for(int i = 1; i <= n_elements; ++i) {
+        lua_pushinteger(L, i); // Lua index starts from 1
+        lua_gettable(L, -2);
+        const QString value = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
+        lua_pop(L, 1);
+        to << value;
+    }
+
+    lua_pop(L, fields.size()/* - 1*/);
+    qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
+}
+
 static void projectParseError(const QString &errorMessage)
 {
     Core::ICore::instance()->messageManager()->printToOutputPanePopup(
@@ -171,9 +205,9 @@ void PremakeProject::parseProject(RefreshOptions options)
     }
 
     if (options & Files) {
-        getLuaTable(L, "_qtcreator_files", m_files);
-        getLuaTable(L, "_qtcreator_generated_files", m_generated);
-        getLuaTable(L, "_qtcreator_scriptdepends", m_scriptDepends);
+        tableToStringList(L, "_qtcreator_files", m_files);
+        tableToStringList(L, "_qtcreator_generated_files", m_generated);
+        tableToStringList(L, "_qtcreator_scriptdepends", m_scriptDepends);
         m_scriptDepends.removeDuplicates();
         foreach(const QString &file, m_files) {
             m_scriptDepends.removeAll(file);
@@ -181,7 +215,7 @@ void PremakeProject::parseProject(RefreshOptions options)
     }
 
     if (options & Configuration) {
-        getLuaTable(L, "_qtcreator_includes", m_includePaths);
+        tableToStringList(L, "_qtcreator_includes", m_includePaths);
         m_includePaths.removeDuplicates();
         for (int i=0; i<m_includePaths.size(); ++i) {
             m_includePaths[i].replace(QLatin1String("$(QT_INCLUDE)"), qtInfo.value(QLatin1String("QT_INSTALL_HEADERS")));
@@ -190,7 +224,7 @@ void PremakeProject::parseProject(RefreshOptions options)
 //        qDebug() << Q_FUNC_INFO << "m_includePaths=" << m_includePaths;
 
         QStringList defines;
-        getLuaTable(L, "_qtcreator_defines", defines);
+        tableToStringList(L, "_qtcreator_defines", defines);
         defines.removeDuplicates();
         m_defines.clear();
         foreach(const QString &def, defines)
