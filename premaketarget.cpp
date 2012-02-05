@@ -152,9 +152,11 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
     PremakeTarget *t = new PremakeTarget(project);
 
     // Set up BuildConfiguration:
-    PremakeBuildConfiguration *bc = static_cast<PremakeBuildConfiguration *>
-            (t->buildConfigurationFactory()->createBuildConfiguration(t, QLatin1String("all")));
-    t->addBuildConfiguration(bc);
+    foreach (const QString conf, project->configurations()) {
+        PremakeBuildConfiguration *bc = static_cast<PremakeBuildConfiguration *>
+            (t->buildConfigurationFactory()->createBuildConfiguration(t, conf));
+        t->addBuildConfiguration(bc);
+    }
 
     t->addDeployConfiguration(t->deployConfigurationFactory()->create(t,
                 QLatin1String(ProjectExplorer::Constants::DEFAULT_DEPLOYCONFIGURATION_ID)));

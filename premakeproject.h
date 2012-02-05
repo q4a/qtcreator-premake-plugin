@@ -100,11 +100,13 @@ public:
     QStringList files() const;
     QStringList generated() const;
     QStringList scriptDepends() const;
+
+    QStringList configurations();
+
     ProjectExplorer::ToolChain *toolChain() const;
     void setToolChain(ProjectExplorer::ToolChain *tc);
 
     QVariantMap toMap() const;
-
 signals:
     void toolChainChanged(ProjectExplorer::ToolChain *);
 
@@ -113,6 +115,7 @@ protected:
 
 private:
     void parseProject(RefreshOptions options);
+    void parseConfigurations();
 
     PremakeManager *m_manager;
     QString m_fileName;
@@ -124,6 +127,7 @@ private:
     QStringList m_scriptDepends;
     QStringList m_includePaths;
     QByteArray m_defines;
+    QStringList m_configurations;
 
     PremakeProjectNode *m_rootNode;
     ProjectExplorer::ToolChain *m_toolChain;

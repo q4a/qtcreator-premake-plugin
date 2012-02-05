@@ -98,31 +98,6 @@ bool PremakeProject::removeFiles(const QStringList &filePaths)
     return false;
 }
 
-static void getLuaTable(lua_State *L, const char *tablename, QStringList &to)
-{
-    lua_getglobal(L, tablename);
-    // get "table" table
-    lua_pushstring(L, "table");
-    lua_gettable(L, LUA_GLOBALSINDEX);
-    // get "getn" entry
-    lua_pushstring(L, "getn");
-    lua_gettable(L, -2);
-    // call it and get result
-    lua_pushvalue(L, -3); // -3 is our table
-    if(lua_pcall(L, 1, 1, 0) != 0)
-        qWarning() << lua_tostring(L, -1);
-    int n_elements = lua_tonumber(L, -1);
-    lua_pop(L, 2);
-    to.clear();
-    for(int i=0; i<n_elements; ++i) {
-        lua_pushinteger(L, i+1); // Lua index starts from 1
-        lua_gettable(L, -2);
-        QString filename = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
-        lua_pop(L, 1);
-        to << filename; //m_rootDir.absoluteFilePath(filename);
-    }
-}
-
 static void tableToStringList(lua_State *L, const QByteArray &tablename, QStringList &to)
 {
     const QList<QByteArray> fields = tablename.split('.');
@@ -132,28 +107,26 @@ static void tableToStringList(lua_State *L, const QByteArray &tablename, QString
     lua_checkstack(L, fields.size());
     lua_getglobal(L, fields.first().data());
     for (int i = 1; i < fields.size(); ++i) {
+        if (lua_isnil(L, -1)) {
+            qWarning() << "Cannot access" << tablename << ":" << fields.at(i-1) << "is nil";
+            lua_pop(L, i);
+            return;
+        }
         lua_getfield(L, -1, fields.at(i).data());
     }
 
-    // get "getn" entry
-//    lua_pushstring(L, "getn");
-//    lua_gettable(L, -2);
-//    // call it and get result
-//    lua_pushvalue(L, -3); // -3 is our table
-//    if(lua_pcall(L, 1, 1, 0) != 0)
-//        qWarning() << lua_tostring(L, -1);
-    int n_elements = lua_objlen(L, -1); //lua_tonumber(L, -1);
-//    lua_pop(L, 2);
+    int n_elements = lua_objlen(L, -1);
     to.clear();
+    // Lua index starts from 1
     for(int i = 1; i <= n_elements; ++i) {
-        lua_pushinteger(L, i); // Lua index starts from 1
+        lua_pushinteger(L, i);
         lua_gettable(L, -2);
         const QString value = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
         lua_pop(L, 1);
         to << value;
     }
 
-    lua_pop(L, fields.size()/* - 1*/);
+    lua_pop(L, fields.size());
     qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
 }
 
@@ -165,6 +138,30 @@ static void projectParseError(const QString &errorMessage)
 static void projectParseError(const char *errorMessage)
 {
     projectParseError(QString::fromLocal8Bit(errorMessage));
+}
+
+void PremakeProject::parseConfigurations()
+{
+    /// @todo Create a persistent lua state with all built-in scripts loaded
+    /// and clone it before loading project
+    lua_State *L = LuaManager::instance()->initLuaState(m_fileName, "_qtcreator",
+                                                        false, QLatin1String(""));
+    if(call_premake_main(L) != 0)
+        projectParseError(lua_tostring(L, -1));
+
+    lua_getfield(L, LUA_GLOBALSINDEX, "_qtcreator_projectname");
+    if(lua_pcall(L, 0, 1, 0) != 0) {
+        projectParseError(lua_tostring(L, -1));
+    } else {
+        m_projectName = QString::fromLocal8Bit(lua_tostring(L, -1));
+        m_rootNode->setDisplayName(m_projectName);
+    }
+    lua_pop(L, 1);
+
+    tableToStringList(L, QString::fromLatin1("premake.solution.list.%1.configurations")
+                      .arg(m_projectName).toLocal8Bit(), m_configurations);
+
+    lua_close(L);
 }
 
 void PremakeProject::parseProject(RefreshOptions options)
@@ -180,9 +177,8 @@ void PremakeProject::parseProject(RefreshOptions options)
                                                         conf->shadowBuildEnabled(),
                                                         conf->buildDirectory());
 
-    if(call_premake_main(L) != 0){
+    if(call_premake_main(L) != 0)
         projectParseError(lua_tostring(L, -1));
-    }
 
     if (options & ProjectName) {
         lua_getfield(L, LUA_GLOBALSINDEX, "_qtcreator_projectname");
@@ -214,12 +210,19 @@ void PremakeProject::parseProject(RefreshOptions options)
         }
     }
 
+    // if (options & ?) {
+    tableToStringList(L, QString::fromLatin1("premake.solution.list.%1.configurations")
+                      .arg(m_projectName).toLocal8Bit(), m_configurations);
+    // }
+
     if (options & Configuration) {
         tableToStringList(L, "_qtcreator_includes", m_includePaths);
         m_includePaths.removeDuplicates();
         for (int i=0; i<m_includePaths.size(); ++i) {
-            m_includePaths[i].replace(QLatin1String("$(QT_INCLUDE)"), qtInfo.value(QLatin1String("QT_INSTALL_HEADERS")));
-            m_includePaths[i].replace(QLatin1String("$(QT_LIB)"), qtInfo.value(QLatin1String("QT_INSTALL_LIBS")));
+            m_includePaths[i].replace(QLatin1String("$(QT_INCLUDE)"),
+                                      qtInfo.value(QLatin1String("QT_INSTALL_HEADERS")));
+            m_includePaths[i].replace(QLatin1String("$(QT_LIB)"),
+                                      qtInfo.value(QLatin1String("QT_INSTALL_LIBS")));
         }
 //        qDebug() << Q_FUNC_INFO << "m_includePaths=" << m_includePaths;
 
@@ -228,7 +231,8 @@ void PremakeProject::parseProject(RefreshOptions options)
         defines.removeDuplicates();
         m_defines.clear();
         foreach(const QString &def, defines)
-            m_defines += QString::fromLatin1("#define %1\n").arg(def).replace(QLatin1Char('='), QLatin1Char(' ')).toLocal8Bit();
+            m_defines += QString::fromLatin1("#define %1\n").arg(def)
+                    .replace(QLatin1Char('='), QLatin1Char(' ')).toLocal8Bit();
 //        qWarning() << m_defines;
     }
 
@@ -314,6 +318,14 @@ QStringList PremakeProject::files() const
 
 QStringList PremakeProject::scriptDepends() const
 { return m_scriptDepends; }
+
+QStringList PremakeProject::configurations()
+{
+    if (m_configurations.isEmpty())
+        parseConfigurations();
+
+    return m_configurations;
+}
 
 QStringList PremakeProject::generated() const
 { return m_generated; }
@@ -440,9 +452,6 @@ bool PremakeProject::fromMap(const QVariantMap &map)
         }
         addTarget(t);
     }
-
-
-
 
     setIncludePaths(allIncludePaths());
 
