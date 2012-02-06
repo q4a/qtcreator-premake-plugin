@@ -69,6 +69,7 @@ public:
 
     // returns the qtVersion
     QtSupport::BaseQtVersion *qtVersion() const;
+    int qtVersionId() const;
     void setQtVersion(QtSupport::BaseQtVersion *ver);
 
     QString makeCommand() const;

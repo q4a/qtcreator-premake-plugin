@@ -291,9 +291,14 @@ QString PremakeBuildConfiguration::projectFileName() const
     return m_fileName;
 }
 
+int PremakeBuildConfiguration::qtVersionId() const
+{
+    return m_qtVersion ? m_qtVersion->uniqueId() : -1;
+}
+
 BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
 {
-    if (!m_qtVersion) {
+/*    if (!m_qtVersion) {
         QtVersionManager *vm = QtVersionManager::instance();
         foreach (BaseQtVersion *ver, vm->validVersions()) {
             foreach (Abi abi, ver->qtAbis()) {
@@ -305,7 +310,7 @@ BaseQtVersion * PremakeBuildConfiguration::qtVersion() const
                 }
             }
         }
-    }
+    }*/
     return m_qtVersion;
 }
 

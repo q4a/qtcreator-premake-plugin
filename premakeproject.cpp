@@ -127,7 +127,7 @@ static void tableToStringList(lua_State *L, const QByteArray &tablename, QString
     }
 
     lua_pop(L, fields.size());
-    qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
+    //qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
 }
 
 static void projectParseError(const QString &errorMessage)
@@ -167,9 +167,9 @@ void PremakeProject::parseConfigurations()
 void PremakeProject::parseProject(RefreshOptions options)
 {
     const PremakeBuildConfiguration *conf = activeTarget()->activeBuildConfiguration();
-
-    const QHash<QString,QString> qtInfo
-            = conf->qtVersion()->versionInfo();
+    QHash<QString,QString> qtInfo;
+    if (conf->qtVersion())
+        qtInfo = conf->qtVersion()->versionInfo();
 
     /// @todo Create a persistent lua state with all built-in scripts loaded
     /// and clone it before loading project

@@ -150,6 +150,14 @@ QString PremakeStep::allArguments() const
             args += QString::fromLatin1(" --to=%1")
                     .arg(projectDir.relativeFilePath(premakeBuildConfiguration()->buildDirectory()));
         }
+        if (premakeBuildConfiguration()->qtVersion()) {
+            args += QString::fromLatin1(" --qt-qmake=%1")
+                    .arg(premakeBuildConfiguration()->qtVersion()->qmakeCommand()
+    #if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+                .toString()
+    #endif
+                );
+        }
     }
     args += QLatin1String(" gmake");
     return args;
@@ -158,8 +166,9 @@ QString PremakeStep::allArguments() const
 void PremakeStep::run(QFutureInterface<bool> &fi)
 {
     emit addOutput(QString::fromLatin1("premake4 %1").arg(allArguments()), BuildStep::MessageOutput);
-
-    lua_State *L = LuaManager::instance()->initLuaState(
+    lua_State *L = 0;
+    if (premakeBuildConfiguration()->qtVersion()) {
+        L = LuaManager::instance()->initLuaState(
                 premakeBuildConfiguration()->projectFileName(),
                 QByteArray("gmake"),
                 premakeBuildConfiguration()->shadowBuildEnabled(),
@@ -170,6 +179,14 @@ void PremakeStep::run(QFutureInterface<bool> &fi)
                 .toString()
     #endif
                 );
+    } else {
+        L = LuaManager::instance()->initLuaState(
+                premakeBuildConfiguration()->projectFileName(),
+                QByteArray("gmake"),
+                premakeBuildConfiguration()->shadowBuildEnabled(),
+                premakeBuildConfiguration()->buildDirectory()
+                );
+    }
     if(call_premake_main(L) != 0){
         emit addOutput(QString::fromLocal8Bit(lua_tostring(L, -1)), BuildStep::ErrorMessageOutput);
         fi.reportResult(false);

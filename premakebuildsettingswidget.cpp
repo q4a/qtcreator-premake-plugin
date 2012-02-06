@@ -82,6 +82,7 @@ void PremakeBuildSettingsWidget::toolChainSelected(int index)
 {
     ToolChain *tc = static_cast<ToolChain *>(m_ui->toolChainComboBox->itemData(index).value<void *>());
     m_target->activeBuildConfiguration()->setToolChain(tc);
+    updateQtVersionList();
     m_target->premakeProject()->refresh(PremakeProject::Everything);
 }
 
@@ -121,26 +122,52 @@ void PremakeBuildSettingsWidget::updateToolChainList()
         if (m_target->activeBuildConfiguration()->toolChain()
                 && m_target->activeBuildConfiguration()->toolChain()->id() == tc->id())
             m_ui->toolChainComboBox->setCurrentIndex(m_ui->toolChainComboBox->count() - 1);
-        if (!m_target->activeBuildConfiguration()->toolChain())
+        if (!m_target->activeBuildConfiguration()->toolChain()) {
             m_target->activeBuildConfiguration()->setToolChain(tc);
+        }
     }
     updateQtVersionList();
+}
+
+static bool qtVersionCompatibleWithToolchain(const BaseQtVersion *ver, const ToolChain *tc)
+{
+    if (ver && tc) {
+        const Abi &tcAbi = tc->targetAbi();
+        foreach (const Abi &abi, ver->qtAbis()) {
+            qDebug() << Q_FUNC_INFO << abi.toString() << tcAbi.toString() << abi.isCompatibleWith(tcAbi);
+            if (abi.isCompatibleWith(tcAbi))
+                return true;
+        }
+    }
+    return false;
 }
 
 void PremakeBuildSettingsWidget::updateQtVersionList()
 {
     m_ui->qtVersionComboBox->clear();
 
+    ToolChain *tc = m_target->activeBuildConfiguration()->toolChain();
+    BaseQtVersion *currentVer = m_target->activeBuildConfiguration()->qtVersion();
+    if (currentVer && !qtVersionCompatibleWithToolchain(currentVer, tc)) {
+        m_target->activeBuildConfiguration()->setQtVersion(0);
+    }
+
     QtVersionManager *vm = QtVersionManager::instance();
     foreach (BaseQtVersion *ver, vm->validVersions()) {
-        ToolChain *tc = m_target->activeBuildConfiguration()->toolChain();
-        if (tc && ver->qtAbis().contains(tc->targetAbi())) {
+        if (tc && qtVersionCompatibleWithToolchain(ver, tc)) {
             m_ui->qtVersionComboBox->addItem(ver->displayName(),
                                              qVariantFromValue(static_cast<void *>(ver)));
 
-            if (ver->uniqueId() == m_target->activeBuildConfiguration()->qtVersion()->uniqueId())
+            if (ver->uniqueId() == m_target->activeBuildConfiguration()->qtVersionId())
                 m_ui->qtVersionComboBox->setCurrentIndex(m_ui->qtVersionComboBox->count() - 1);
+            if (!m_target->activeBuildConfiguration()->qtVersion())
+                m_target->activeBuildConfiguration()->setQtVersion(ver);
         }
+    }
+
+    if (!m_target->activeBuildConfiguration()->qtVersion()) {
+        m_ui->qtVersionComboBox->addItem(tr("<Auto-detected Qt version>"), qVariantFromValue(static_cast<void *>(0)));
+        m_ui->qtVersionComboBox->setCurrentIndex(0);
     }
 }
 
