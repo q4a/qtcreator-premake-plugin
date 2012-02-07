@@ -54,6 +54,7 @@ namespace {
 const char * const BUILD_DIRECTORY_KEY("PremakeProjectManager.PremakeBuildConfiguration.BuildDirectory");
 const char * const SHADOW_BUILD_KEY("PremakeProjectManager.PremakeBuildConfiguration.ShadowBuild");
 const char * const QT_VERSION_ID_KEY("PremakeProjectManager.PremakeBuildConfiguration.QtVersionId");
+const char * const INTERNAL_CONFIGURATION_KEY("PremakeProjectManager.PremakeBuildConfiguration.InternalConfiguration");
 }
 
 PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
@@ -89,11 +90,18 @@ QVariantMap PremakeBuildConfiguration::toMap() const
     map.insert(QLatin1String(BUILD_DIRECTORY_KEY), m_buildDirectory);
     map.insert(QLatin1String(SHADOW_BUILD_KEY), m_shadowBuildEnabled);
     map.insert(QLatin1String(QT_VERSION_ID_KEY), m_qtVersion ? m_qtVersion->uniqueId() : 0);
+    map.insert(QLatin1String(INTERNAL_CONFIGURATION_KEY), m_internalConfiguration);
     return map;
 }
 
 bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 {
+    if (!BuildConfiguration::fromMap(map))
+        return false;
+
+    // Default value ???
+    m_internalConfiguration = map.value(QLatin1String(INTERNAL_CONFIGURATION_KEY), QByteArray()).toByteArray();
+
     m_buildDirectory = map.value(QLatin1String(BUILD_DIRECTORY_KEY),
         target()->project()->projectDirectory().append(QLatin1String("/build"))).toString();
     m_shadowBuildEnabled = map.value(QLatin1String(SHADOW_BUILD_KEY),
@@ -120,7 +128,7 @@ bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 //            }
     }
 
-    return BuildConfiguration::fromMap(map);
+    return true;
 }
 
 QString PremakeBuildConfiguration::buildDirectory() const
@@ -156,6 +164,33 @@ void PremakeBuildConfiguration::setBuildDirectory(const QString &buildDirectory)
 PremakeTarget *PremakeBuildConfiguration::premakeTarget() const
 {
     return static_cast<PremakeTarget *>(target());
+}
+
+QByteArray PremakeBuildConfiguration::internalConfigurationName() const
+{
+    return m_internalConfiguration;
+}
+
+void PremakeBuildConfiguration::setInternalConfigurationName(const QByteArray &internalConf)
+{
+    const QByteArray old = m_internalConfiguration;
+    m_internalConfiguration = internalConf;
+
+    if (!old.isEmpty() && old != internalConf) {
+        m_shortConfiguration.clear();
+        // emit ?
+        premakeTarget()->premakeProject()->refresh(PremakeProject::Everything);
+    }
+}
+
+QByteArray PremakeBuildConfiguration::shortConfigurationName() const
+{
+    return m_shortConfiguration;
+}
+
+void PremakeBuildConfiguration::setShortConfigurationName(const QByteArray &shortName)
+{
+    m_shortConfiguration = shortName;
 }
 
 ProjectExplorer::IOutputParser *PremakeBuildConfiguration::createOutputParser() const
@@ -208,28 +243,31 @@ BuildConfiguration *PremakeBuildConfigurationFactory::create(ProjectExplorer::Ta
     if (!canCreate(parent, id))
         return 0;
 
-    //TODO asking for name is duplicated everywhere, but maybe more
-    // wizards will show up, that incorporate choosing the name
-    bool ok;
-    QString buildConfigurationName = QInputDialog::getText(0,
-                          tr("New Configuration"),
-                          tr("New configuration name:"),
-                          QLineEdit::Normal,
-                          QString(),
-                          &ok);
-    if (!ok || buildConfigurationName.isEmpty())
-        return false;
+//    //TODO asking for name is duplicated everywhere, but maybe more
+//    // wizards will show up, that incorporate choosing the name
+//    bool ok;
+//    QString buildConfigurationName = QInputDialog::getText(0,
+//                          tr("New Configuration"),
+//                          tr("New configuration name:"),
+//                          QLineEdit::Normal,
+//                          QString(),
+//                          &ok);
+//    if (!ok || buildConfigurationName.isEmpty())
+//        return false;
 
-    PremakeBuildConfiguration *bc = createBuildConfiguration(static_cast<PremakeTarget *>(parent),
-                                                             buildConfigurationName);
-    parent->addBuildConfiguration(bc); // also makes the name unique...
-    return bc;
+//    PremakeBuildConfiguration *bc = createBuildConfiguration(static_cast<PremakeTarget *>(parent),
+//                                                             buildConfigurationName);
+//    parent->addBuildConfiguration(bc); // also makes the name unique...
+//    return bc;
+    return 0;
 }
 
 PremakeBuildConfiguration *PremakeBuildConfigurationFactory::createBuildConfiguration(PremakeTarget *parent,
-                                                                                      const QString &name)
+                                                                                      const QString &name,
+                                                                                      const QByteArray &premakeConfigurationName)
 {
     PremakeBuildConfiguration *bc = new PremakeBuildConfiguration(parent);
+    bc->setInternalConfigurationName(premakeConfigurationName);
     bc->setDisplayName(name);
 
     ProjectExplorer::BuildStepList *buildSteps = bc->stepList(QLatin1String(ProjectExplorer::Constants::BUILDSTEPS_BUILD));

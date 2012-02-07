@@ -154,7 +154,7 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
     // Set up BuildConfiguration:
     foreach (const QString conf, project->configurations()) {
         PremakeBuildConfiguration *bc = static_cast<PremakeBuildConfiguration *>
-            (t->buildConfigurationFactory()->createBuildConfiguration(t, conf));
+            (t->buildConfigurationFactory()->createBuildConfiguration(t, conf, conf.toLocal8Bit()));
         t->addBuildConfiguration(bc);
     }
 

@@ -171,6 +171,7 @@ void PremakeStep::run(QFutureInterface<bool> &fi)
         L = LuaManager::instance()->initLuaState(
                 premakeBuildConfiguration()->projectFileName(),
                 QByteArray("gmake"),
+                QByteArray(),
                 premakeBuildConfiguration()->shadowBuildEnabled(),
                 premakeBuildConfiguration()->buildDirectory(),
                 true,
@@ -183,6 +184,7 @@ void PremakeStep::run(QFutureInterface<bool> &fi)
         L = LuaManager::instance()->initLuaState(
                 premakeBuildConfiguration()->projectFileName(),
                 QByteArray("gmake"),
+                QByteArray(),
                 premakeBuildConfiguration()->shadowBuildEnabled(),
                 premakeBuildConfiguration()->buildDirectory()
                 );

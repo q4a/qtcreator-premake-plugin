@@ -98,53 +98,131 @@ bool PremakeProject::removeFiles(const QStringList &filePaths)
     return false;
 }
 
-static void tableToStringList(lua_State *L, const QByteArray &tablename, QStringList &to)
-{
-    const QList<QByteArray> fields = tablename.split('.');
-    Q_ASSERT(fields.size() > 0);
-
-    // bring target table on stack
-    lua_checkstack(L, fields.size());
-    lua_getglobal(L, fields.first().data());
-    for (int i = 1; i < fields.size(); ++i) {
-        if (lua_isnil(L, -1)) {
-            qWarning() << "Cannot access" << tablename << ":" << fields.at(i-1) << "is nil";
-            lua_pop(L, i);
-            return;
-        }
-        lua_getfield(L, -1, fields.at(i).data());
-    }
-
-    int n_elements = lua_objlen(L, -1);
-    to.clear();
-    // Lua index starts from 1
-    for(int i = 1; i <= n_elements; ++i) {
-        lua_pushinteger(L, i);
-        lua_gettable(L, -2);
-        const QString value = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
-        lua_pop(L, 1);
-        to << value;
-    }
-
-    lua_pop(L, fields.size());
-    //qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
-}
-
 static void projectParseError(const QString &errorMessage)
 {
     Core::ICore::instance()->messageManager()->printToOutputPanePopup(
             QCoreApplication::translate("PremakeProject", "Premake error: ") + errorMessage);
 }
+
 static void projectParseError(const char *errorMessage)
 {
     projectParseError(QString::fromLocal8Bit(errorMessage));
 }
 
+class Callback
+{
+public:
+    // This function operates on stack top value
+    virtual bool call(lua_State *L) = 0;
+};
+
+class GetStringList : public Callback
+{
+public:
+    GetStringList(QStringList &to) : m_to(to) {}
+
+    bool call(lua_State *L)
+    {
+        int n_elements = lua_objlen(L, -1);
+        m_to.clear();
+        // Lua index starts from 1
+        for(int i = 1; i <= n_elements; ++i) {
+            lua_pushinteger(L, i);
+            lua_gettable(L, -2);
+            const QString value = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
+            lua_pop(L, 1);
+            m_to << value;
+        }
+        return true;
+    }
+
+private:
+    QStringList &m_to;
+};
+
+class CallLuaFunctionSingleReturnValue : public Callback
+{
+public:
+    bool call(lua_State *L)
+    {
+        foreach (const QByteArray &arg, m_args)
+            lua_pushstring(L, arg);
+
+        if(lua_pcall(L, m_args.size(), 1, 0) != 0) {
+            projectParseError(lua_tostring(L, -1));
+            return false;
+        } else {
+            m_result = QString::fromLocal8Bit(lua_tostring(L, -1));
+            return true;
+        }
+    }
+
+    void setArgs(const QList<QByteArray> &args)
+    {
+        m_args = args;
+    }
+
+    QString result()
+    {
+        return m_result;
+    }
+
+private:
+    QList<QByteArray> m_args;
+    QString m_result;
+};
+
+static bool luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback)
+{
+    qDebug() << Q_FUNC_INFO << "enter stack pos" << lua_gettop(L);
+    const QList<QByteArray> fields = objname.split('.');
+    Q_ASSERT(fields.size() > 0);
+
+    // Bring target table on stack
+    lua_checkstack(L, fields.size());
+    lua_getglobal(L, fields.first().data());
+    for (int i = 1; i < fields.size(); ++i) {
+        if (lua_isnil(L, -1)) {
+            qWarning() << "Cannot access" << objname << ":" << fields.at(i-1) << "is nil";
+            lua_pop(L, i);
+            return false;
+        }
+        lua_getfield(L, -1, fields.at(i).data());
+    }
+
+    // Perform needed actions
+    qDebug() << Q_FUNC_INFO << "callback enter stack pos" << lua_gettop(L);
+    bool result = callback.call(L);
+    qDebug() << Q_FUNC_INFO << "callback exit stack pos" << lua_gettop(L);
+
+    // Restore stack state
+    lua_pop(L, fields.size());
+    qDebug() << Q_FUNC_INFO << "exit stack pos" << lua_gettop(L);
+    return result;
+}
+
+static QString callLuaFunction(lua_State *L, const QByteArray &funcname,
+                               const QList<QByteArray> &args = QList<QByteArray>())
+{
+    CallLuaFunctionSingleReturnValue callback;
+    callback.setArgs(args);
+    luaRecursiveAccessor(L, funcname, callback);
+    return callback.result();
+}
+
+static void tableToStringList(lua_State *L, const QByteArray &tablename, QStringList &to)
+{
+    GetStringList callback(to);
+    luaRecursiveAccessor(L, tablename, callback);
+    qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
+}
+
+
 void PremakeProject::parseConfigurations()
 {
     /// @todo Create a persistent lua state with all built-in scripts loaded
     /// and clone it before loading project
-    lua_State *L = LuaManager::instance()->initLuaState(m_fileName, "_qtcreator",
+    lua_State *L = LuaManager::instance()->initLuaState(m_fileName, "_qtcreator", QByteArray(),
                                                         false, QLatin1String(""));
     if(call_premake_main(L) != 0)
         projectParseError(lua_tostring(L, -1));
@@ -174,6 +252,7 @@ void PremakeProject::parseProject(RefreshOptions options)
     /// @todo Create a persistent lua state with all built-in scripts loaded
     /// and clone it before loading project
     lua_State *L = LuaManager::instance()->initLuaState(m_fileName, "_qtcreator",
+                                                        conf->internalConfigurationName(),
                                                         conf->shadowBuildEnabled(),
                                                         conf->buildDirectory());
 
@@ -213,6 +292,17 @@ void PremakeProject::parseProject(RefreshOptions options)
     // if (options & ?) {
     tableToStringList(L, QString::fromLatin1("premake.solution.list.%1.configurations")
                       .arg(m_projectName).toLocal8Bit(), m_configurations);
+    foreach (BuildConfiguration *c, activeTarget()->buildConfigurations()) {
+        PremakeBuildConfiguration *pc = qobject_cast<PremakeBuildConfiguration *>(c);
+        if (pc && pc->shortConfigurationName().isEmpty()) {
+            const QString result = callLuaFunction(L, "premake.getconfigname",
+                                          QList<QByteArray>() << pc->internalConfigurationName() << "Native" << "true");
+            qDebug() << Q_FUNC_INFO << "Updating make config for" << pc->displayName() << result;
+            pc->setShortConfigurationName(result.toLocal8Bit());
+
+        }
+    }
+
     // }
 
     if (options & Configuration) {

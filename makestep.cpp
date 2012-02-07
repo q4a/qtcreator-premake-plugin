@@ -239,6 +239,9 @@ bool MakeStep::init()
 #endif
     }
 
+    // Configuration name
+    Utils::QtcProcess::addArg(&args, QLatin1String("config=") + QLatin1String(premakeBuildConfiguration()->shortConfigurationName()));
+
     setEnabled(true);
     pp->setArguments(args);
 

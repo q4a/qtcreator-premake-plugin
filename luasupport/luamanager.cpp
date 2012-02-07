@@ -41,6 +41,7 @@ static void projectParseError(const QString &errorMessage)
 
 lua_State * LuaManager::initLuaState(const QString &fileName,
                                      const QByteArray &action,
+                                     const QByteArray &configuration,
                                      bool shadowBuild,
                                      const QString &buildDir,
                                      bool usesQt,
@@ -65,6 +66,9 @@ lua_State * LuaManager::initLuaState(const QString &fileName,
         argv[argc++] = qmake.data();
 
     argv[argc++] = action.data();
+
+    if (!configuration.isEmpty())
+        argv[argc++] = configuration.data();
 
     if(premake_init(L, argc, argv) != 0)
         projectParseError(QString::fromLocal8Bit(lua_tostring(L, -1)));

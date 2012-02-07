@@ -54,6 +54,11 @@ public:
 
     PremakeTarget *premakeTarget() const;
 
+    QByteArray internalConfigurationName() const;
+    void setInternalConfigurationName(const QByteArray &internalConf);
+    QByteArray shortConfigurationName() const;
+    void setShortConfigurationName(const QByteArray &shortName);
+
     virtual QString buildDirectory() const;
 
     QString rawBuildDirectory() const;
@@ -89,8 +94,10 @@ protected:
     virtual bool fromMap(const QVariantMap &map);
 
 private:
-    QString m_buildDirectory;
     QString m_fileName;
+    QString m_buildDirectory;
+    QByteArray m_internalConfiguration;
+    QByteArray m_shortConfiguration;
     bool m_shadowBuildEnabled;
     mutable QtSupport::BaseQtVersion *m_qtVersion;
 };
@@ -112,7 +119,9 @@ public:
     ProjectExplorer::BuildConfiguration *clone(ProjectExplorer::Target *parent, ProjectExplorer::BuildConfiguration *source);
     bool canRestore(ProjectExplorer::Target *parent, const QVariantMap &map) const;
     ProjectExplorer::BuildConfiguration *restore(ProjectExplorer::Target *parent, const QVariantMap &map);
-    PremakeBuildConfiguration *createBuildConfiguration(PremakeTarget *parent, const QString &name);
+    PremakeBuildConfiguration *createBuildConfiguration(PremakeTarget *parent,
+                                                        const QString &name,
+                                                        const QByteArray &premakeConfigurationName);
 };
 
 } // namespace Internal

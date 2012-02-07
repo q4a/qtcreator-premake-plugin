@@ -73,12 +73,10 @@ newaction {
     isinternal = true,
     depends = { 'qt' },
     onproject = function(prj)
-        print("Starting project " .. prj.name)
+        local cfgname = _ARGS[1] or prj.solution.configurations[1]
+        print("Starting project " .. prj.name .. "configuration " .. cfgname)
         -- TODO: Query Makefile variable values directly
 
-        -- Uses first configuration
-        -- FIXME: use active configuration
-        local cfgname = prj.solution.configurations[1]
         local cfg = premake.getconfig(prj, cfgname, "Native")
 
         local mocdir = path.join(prj.location, cfg.mocdir or cfg.objectsdir)
