@@ -36,6 +36,7 @@
 #include "premakeprojectconstants.h"
 #include "premaketarget.h"
 #include "luamanager.h"
+#include "luatocpp.h"
 
 #include <projectexplorer/buildenvironmentwidget.h>
 #include <projectexplorer/headerpath.h>
@@ -109,112 +110,24 @@ static void projectParseError(const char *errorMessage)
     projectParseError(QString::fromLocal8Bit(errorMessage));
 }
 
-class Callback
-{
-public:
-    // This function operates on stack top value
-    virtual bool call(lua_State *L) = 0;
-};
-
-class GetStringList : public Callback
-{
-public:
-    GetStringList(QStringList &to) : m_to(to) {}
-
-    bool call(lua_State *L)
-    {
-        int n_elements = lua_objlen(L, -1);
-        m_to.clear();
-        // Lua index starts from 1
-        for(int i = 1; i <= n_elements; ++i) {
-            lua_pushinteger(L, i);
-            lua_gettable(L, -2);
-            const QString value = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
-            lua_pop(L, 1);
-            m_to << value;
-        }
-        return true;
-    }
-
-private:
-    QStringList &m_to;
-};
-
-class CallLuaFunctionSingleReturnValue : public Callback
-{
-public:
-    bool call(lua_State *L)
-    {
-        foreach (const QByteArray &arg, m_args)
-            lua_pushstring(L, arg);
-
-        if(lua_pcall(L, m_args.size(), 1, 0) != 0) {
-            projectParseError(lua_tostring(L, -1));
-            return false;
-        } else {
-            m_result = QString::fromLocal8Bit(lua_tostring(L, -1));
-            return true;
-        }
-    }
-
-    void setArgs(const QList<QByteArray> &args)
-    {
-        m_args = args;
-    }
-
-    QString result()
-    {
-        return m_result;
-    }
-
-private:
-    QList<QByteArray> m_args;
-    QString m_result;
-};
-
-static bool luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback)
-{
-    qDebug() << Q_FUNC_INFO << "enter stack pos" << lua_gettop(L);
-    const QList<QByteArray> fields = objname.split('.');
-    Q_ASSERT(fields.size() > 0);
-
-    // Bring target table on stack
-    lua_checkstack(L, fields.size());
-    lua_getglobal(L, fields.first().data());
-    for (int i = 1; i < fields.size(); ++i) {
-        if (lua_isnil(L, -1)) {
-            qWarning() << "Cannot access" << objname << ":" << fields.at(i-1) << "is nil";
-            lua_pop(L, i);
-            return false;
-        }
-        lua_getfield(L, -1, fields.at(i).data());
-    }
-
-    // Perform needed actions
-    qDebug() << Q_FUNC_INFO << "callback enter stack pos" << lua_gettop(L);
-    bool result = callback.call(L);
-    qDebug() << Q_FUNC_INFO << "callback exit stack pos" << lua_gettop(L);
-
-    // Restore stack state
-    lua_pop(L, fields.size());
-    qDebug() << Q_FUNC_INFO << "exit stack pos" << lua_gettop(L);
-    return result;
-}
-
 static QString callLuaFunction(lua_State *L, const QByteArray &funcname,
                                const QList<QByteArray> &args = QList<QByteArray>())
 {
     CallLuaFunctionSingleReturnValue callback;
     callback.setArgs(args);
-    luaRecursiveAccessor(L, funcname, callback);
+    if (!luaRecursiveAccessor(L, funcname, callback)) {
+        projectParseError(QString::fromLatin1(funcname) + QString::fromLatin1(": ")
+                          + callback.error());
+    }
     return callback.result();
 }
 
 static void tableToStringList(lua_State *L, const QByteArray &tablename, QStringList &to)
 {
     GetStringList callback(to);
-    luaRecursiveAccessor(L, tablename, callback);
-    qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
+    if (!luaRecursiveAccessor(L, tablename, callback))
+        projectParseError(callback.error());
+//    qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
 }
 
 
@@ -227,14 +140,8 @@ void PremakeProject::parseConfigurations()
     if(call_premake_main(L) != 0)
         projectParseError(lua_tostring(L, -1));
 
-    lua_getfield(L, LUA_GLOBALSINDEX, "_qtcreator_projectname");
-    if(lua_pcall(L, 0, 1, 0) != 0) {
-        projectParseError(lua_tostring(L, -1));
-    } else {
-        m_projectName = QString::fromLocal8Bit(lua_tostring(L, -1));
-        m_rootNode->setDisplayName(m_projectName);
-    }
-    lua_pop(L, 1);
+    m_projectName = callLuaFunction(L, "_qtcreator_projectname");
+    m_rootNode->setDisplayName(m_projectName);
 
     tableToStringList(L, QString::fromLatin1("premake.solution.list.%1.configurations")
                       .arg(m_projectName).toLocal8Bit(), m_configurations);
@@ -260,23 +167,14 @@ void PremakeProject::parseProject(RefreshOptions options)
         projectParseError(lua_tostring(L, -1));
 
     if (options & ProjectName) {
-        lua_getfield(L, LUA_GLOBALSINDEX, "_qtcreator_projectname");
-        if(lua_pcall(L, 0, 1, 0) != 0) {
-            projectParseError(lua_tostring(L, -1));
-        } else {
-            m_projectName = QString::fromLocal8Bit(lua_tostring(L, -1));
-            m_rootNode->setDisplayName(m_projectName);
-        }
-        lua_pop(L, 1);
+        m_projectName = callLuaFunction(L, "_qtcreator_projectname");
+        m_rootNode->setDisplayName(m_projectName);
     }
 
     if(options & RootPath) {
-        lua_getfield(L, LUA_GLOBALSINDEX, "_qtcreator_rootpath");
-        if(lua_pcall(L, 0, 1, 0) != 0)
-            projectParseError(lua_tostring(L, -1));
-        else
-            m_rootNode->setPath(QString::fromLocal8Bit(lua_tostring(L, -1)));
-        lua_pop(L, 1);
+        const QString rootPath = callLuaFunction(L, "_qtcreator_rootpath");
+        if (!rootPath.isEmpty())
+            m_rootNode->setPath(rootPath);
     }
 
     if (options & Files) {
