@@ -211,7 +211,8 @@ bool MakeStep::init()
             QString cxx;
             typedef QPair<QRegExp, QLatin1String> Rx;
             QList<Rx> replacements = QList<Rx>()
-                << qMakePair(QRegExp(QLatin1String("icpc$")), QLatin1String("icc"))
+                << qMakePair(QRegExp(QLatin1String("icpc$")), QLatin1String("icc")) // Intel
+                << qMakePair(QRegExp(QLatin1String("pathCC$")), QLatin1String("pathcc")) // PathScale
                 << qMakePair(QRegExp(QLatin1String("clang\\+\\+")), QLatin1String("clang"))
                 << qMakePair(QRegExp(QLatin1String("g\\+\\+$")), QLatin1String("gcc"));
 #ifdef Q_OS_WIN32
