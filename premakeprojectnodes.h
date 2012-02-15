@@ -38,10 +38,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QHash>
 
-namespace Core {
-class IFile;
-}
-
 namespace PremakeProjectManager {
 namespace Internal {
 
