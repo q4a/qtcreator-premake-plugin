@@ -106,6 +106,9 @@ public:
     ProjectExplorer::ToolChain *toolChain() const;
     void setToolChain(ProjectExplorer::ToolChain *tc);
 
+    bool hasBuildTarget(const QString &title) const;
+    QStringList buildTargetTitles() const;
+
     QVariantMap toMap() const;
 signals:
     void toolChainChanged(ProjectExplorer::ToolChain *);
@@ -128,6 +131,9 @@ private:
     QStringList m_includePaths;
     QByteArray m_defines;
     QStringList m_configurations;
+
+    QStringList m_consoleApps;
+    QStringList m_windowedApps;
 
     PremakeProjectNode *m_rootNode;
     ProjectExplorer::ToolChain *m_toolChain;

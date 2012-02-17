@@ -38,7 +38,8 @@ HEADERS += premakeproject.h \
     premakestep.h \
     premakebuildconfiguration.h \
     premakebuildsettingswidget.h \
-    makestep.h
+    makestep.h \
+    premakerunconfiguration.h
 SOURCES += premakeproject.cpp \
     premakeprojectplugin.cpp \
     premaketarget.cpp \
@@ -48,7 +49,8 @@ SOURCES += premakeproject.cpp \
     premakestep.cpp \
     premakebuildconfiguration.cpp \
     premakebuildsettingswidget.cpp \
-    makestep.cpp
+    makestep.cpp \
+    premakerunconfiguration.cpp
 
 SOURCES += \
     scripts.c \

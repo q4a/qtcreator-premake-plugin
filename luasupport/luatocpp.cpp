@@ -47,7 +47,7 @@ Callback::~Callback()
 
 bool LuaSupport::luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback)
 {
-    qDebug() << Q_FUNC_INFO << "enter stack pos" << lua_gettop(L);
+//    qDebug() << Q_FUNC_INFO << "enter stack pos" << lua_gettop(L);
     const QList<QByteArray> fields = objname.split('.');
     Q_ASSERT(fields.size() > 0);
 
@@ -64,13 +64,13 @@ bool LuaSupport::luaRecursiveAccessor(lua_State *L, const QByteArray &objname, C
     }
 
     // Perform needed actions
-    qDebug() << Q_FUNC_INFO << "callback enter stack pos" << lua_gettop(L);
+//    qDebug() << Q_FUNC_INFO << "callback enter stack pos" << lua_gettop(L);
     bool result = callback.call(L);
-    qDebug() << Q_FUNC_INFO << "callback exit stack pos" << lua_gettop(L);
+//    qDebug() << Q_FUNC_INFO << "callback exit stack pos" << lua_gettop(L);
 
     // Restore stack state
     lua_pop(L, fields.size());
-    qDebug() << Q_FUNC_INFO << "exit stack pos" << lua_gettop(L);
+//    qDebug() << Q_FUNC_INFO << "exit stack pos" << lua_gettop(L);
     return result;
 }
 

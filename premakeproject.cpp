@@ -201,6 +201,12 @@ void PremakeProject::parseProject(RefreshOptions options)
         }
     }
 
+    QStringList consoleApps;
+    QStringList windowedApps;
+    tableToStringList(L, "_qtcreator_consoleapps", consoleApps);
+    tableToStringList(L, "_qtcreator_windowedapps", windowedApps);
+    qDebug() << Q_FUNC_INFO << consoleApps << windowedApps;
+
     // }
 
     if (options & Configuration) {
@@ -361,6 +367,18 @@ void PremakeProject::setToolChain(ToolChain *tc)
     refresh(Configuration);
 
     emit toolChainChanged(m_toolChain);
+}
+
+bool PremakeProject::hasBuildTarget(const QString &title) const
+{
+    qDebug() << Q_FUNC_INFO  << title;
+    return m_consoleApps.contains(title) || m_windowedApps.contains(title);
+}
+
+QStringList PremakeProject::buildTargetTitles() const
+{
+    qDebug() << Q_FUNC_INFO << m_consoleApps + m_windowedApps;
+    return m_consoleApps + m_windowedApps;
 }
 
 ToolChain *PremakeProject::toolChain() const

@@ -25,6 +25,8 @@ _qtcreator_generated_files = {}
 _qtcreator_includes = {}
 _qtcreator_defines = {}
 _qtcreator_scriptdepends = {}
+_qtcreator_consoleapps = {}
+_qtcreator_windowedapps = {}
 
 function _qtcreator_projectname()
     return solution().name
@@ -104,6 +106,12 @@ newaction {
             idir = idir:gsub("%$%(UIDIR%)", uidir)
             idir = path.getabsolute(path.join(prj.location, idir))
             table.insert(_qtcreator_includes, idir)
+        end
+
+        if prj.kind == "ConsoleApp" then
+            table.insert(_qtcreator_consoleapps, prj.name)
+        elseif prj.kind == "WindowedApp" then
+            table.insert(_qtcreator_windowedapps, prj.name)
         end
     end
 }

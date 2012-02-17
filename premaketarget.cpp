@@ -103,6 +103,11 @@ bool PremakeTarget::fromMap(const QVariantMap &map)
     return true;
 }
 
+void PremakeTarget::updateRunConfigurations()
+{
+    qDebug() << Q_FU...;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // PremakeTargetFactory
 ////////////////////////////////////////////////////////////////////////////////////
@@ -167,10 +172,10 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
                 QLatin1String(ProjectExplorer::Constants::DEFAULT_DEPLOYCONFIGURATION_ID)));
 
     // Query project on executables
+    t->updateRunConfigurations();
 
-    // Add a runconfiguration. The CustomExecutableRC one will query the user
-    // for its settings, so it is a good choice here.
-    t->addRunConfiguration(new ProjectExplorer::CustomExecutableRunConfiguration(t));
+    if (t->runConfigurations().isEmpty())
+        t->addRunConfiguration(new ProjectExplorer::CustomExecutableRunConfiguration(t));
 
     return t;
 }
