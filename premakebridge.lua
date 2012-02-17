@@ -25,6 +25,7 @@ _qtcreator_generated_files = {}
 _qtcreator_includes = {}
 _qtcreator_defines = {}
 _qtcreator_scriptdepends = {}
+_qtcreator_targets = {}
 
 function _qtcreator_projectname()
     return solution().name
@@ -68,6 +69,16 @@ function _qtcreator_rootpath()
     end
 end
 
+local function target(prj, cfg, isConsole)
+    local tgt = cfg.buildtarget
+    local tginfo = {}
+    tginfo.title = prj.name
+    tginfo.isConsole = isConsole
+    tginfo.absoluteDirectory = path.getabsolute(path.join(prj.location, tgt.directory))
+    tginfo.executablePath = path.join(tginfo.absoluteDirectory, tgt.name)
+    return tginfo
+end
+
 newaction {
     trigger = '_qtcreator',
     isinternal = true,
@@ -104,6 +115,12 @@ newaction {
             idir = idir:gsub("%$%(UIDIR%)", uidir)
             idir = path.getabsolute(path.join(prj.location, idir))
             table.insert(_qtcreator_includes, idir)
+        end
+
+        if prj.kind == "ConsoleApp" then
+            table.insert(_qtcreator_targets, target(prj, cfg, "true"))
+        elseif prj.kind == "WindowedApp" then
+            table.insert(_qtcreator_targets, target(prj, cfg, "false"))
         end
     end
 }

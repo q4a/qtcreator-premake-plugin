@@ -57,6 +57,13 @@ class PremakeTarget;
 class PremakeStep;
 class PremakeProjectFile;
 
+struct PremakeBuildTarget
+{
+    QString executable;
+    QString workingDirectory;
+    bool isConsole;
+};
+
 class PremakeProject : public ProjectExplorer::Project
 {
     Q_OBJECT
@@ -106,9 +113,16 @@ public:
     ProjectExplorer::ToolChain *toolChain() const;
     void setToolChain(ProjectExplorer::ToolChain *tc);
 
+    QStringList buildTargetTitles() const;
+    bool hasBuildTarget(const QString &title) const;
+    PremakeBuildTarget buildTargetForTitle(const QString &title);
+
     QVariantMap toMap() const;
+
 signals:
-    void toolChainChanged(ProjectExplorer::ToolChain *);
+    void toolChainChanged(ProjectExplorer::ToolChain *);signals:
+    /// emitted after parsing
+    void buildTargetsChanged();
 
 protected:
     virtual bool fromMap(const QVariantMap &map);
@@ -128,6 +142,8 @@ private:
     QStringList m_includePaths;
     QByteArray m_defines;
     QStringList m_configurations;
+
+    QHash<QString, PremakeBuildTarget> m_buildTargets;
 
     PremakeProjectNode *m_rootNode;
     ProjectExplorer::ToolChain *m_toolChain;

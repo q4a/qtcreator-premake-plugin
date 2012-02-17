@@ -39,7 +39,8 @@ HEADERS += premakeproject.h \
     premakestep.h \
     premakebuildconfiguration.h \
     premakebuildsettingswidget.h \
-    makestep.h
+    makestep.h \
+    premakerunconfiguration.h
 SOURCES += premakeproject.cpp \
     premakeprojectplugin.cpp \
     premaketarget.cpp \
@@ -49,7 +50,8 @@ SOURCES += premakeproject.cpp \
     premakestep.cpp \
     premakebuildconfiguration.cpp \
     premakebuildsettingswidget.cpp \
-    makestep.cpp
+    makestep.cpp \
+    premakerunconfiguration.cpp
 
 RESOURCES += premakeproject.qrc
 FORMS += premakestep.ui \
@@ -57,6 +59,7 @@ FORMS += premakestep.ui \
     premakeprojectconfigwidget.ui
 OTHER_FILES += premakebridge.lua \
     PremakeProject.mimetypes.xml \
+    PremakeProjectManager.pluginspec.in \
     README
 
 !macx {

@@ -35,6 +35,7 @@
 #include "premakebuildconfiguration.h"
 #include "premakebuildsettingswidget.h"
 #include "premakeproject.h"
+#include "premakerunconfiguration.h"
 #include "makestep.h"
 
 #include <projectexplorer/buildsteplist.h>
@@ -64,6 +65,7 @@ PremakeTarget::PremakeTarget(PremakeProject *parent) :
     setDefaultDisplayName(QApplication::translate("PremakeProjectManager::PremakeTarget",
                                                   PREMAKE_DESKTOP_TARGET_DISPLAY_NAME));
     setIcon(qApp->style()->standardIcon(QStyle::SP_ComputerIcon));
+    connect(parent, SIGNAL(buildTargetsChanged()), SLOT(updateRunConfigurations()));
 }
 
 PremakeTarget::~PremakeTarget()
@@ -103,6 +105,61 @@ bool PremakeTarget::fromMap(const QVariantMap &map)
     return true;
 }
 
+void PremakeTarget::updateRunConfigurations()
+{
+    qDebug() << Q_FUNC_INFO;
+    // *Update* runconfigurations:
+    QMultiMap<QString, PremakeRunConfiguration*> existingRunConfigurations;
+    QList<ProjectExplorer::RunConfiguration *> toRemove;
+    foreach (ProjectExplorer::RunConfiguration* rc, runConfigurations()) {
+        if (PremakeRunConfiguration* premakeRC = qobject_cast<PremakeRunConfiguration *>(rc))
+            existingRunConfigurations.insert(premakeRC->title(), premakeRC);
+        ProjectExplorer::CustomExecutableRunConfiguration *ceRC =
+                qobject_cast<ProjectExplorer::CustomExecutableRunConfiguration *>(rc);
+        if (ceRC && !ceRC->isConfigured())
+            toRemove << rc;
+    }
+
+    foreach (const QString &title, premakeProject()->buildTargetTitles()) {
+        qDebug() << Q_FUNC_INFO << title;
+        PremakeBuildTarget pt = premakeProject()->buildTargetForTitle(title);
+        QList<PremakeRunConfiguration *> list = existingRunConfigurations.values(title);
+        if (!list.isEmpty()) {
+            // Already exists, so override the settings...
+            foreach (PremakeRunConfiguration *rc, list) {
+                rc->setExecutable(pt.executable);
+                rc->setBaseWorkingDirectory(pt.workingDirectory);
+                rc->setEnabled(true);
+            }
+            existingRunConfigurations.remove(title);
+        } else {
+            // Does not exist yet
+            addRunConfiguration(new PremakeRunConfiguration(this, pt.executable,
+                                                            pt.workingDirectory, title));
+        }
+    }
+
+    QMultiMap<QString, PremakeRunConfiguration *>::const_iterator it =
+            existingRunConfigurations.constBegin();
+    for ( ; it != existingRunConfigurations.constEnd(); ++it) {
+        PremakeRunConfiguration *rc = it.value();
+        // The executables for those runconfigurations aren't build by the current buildconfiguration
+        // We just set a disable flag and show that in the display name
+        rc->setEnabled(false);
+        // removeRunConfiguration(rc);
+    }
+
+    foreach (ProjectExplorer::RunConfiguration *rc, toRemove)
+        removeRunConfiguration(rc);
+
+    if (runConfigurations().isEmpty()) {
+        // Oh no, no run configuration,
+        // create a custom executable run configuration
+        ProjectExplorer::CustomExecutableRunConfiguration *rc = new ProjectExplorer::CustomExecutableRunConfiguration(this);
+        addRunConfiguration(rc);
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // PremakeTargetFactory
 ////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +167,9 @@ bool PremakeTarget::fromMap(const QVariantMap &map)
 PremakeTargetFactory::PremakeTargetFactory(QObject *parent) :
     ITargetFactory(parent)
 {
+//    setDefaultDisplayName(displayNameForId(id()));
+//    setIcon(qApp->style()->standardIcon(QStyle::SP_ComputerIcon));
+//    connect(parent, SIGNAL(buildTargetsChanged()), SLOT(updateRunConfigurations()));
 }
 
 PremakeTargetFactory::~PremakeTargetFactory()
@@ -166,11 +226,9 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
     t->addDeployConfiguration(t->deployConfigurationFactory()->create(t,
                 QLatin1String(ProjectExplorer::Constants::DEFAULT_DEPLOYCONFIGURATION_ID)));
 
+    qDebug() << Q_FUNC_INFO << "here";
     // Query project on executables
-
-    // Add a runconfiguration. The CustomExecutableRC one will query the user
-    // for its settings, so it is a good choice here.
-    t->addRunConfiguration(new ProjectExplorer::CustomExecutableRunConfiguration(t));
+    t->updateRunConfigurations();
 
     return t;
 }
