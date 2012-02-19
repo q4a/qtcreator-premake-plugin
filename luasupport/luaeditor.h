@@ -119,7 +119,7 @@ public:
 
     void jumpToFile();
 
-    LuaEditorWidget::Link findLinkAt(const QTextCursor &cursor,
+    Link findLinkAt(const QTextCursor &cursor,
                                      bool resolveTarget = true);
 protected:
     TextEditor::BaseTextEditor *createEditor();
