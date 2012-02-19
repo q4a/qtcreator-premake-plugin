@@ -46,19 +46,19 @@
 namespace PremakeProjectManager {
 namespace Constants {
 
-const char *const PROJECTCONTEXT     = "PremakeProject.ProjectContext";
-const char *const PREMAKEMIMETYPE    = "application/vnd.premake";
+const char PROJECTCONTEXT[]     = "PremakeProject.ProjectContext";
+const char PREMAKEMIMETYPE[]    = "application/vnd.premake";
 
 // kinds
-const char *const PROJECT_KIND       = "Premake";
+const char PROJECT_KIND[]       = "Premake";
 
 // Project
-const char *const PREMAKEPROJECT_ID  = "PremakeProjectManager.PremakeProject";
-const char *const PREMAKE_BC_ID = "PremakeProjectManager.PremakeBuildConfiguration";
+const char PREMAKEPROJECT_ID[]  = "PremakeProjectManager.PremakeProject";
+const char PREMAKE_BC_ID[]      = "PremakeProjectManager.PremakeBuildConfiguration";
 
 // ICONS
-const char * const ICON_PREMAKE   = ":/premakeproject/images/premake.png";
-const char * const ICON_PREMAKEPROJECT   = ":/premakeproject/images/premakeproject.png";
+const char ICON_PREMAKE[]       = ":/premakeproject/images/premake.png";
+const char ICON_PREMAKEPROJECT[]= ":/premakeproject/images/premakeproject.png";
 
 } // namespace Constants
 } // namespace PremakeProjectManager
