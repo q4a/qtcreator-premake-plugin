@@ -108,6 +108,8 @@ public:
 
     bool hasBuildTarget(const QString &title) const;
     QStringList buildTargetTitles() const;
+    QStringList consoleApps() const;
+    QStringList windowedApps() const;
 
     QVariantMap toMap() const;
 signals:

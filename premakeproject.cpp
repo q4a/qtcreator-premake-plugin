@@ -381,6 +381,16 @@ QStringList PremakeProject::buildTargetTitles() const
     return m_consoleApps + m_windowedApps;
 }
 
+QStringList PremakeProject::consoleApps() const
+{
+    return m_consoleApps;
+}
+
+QStringList PremakeProject::windowedApps() const
+{
+    return m_windowedApps;
+}
+
 ToolChain *PremakeProject::toolChain() const
 {
     return m_toolChain;

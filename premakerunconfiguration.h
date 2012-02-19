@@ -46,7 +46,7 @@ class PremakeRunConfiguration : public ProjectExplorer::LocalApplicationRunConfi
 {
     friend class PremakeRunConfigurationFactory;
 public:
-    PremakeRunConfiguration(PremakeTarget *parent, const QByteArray &projectName);
+    PremakeRunConfiguration(PremakeTarget *parent, const QString &title);
     ~PremakeRunConfiguration();
 
     PremakeTarget *premakeTarget() const;
@@ -60,6 +60,8 @@ public:
     Utils::Environment environment() const;
     QString dumperLibrary() const;
     QStringList dumperLibraryLocations() const;
+
+    QString title() const;
 
 protected:
     virtual bool fromMap(const QVariantMap &map);

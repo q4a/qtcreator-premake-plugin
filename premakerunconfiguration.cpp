@@ -62,8 +62,9 @@ QString idFromBuildTarget(const QString &target)
 }
 
 
-PremakeRunConfiguration::PremakeRunConfiguration(PremakeTarget *parent, const QByteArray &projectName)
+PremakeRunConfiguration::PremakeRunConfiguration(PremakeTarget *parent, const QString &title)
     : LocalApplicationRunConfiguration(parent, QLatin1String(PREMAKE_RC_ID))
+    , m_title(title)
 {
 }
 
@@ -130,6 +131,11 @@ QStringList PremakeRunConfiguration::dumperLibraryLocations() const
     if (version)
         return version->debuggingHelperLibraryLocations();
     return QStringList();
+}
+
+QString PremakeRunConfiguration::title() const
+{
+    retunr m_title;
 }
 
 bool PremakeRunConfiguration::fromMap(const QVariantMap &map)

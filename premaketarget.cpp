@@ -35,6 +35,7 @@
 #include "premakebuildconfiguration.h"
 #include "premakebuildsettingswidget.h"
 #include "premakeproject.h"
+#include "premakerunconfiguration.h"
 #include "makestep.h"
 
 #include <projectexplorer/buildsteplist.h>
@@ -105,7 +106,54 @@ bool PremakeTarget::fromMap(const QVariantMap &map)
 
 void PremakeTarget::updateRunConfigurations()
 {
-    qDebug() << Q_FU...;
+    qDebug() << Q_FUNC_INFO;
+    // *Update* runconfigurations:
+    QMultiMap<QString, PremakeRunConfiguration*> existingRunConfigurations;
+    QList<ProjectExplorer::RunConfiguration *> toRemove;
+    foreach (ProjectExplorer::RunConfiguration* rc, runConfigurations()) {
+        if (PremakeRunConfiguration* premakeRC = qobject_cast<PremakeRunConfiguration *>(rc))
+            existingRunConfigurations.insert(premakeRC->title(), premakeRC);
+        ProjectExplorer::CustomExecutableRunConfiguration *ceRC =
+                qobject_cast<ProjectExplorer::CustomExecutableRunConfiguration *>(rc);
+        if (ceRC && !ceRC->isConfigured())
+            toRemove << rc;
+    }
+
+    foreach (const QString &title, premakeProject()->consoleApps()) {
+        QList<PremakeRunConfiguration *> list = existingRunConfigurations.values(title);
+        if (!list.isEmpty()) {
+            // Already exists, so override the settings...
+            foreach (PremakeRunConfiguration *rc, list) {
+                rc->setExecutable(ct.executable);
+                rc->setBaseWorkingDirectory(ct.workingDirectory);
+                rc->setEnabled(true);
+            }
+            existingRunConfigurations.remove(ct.title);
+        } else {
+            // Does not exist yet
+            addRunConfiguration(new PremakeRunConfiguration(this, title));
+        }
+    }
+
+    QMultiMap<QString, PremakeRunConfiguration *>::const_iterator it =
+            existingRunConfigurations.constBegin();
+    for ( ; it != existingRunConfigurations.constEnd(); ++it) {
+        PremakeRunConfiguration *rc = it.value();
+        // The executables for those runconfigurations aren't build by the current buildconfiguration
+        // We just set a disable flag and show that in the display name
+        rc->setEnabled(false);
+        // removeRunConfiguration(rc);
+    }
+
+    foreach (ProjectExplorer::RunConfiguration *rc, toRemove)
+        removeRunConfiguration(rc);
+
+    if (runConfigurations().isEmpty()) {
+        // Oh no, no run configuration,
+        // create a custom executable run configuration
+        ProjectExplorer::CustomExecutableRunConfiguration *rc = new ProjectExplorer::CustomExecutableRunConfiguration(this);
+        addRunConfiguration(rc);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -173,9 +221,6 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
 
     // Query project on executables
     t->updateRunConfigurations();
-
-    if (t->runConfigurations().isEmpty())
-        t->addRunConfiguration(new ProjectExplorer::CustomExecutableRunConfiguration(t));
 
     return t;
 }
