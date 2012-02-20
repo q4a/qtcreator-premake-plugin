@@ -246,11 +246,12 @@ void PremakeProject::refresh(RefreshOptions options)
 
     if (modelManager) {
         CPlusPlus::CppModelManagerInterface::ProjectInfo pinfo = modelManager->projectInfo(this);
+        ToolChain *tc = activeTarget()->activeBuildConfiguration()->toolChain();
 
+#if IDE_VER < IDE_VERSION_CHECK(2, 4, 80)
         pinfo.frameworkPaths.clear();
         pinfo.includePaths.clear();
 
-        ToolChain *tc = activeTarget()->activeBuildConfiguration()->toolChain();
         if (tc) {
             pinfo.defines = tc->predefinedMacros();
             pinfo.defines += '\n';
@@ -265,15 +266,39 @@ void PremakeProject::refresh(RefreshOptions options)
 
         pinfo.includePaths += allIncludePaths();
         pinfo.defines += m_defines;
-
-        // ### add _defines.
         pinfo.sourceFiles = files();
-        //pinfo.sourceFiles += generated();
+#else
+        pinfo.clearProjectParts();
+        CPlusPlus::CppModelManagerInterface::ProjectPart::Ptr part(
+                    new CPlusPlus::CppModelManagerInterface::ProjectPart);
+
+        if (tc) {
+            part->defines = tc->predefinedMacros(QStringList());
+            part->defines += '\n';
+
+            foreach (const HeaderPath &headerPath, tc->systemHeaderPaths()) {
+                if (headerPath.kind() == HeaderPath::FrameworkHeaderPath)
+                    part->frameworkPaths.append(headerPath.path());
+                else
+                    part->includePaths.append(headerPath.path());
+            }
+        }
+
+        part->includePaths += allIncludePaths();
+        part->defines += m_defines;
+        part->sourceFiles = files();
+
+        pinfo.appendProjectPart(part);
+#endif
 
         QStringList filesToUpdate;
 
         if (options & Configuration) {
+#if IDE_VER < IDE_VERSION_CHECK(2, 4, 80)
             filesToUpdate = pinfo.sourceFiles;
+#else
+            filesToUpdate = pinfo.sourceFiles();
+#endif
             filesToUpdate.prepend(QLatin1String("<configuration>")); // XXX don't hardcode configuration file name
             // Full update, if there's a code model update, cancel it
             m_codeModelFuture.cancel();
@@ -353,7 +378,7 @@ QString PremakeProject::id() const
     return QLatin1String(Constants::PREMAKEPROJECT_ID);
 }
 
-Core::IFile *PremakeProject::file() const
+Core::IDocument *PremakeProject::document() const
 {
     return m_file;
 }
@@ -452,7 +477,7 @@ bool PremakeProject::fromMap(const QVariantMap &map)
 ////////////////////////////////////////////////////////////////////////////////////
 
 PremakeProjectFile::PremakeProjectFile(PremakeProject *parent, QString fileName)
-    : Core::IFile(parent),
+    : Core::IDocument(parent),
       m_project(parent),
       m_fileName(fileName)
 { }
@@ -507,7 +532,7 @@ void PremakeProjectFile::rename(const QString &newName)
     Q_ASSERT(false);
 }
 
-Core::IFile::ReloadBehavior PremakeProjectFile::reloadBehavior(ChangeTrigger state, ChangeType type) const
+Core::IDocument::ReloadBehavior PremakeProjectFile::reloadBehavior(ChangeTrigger state, ChangeType type) const
 {
     Q_UNUSED(state)
     Q_UNUSED(type)

@@ -70,7 +70,7 @@ public:
 #endif
 
     virtual QString displayName() const;
-    virtual Core::IFile *open(const QString &fileName);
+    virtual Core::IDocument *open(const QString &fileName);
 
 public slots:
     void jumpToFile();

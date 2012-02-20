@@ -35,7 +35,6 @@
 #include "premakeprojectconstants.h"
 
 #include <coreplugin/fileiconprovider.h>
-#include <coreplugin/ifile.h>
 #include <projectexplorer/projectexplorer.h>
 
 #include <QtCore/QCoreApplication>

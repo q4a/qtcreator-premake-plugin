@@ -75,7 +75,12 @@ ProjectExplorer::Project *PremakeManager::openProject(const QString &fileName, Q
 
     ProjectExplorer::ProjectExplorerPlugin *projectExplorer = ProjectExplorer::ProjectExplorerPlugin::instance();
     foreach (ProjectExplorer::Project *pi, projectExplorer->session()->projects()) {
-        if (fileName == pi->file()->fileName()) {
+#if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+        const QString existingProjectFileName = pi->document()->fileName();
+#else
+        const QString existingProjectFileName = pi->file()->fileName();
+#endif
+        if (fileName == existingProjectFileName) {
             Core::MessageManager *messageManager = Core::ICore::instance()->messageManager();
             messageManager->printToOutputPanePopup(tr("Failed opening project '%1': Project already open")
                                                    .arg(QDir::toNativeSeparators(fileName)));

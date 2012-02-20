@@ -139,12 +139,16 @@ QString LuaEditorFactory::displayName() const
     return tr(Constants::LUA_EDITOR_DISPLAY_NAME);
 }
 
-Core::IFile *LuaEditorFactory::open(const QString &fileName)
+Core::IDocument *LuaEditorFactory::open(const QString &fileName)
 {
     Core::EditorManager *editorManager = Core::EditorManager::instance();
 
     if (Core::IEditor *editor = editorManager->openEditor(fileName, id()))
+#if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+        return editor->document();
+#else
         return editor->file();
+#endif
 
     return 0;
 }
@@ -307,7 +311,11 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
     if (buffer.isEmpty())
         return link;
 
+#if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+    QDir dir(QFileInfo(editorDocument()->fileName()).absolutePath());
+#else
     QDir dir(QFileInfo(file()->fileName()).absolutePath());
+#endif
     QString fileName = dir.filePath(buffer);
     QFileInfo fi(fileName);
     if (fi.exists()) {

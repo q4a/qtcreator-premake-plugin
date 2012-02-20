@@ -44,7 +44,6 @@
 #include <projectexplorer/toolchain.h>
 #include <projectexplorer/buildstep.h>
 #include <projectexplorer/buildconfiguration.h>
-#include <coreplugin/ifile.h>
 
 #include <QtCore/QFuture>
 
@@ -68,7 +67,8 @@ public:
 
     QString displayName() const;
     QString id() const;
-    Core::IFile *file() const;
+    Core::IDocument *document() const;
+    Core::IDocument *file() const { return document(); }
     ProjectExplorer::IProjectManager *projectManager() const;
     PremakeTarget *activeTarget() const;
 
@@ -134,7 +134,7 @@ private:
     QFuture<void> m_codeModelFuture;
 };
 
-class PremakeProjectFile : public Core::IFile
+class PremakeProjectFile : public Core::IDocument
 {
     Q_OBJECT
 
