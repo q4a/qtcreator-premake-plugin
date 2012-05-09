@@ -121,6 +121,11 @@ bool PremakeTargetFactory::supportsTargetId(const QString &id) const
     return id == QLatin1String(PREMAKE_DESKTOP_TARGET_ID);
 }
 
+QStringList PremakeTargetFactory::supportedTargetIds() const
+{
+    return QStringList(QLatin1String(PREMAKE_DESKTOP_TARGET_ID));
+}
+
 QStringList PremakeTargetFactory::supportedTargetIds(ProjectExplorer::Project *parent) const
 {
     if (!qobject_cast<PremakeProject *>(parent))

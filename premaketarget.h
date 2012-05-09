@@ -89,6 +89,7 @@ public:
     ~PremakeTargetFactory();
 
     bool supportsTargetId(const QString &id) const;
+    QStringList supportedTargetIds() const;
 
     QStringList supportedTargetIds(ProjectExplorer::Project *parent) const;
     QString displayNameForId(const QString &id) const;
