@@ -25,9 +25,10 @@ include($$QTC_SOURCE/src/plugins/cpptools/cpptools.pri)
 include($$QTC_SOURCE/src/plugins/texteditor/texteditor.pri)
 include($$QTC_SOURCE/src/plugins/qtsupport/qtsupport.pri)
 include(luasupport/luasupport.pri)
+include(premake.pri)
 
-INCLUDEPATH += . premake/src/host/lua-5.1.4/src
-DEFINES += PREMAKE_LIBRARY NDEBUG QT_NO_CAST_FROM_ASCII
+INCLUDEPATH += .
+DEFINES += QT_NO_CAST_FROM_ASCII
 HEADERS += premakeproject.h \
     premakeprojectplugin.h \
     premaketarget.h \
@@ -52,53 +53,6 @@ SOURCES += premakeproject.cpp \
     makestep.cpp \
     premakerunconfiguration.cpp
 
-SOURCES += \
-    scripts.c \
-    premake/src/host/premake.c \
-    premake/src/host/lua-5.1.4/src/lzio.c \
-    premake/src/host/lua-5.1.4/src/lvm.c \
-    premake/src/host/lua-5.1.4/src/lundump.c \
-    premake/src/host/lua-5.1.4/src/ltm.c \
-    premake/src/host/lua-5.1.4/src/ltablib.c \
-    premake/src/host/lua-5.1.4/src/ltable.c \
-    premake/src/host/lua-5.1.4/src/lstrlib.c \
-    premake/src/host/lua-5.1.4/src/lstring.c \
-    premake/src/host/lua-5.1.4/src/lstate.c \
-    premake/src/host/lua-5.1.4/src/lparser.c \
-    premake/src/host/lua-5.1.4/src/loslib.c \
-    premake/src/host/lua-5.1.4/src/lopcodes.c \
-    premake/src/host/lua-5.1.4/src/lobject.c \
-    premake/src/host/lua-5.1.4/src/loadlib.c \
-    premake/src/host/lua-5.1.4/src/lmem.c \
-    premake/src/host/lua-5.1.4/src/lmathlib.c \
-    premake/src/host/lua-5.1.4/src/llex.c \
-    premake/src/host/lua-5.1.4/src/liolib.c \
-    premake/src/host/lua-5.1.4/src/linit.c \
-    premake/src/host/lua-5.1.4/src/lgc.c \
-    premake/src/host/lua-5.1.4/src/lfunc.c \
-    premake/src/host/lua-5.1.4/src/ldump.c \
-    premake/src/host/lua-5.1.4/src/ldo.c \
-    premake/src/host/lua-5.1.4/src/ldebug.c \
-    premake/src/host/lua-5.1.4/src/ldblib.c \
-    premake/src/host/lua-5.1.4/src/lcode.c \
-    premake/src/host/lua-5.1.4/src/lbaselib.c \
-    premake/src/host/lua-5.1.4/src/lauxlib.c \
-    premake/src/host/lua-5.1.4/src/lapi.c \
-    premake/src/host/string_endswith.c \
-    premake/src/host/path_isabsolute.c \
-    premake/src/host/os_uuid.c \
-    premake/src/host/os_rmdir.c \
-    premake/src/host/os_pathsearch.c \
-    premake/src/host/os_mkdir.c \
-    premake/src/host/os_match.c \
-    premake/src/host/os_isfile.c \
-    premake/src/host/os_isdir.c \
-    premake/src/host/os_is64bit.c \
-    premake/src/host/os_getversion.c \
-    premake/src/host/os_getcwd.c \
-    premake/src/host/os_copyfile.c \
-    premake/src/host/os_chdir.c \
-    premake/src/host/os_stat.c
 RESOURCES += premakeproject.qrc
 FORMS += premakestep.ui \
     makestep.ui \
@@ -106,23 +60,6 @@ FORMS += premakestep.ui \
 OTHER_FILES += premakebridge.lua \
     PremakeProject.mimetypes.xml \
     README
-
-unix:!macx {
-    DEFINES += LUA_USE_DLOPEN LUA_USE_POSIX
-}
-
-linux*:LIBS += -ldl
-
-macx {
-    LIBS += -framework CoreServices
-    DEFINES += LUA_USE_MACOSX
-}
-
-win32 {
-    DEFINES -= UNICODE
-    DEFINES += _CRT_SECURE_NO_WARNINGS
-    LIBS += -luser32 -lole32
-}
 
 !macx {
     lua_highlight.target = $$QTC_BUILD/share/qtcreator/generic-highlighter/lua.xml
