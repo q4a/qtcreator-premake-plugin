@@ -65,7 +65,7 @@ bool GetStringList::call(lua_State *L)
     for(int i = 1; i <= n_elements; ++i) {
         lua_pushinteger(L, i);
         lua_gettable(L, -2);
-        const QString value = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
+        const QString value = QString::fromLocal8Bit(lua_tostring(L, -1));
         lua_pop(L, 1);
         m_to << value;
     }
@@ -106,4 +106,66 @@ QString CallLuaFunctionSingleReturnValue::result()
 QString CallLuaFunctionSingleReturnValue::error() const
 {
     return m_error;
+}
+
+
+GetStringMap::GetStringMap(StringMap &to)
+    : m_to(to)
+{
+}
+
+bool GetStringMap::call(lua_State *L)
+{
+    m_to.clear();
+    for (lua_pushnil(L); lua_next(L, -2); lua_pop(L, 1)) {
+        if (lua_type(L, -2) != LUA_TSTRING)
+            continue;
+
+        const QString key = QString::fromLocal8Bit(lua_tostring(L, -2));
+        const QString value = QString::fromLocal8Bit(lua_tostring(L, -1));
+        m_to[key] = value;
+    }
+    return true;
+}
+
+QString GetStringMap::error() const
+{
+    return QString();
+}
+
+
+GetStringMapList::GetStringMapList(StringMapList &to)
+    : m_to(to)
+{
+}
+
+bool GetStringMapList::call(lua_State *L)
+{
+    m_to.clear();
+    int n_elements = lua_objlen(L, -1);
+    // Lua index starts from 1
+    for(int i = 1; i <= n_elements; ++i) {
+        lua_pushinteger(L, i);
+        lua_gettable(L, -2);
+
+        if (lua_type(L, -1) == LUA_TTABLE) {
+            StringMap map;
+            for (lua_pushnil(L); lua_next(L, -2); lua_pop(L, 1)) {
+                if (lua_type(L, -2) != LUA_TSTRING)
+                    continue;
+
+                const QString key = QString::fromLocal8Bit(lua_tostring(L, -2));
+                const QString value = QString::fromLocal8Bit(lua_tostring(L, -1));
+                map[key] = value;
+            }
+            m_to << map;
+        }
+        lua_pop(L, 1);
+    }
+    return true;
+}
+
+QString GetStringMapList::error() const
+{
+    return QString();
 }

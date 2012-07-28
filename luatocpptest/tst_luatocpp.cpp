@@ -61,6 +61,62 @@ private Q_SLOTS:
         QCOMPARE(lua_gettop(L), 0);
     }
 
+    void tableToStringMap()
+    {
+        const char *test_code = "a = {}; a.b = {}; a.b.c = { 'abcd', 'efgh', 'ijkl', 'mnop' };"
+                "a.b.d = { a = 'b', c = 'd' }";
+        QCOMPARE(luaL_dostring(L, test_code), 0);
+
+        StringMap to;
+        GetStringMap callback(to);
+        QVERIFY(luaRecursiveAccessor(L, "a.b", callback));
+        StringMap m1;
+        m1["c"] = QString();
+        m1["d"] = QString();
+        QCOMPARE(to, m1);
+        QCOMPARE(lua_gettop(L), 0);
+
+        QVERIFY(luaRecursiveAccessor(L, "a.b.c", callback));
+        QCOMPARE(to, StringMap());
+        QCOMPARE(lua_gettop(L), 0);
+
+        QVERIFY(luaRecursiveAccessor(L, "a.b.d", callback));
+        StringMap m2;
+        m2["a"] = QString("b");
+        m2["c"] = QString("d");
+        QCOMPARE(to, m2);
+        QCOMPARE(lua_gettop(L), 0);
+    }
+
+
+
+    void tableToStringMapList()
+    {
+        const char *test_code = "a = {}; a.b = {}; a.b.c = { 'abcd', 'efgh', 'ijkl', 'mnop' };"
+                "a.b.d = { { a = 'b', c = 'd' }, { x = 'i', y = 'j' } }";
+        QCOMPARE(luaL_dostring(L, test_code), 0);
+
+        StringMapList to;
+        GetStringMapList callback(to);
+        QVERIFY(luaRecursiveAccessor(L, "a.b", callback));
+        QCOMPARE(to, StringMapList());
+        QCOMPARE(lua_gettop(L), 0);
+
+        QVERIFY(luaRecursiveAccessor(L, "a.b.c", callback));
+        QCOMPARE(to, StringMapList());
+        QCOMPARE(lua_gettop(L), 0);
+
+        QVERIFY(luaRecursiveAccessor(L, "a.b.d", callback));
+        StringMap m1;
+        m1["a"] = QString("b");
+        m1["c"] = QString("d");
+        StringMap m2;
+        m2["x"] = QString("i");
+        m2["y"] = QString("j");
+        QCOMPARE(to, StringMapList() << m1 << m2);
+        QCOMPARE(lua_gettop(L), 0);
+    }
+
 private:
     lua_State *L;
 };

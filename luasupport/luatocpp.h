@@ -35,6 +35,7 @@ extern "C" {
 }
 
 #include <QList>
+#include <QMap>
 #include <QString>
 
 struct lua_State;
@@ -43,6 +44,10 @@ class QString;
 class QStringList;
 
 namespace LuaSupport {
+
+typedef QMap<QString, QString> StringMap;
+typedef QList<StringMap> StringMapList;
+
 
 namespace Internal {
 bool getFieldByPath(lua_State *L, const QList<QByteArray> &fields, const QByteArray &objname);
@@ -86,6 +91,28 @@ private:
     QList<QByteArray> m_args;
     QString m_result;
     QString m_error;
+};
+
+class GetStringMap
+{
+public:
+    GetStringMap(StringMap &to);
+    bool call(lua_State *L);
+    QString error() const;
+
+private:
+    StringMap &m_to;
+};
+
+class GetStringMapList
+{
+public:
+    GetStringMapList(StringMapList &to);
+    bool call(lua_State *L);
+    QString error() const;
+
+private:
+    StringMapList &m_to;
 };
 
 }
