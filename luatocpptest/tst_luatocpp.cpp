@@ -1,9 +1,5 @@
 #include "luasupport/luatocpp.h"
 
-extern "C" {
-#include "premake/src/host/premake.h"
-}
-
 #include <QString>
 #include <QtTest>
 #include <QStringList>

@@ -30,6 +30,13 @@
 #ifndef LUATOCPP_H
 #define LUATOCPP_H
 
+extern "C" {
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
+}
+
+#include <QDebug>
 #include <QList>
 #include <QString>
 
@@ -40,22 +47,33 @@ class QStringList;
 
 namespace LuaSupport {
 
-class Callback
+template <typename Callback>
+bool luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback)
 {
-public:
-    virtual ~Callback();
+    const QList<QByteArray> fields = objname.split('.');
+    Q_ASSERT(fields.size() > 0);
 
-    // This function operates on stack top value
-    virtual bool call(lua_State *L) = 0;
+    // Bring target table on stack
+    lua_checkstack(L, fields.size());
+    lua_getglobal(L, fields.first().data());
+    for (int i = 1; i < fields.size(); ++i) {
+        if (lua_isnil(L, -1)) {
+            qWarning() << "Cannot access" << objname << ":" << fields.at(i-1) << "is nil";
+            lua_pop(L, i);
+            return false;
+        }
+        lua_getfield(L, -1, fields.at(i).data());
+    }
+    // Perform needed actions
+    bool result = callback.call(L);
+    // Restore stack state
+    lua_pop(L, fields.size());
 
-    virtual QString error() const = 0;
-};
+    return result;
+}
 
 
-bool luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback);
-
-
-class GetStringList : public Callback
+class GetStringList
 {
 public:
     GetStringList(QStringList &to);
@@ -66,7 +84,7 @@ private:
     QStringList &m_to;
 };
 
-class CallLuaFunctionSingleReturnValue : public Callback
+class CallLuaFunctionSingleReturnValue
 {
 public:
     bool call(lua_State *L);

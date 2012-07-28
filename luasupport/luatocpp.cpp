@@ -29,50 +29,9 @@
 
 #include "luatocpp.h"
 
-extern "C" {
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-}
-
-#include <QDebug>
 #include <QStringList>
 
 using namespace LuaSupport;
-
-Callback::~Callback()
-{
-}
-
-
-bool LuaSupport::luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback)
-{
-//    qDebug() << Q_FUNC_INFO << "enter stack pos" << lua_gettop(L);
-    const QList<QByteArray> fields = objname.split('.');
-    Q_ASSERT(fields.size() > 0);
-
-    // Bring target table on stack
-    lua_checkstack(L, fields.size());
-    lua_getglobal(L, fields.first().data());
-    for (int i = 1; i < fields.size(); ++i) {
-        if (lua_isnil(L, -1)) {
-            qWarning() << "Cannot access" << objname << ":" << fields.at(i-1) << "is nil";
-            lua_pop(L, i);
-            return false;
-        }
-        lua_getfield(L, -1, fields.at(i).data());
-    }
-
-    // Perform needed actions
-//    qDebug() << Q_FUNC_INFO << "callback enter stack pos" << lua_gettop(L);
-    bool result = callback.call(L);
-//    qDebug() << Q_FUNC_INFO << "callback exit stack pos" << lua_gettop(L);
-
-    // Restore stack state
-    lua_pop(L, fields.size());
-//    qDebug() << Q_FUNC_INFO << "exit stack pos" << lua_gettop(L);
-    return result;
-}
 
 
 GetStringList::GetStringList(QStringList &to)
