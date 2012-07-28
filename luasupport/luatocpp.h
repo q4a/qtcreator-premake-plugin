@@ -32,11 +32,8 @@
 
 extern "C" {
 #include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
 }
 
-#include <QDebug>
 #include <QList>
 #include <QString>
 
@@ -47,31 +44,24 @@ class QStringList;
 
 namespace LuaSupport {
 
+namespace Internal {
+bool getFieldByPath(lua_State *L, const QList<QByteArray> &fields, const QByteArray &objname);
+}
+
 template <typename Callback>
 bool luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback)
 {
     const QList<QByteArray> fields = objname.split('.');
-    Q_ASSERT(fields.size() > 0);
+    if (!Internal::getFieldByPath(L, fields, objname))
+        return false; // getFieldByPath cleans stack on failure
 
-    // Bring target table on stack
-    lua_checkstack(L, fields.size());
-    lua_getglobal(L, fields.first().data());
-    for (int i = 1; i < fields.size(); ++i) {
-        if (lua_isnil(L, -1)) {
-            qWarning() << "Cannot access" << objname << ":" << fields.at(i-1) << "is nil";
-            lua_pop(L, i);
-            return false;
-        }
-        lua_getfield(L, -1, fields.at(i).data());
-    }
-    // Perform needed actions
+    // Perform callback action
     bool result = callback.call(L);
     // Restore stack state
     lua_pop(L, fields.size());
 
     return result;
 }
-
 
 class GetStringList
 {

@@ -1,5 +1,10 @@
 #include "luasupport/luatocpp.h"
 
+extern "C" {
+#include "lauxlib.h"
+#include "lualib.h"
+}
+
 #include <QString>
 #include <QtTest>
 #include <QStringList>
@@ -34,6 +39,9 @@ private Q_SLOTS:
 
         QVERIFY(luaRecursiveAccessor(L, "a.b.c", callback));
         QCOMPARE(callback.result(), QLatin1String("Success!arg1arg2"));
+        QCOMPARE(lua_gettop(L), 0);
+
+        QVERIFY(!luaRecursiveAccessor(L, "a.b.c.d", callback));
         QCOMPARE(lua_gettop(L), 0);
     }
 

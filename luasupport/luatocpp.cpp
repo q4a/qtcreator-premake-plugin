@@ -29,10 +29,28 @@
 
 #include "luatocpp.h"
 
+#include <QDebug>
 #include <QStringList>
 
-using namespace LuaSupport;
+bool LuaSupport::Internal::getFieldByPath(lua_State *L, const QList<QByteArray> &fields, const QByteArray &objname)
+{
+    Q_ASSERT(fields.size() > 0);
 
+    // Bring target table on stack
+    lua_checkstack(L, fields.size());
+    lua_getglobal(L, fields.first().data());
+    for (int i = 1; i < fields.size(); ++i) {
+        if (!lua_istable(L, -1)) {
+            qWarning() << "Cannot access" << objname << ":" << fields.at(i-1) << "is not table";
+            lua_pop(L, i);
+            return false;
+        }
+        lua_getfield(L, -1, fields.at(i).data());
+    }
+    return true;
+}
+
+using namespace LuaSupport;
 
 GetStringList::GetStringList(QStringList &to)
     : m_to(to)
