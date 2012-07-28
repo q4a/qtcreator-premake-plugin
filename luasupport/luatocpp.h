@@ -87,8 +87,8 @@ private:
 class CallLuaFunctionSingleReturnValue
 {
 public:
+    CallLuaFunctionSingleReturnValue(const QList<QByteArray> &args);
     bool call(lua_State *L);
-    void setArgs(const QList<QByteArray> &args);
     QString result();
     QString error() const;
 

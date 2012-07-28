@@ -28,8 +28,7 @@ private Q_SLOTS:
         QCOMPARE(luaL_dostring(L, test_code), 0);
 
         const QList<QByteArray> args = QList<QByteArray>() << "arg1" << "arg2";
-        CallLuaFunctionSingleReturnValue callback;
-        callback.setArgs(args);
+        CallLuaFunctionSingleReturnValue callback(args);
         QVERIFY(!luaRecursiveAccessor(L, "a.b", callback));
         QCOMPARE(lua_gettop(L), 0);
 

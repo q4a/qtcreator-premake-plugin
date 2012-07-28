@@ -59,6 +59,11 @@ QString GetStringList::error() const
     return QString();
 }
 
+CallLuaFunctionSingleReturnValue::CallLuaFunctionSingleReturnValue(const QList<QByteArray> &args)
+    : m_args(args)
+{
+}
+
 bool CallLuaFunctionSingleReturnValue::call(lua_State *L)
 {
     m_result.clear();
@@ -73,11 +78,6 @@ bool CallLuaFunctionSingleReturnValue::call(lua_State *L)
         m_result = QString::fromLocal8Bit(lua_tostring(L, -1));
         return true;
     }
-}
-
-void CallLuaFunctionSingleReturnValue::setArgs(const QList<QByteArray> &args)
-{
-    m_args = args;
 }
 
 QString CallLuaFunctionSingleReturnValue::result()
