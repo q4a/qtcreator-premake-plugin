@@ -25,8 +25,7 @@ _qtcreator_generated_files = {}
 _qtcreator_includes = {}
 _qtcreator_defines = {}
 _qtcreator_scriptdepends = {}
-_qtcreator_consoleapps = {}
-_qtcreator_windowedapps = {}
+_qtcreator_targets = {}
 
 function _qtcreator_projectname()
     return solution().name
@@ -70,6 +69,13 @@ function _qtcreator_rootpath()
     end
 end
 
+local function target(prj, cfg, isConsole)
+    tgt = cfg.buildtarget
+    tgt.title = prj.name
+    tgt.isConsole = isConsole
+    return tgt
+end
+
 newaction {
     trigger = '_qtcreator',
     isinternal = true,
@@ -109,9 +115,9 @@ newaction {
         end
 
         if prj.kind == "ConsoleApp" then
-            table.insert(_qtcreator_consoleapps, prj.name)
+            table.insert(_qtcreator_targets, target(prj, cfg, "true"))
         elseif prj.kind == "WindowedApp" then
-            table.insert(_qtcreator_windowedapps, prj.name)
+            table.insert(_qtcreator_targets, target(prj, cfg, "false"))
         end
     end
 }

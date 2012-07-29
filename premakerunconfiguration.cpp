@@ -35,13 +35,20 @@
 #include "premakeproject.h"
 #include "premaketarget.h"
 
+#include <coreplugin/coreconstants.h>
+#include <projectexplorer/environmentwidget.h>
 #include <utils/pathchooser.h>
 #include <utils/detailswidget.h>
-#include <utils/debuggerlanguagechooser.h>
 #include <utils/qtcprocess.h>
 #include <utils/stringutils.h>
 
 #include <QtCore/QDir>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QToolButton>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QLabel>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
@@ -61,10 +68,15 @@ QString idFromBuildTarget(const QString &target)
     return QString::fromLatin1(PREMAKE_RC_PREFIX) + target;
 }
 
-
-PremakeRunConfiguration::PremakeRunConfiguration(PremakeTarget *parent, const QString &title)
+PremakeRunConfiguration::PremakeRunConfiguration(PremakeTarget *parent, const QString &target,
+                                                 const QString &workingDirectory, const QString &title)
     : LocalApplicationRunConfiguration(parent, QLatin1String(PREMAKE_RC_ID))
+    , m_runMode(Gui)
+    , m_buildTarget(target)
+    , m_workingDirectory(workingDirectory)
     , m_title(title)
+    , m_baseEnvironmentBase(BuildEnvironmentBase)
+    , m_enabled(true)
 {
 }
 
@@ -79,7 +91,7 @@ PremakeTarget *PremakeRunConfiguration::premakeTarget() const
 
 QWidget *PremakeRunConfiguration::createConfigurationWidget()
 {
-    return new QWidget();
+    return new PremakeRunConfigurationWidget(this);
 }
 
 QString PremakeRunConfiguration::executable() const
@@ -90,6 +102,11 @@ QString PremakeRunConfiguration::executable() const
 ProjectExplorer::LocalApplicationRunConfiguration::RunMode PremakeRunConfiguration::runMode() const
 {
     return m_runMode;
+}
+
+void PremakeRunConfiguration::setRunMode(ProjectExplorer::LocalApplicationRunConfiguration::RunMode runMode)
+{
+    m_runMode = runMode;
 }
 
 QString PremakeRunConfiguration::workingDirectory() const
@@ -108,6 +125,11 @@ QString PremakeRunConfiguration::baseWorkingDirectory() const
 QString PremakeRunConfiguration::commandLineArguments() const
 {
     return m_commandLineArguments;
+}
+
+void PremakeRunConfiguration::setCommandLineArguments(const QString &args)
+{
+    m_commandLineArguments = args;
 }
 
 Utils::Environment PremakeRunConfiguration::environment() const
@@ -133,9 +155,42 @@ QStringList PremakeRunConfiguration::dumperLibraryLocations() const
     return QStringList();
 }
 
+bool PremakeRunConfiguration::isEnabled() const
+{
+    return m_enabled;
+}
+
+QString PremakeRunConfiguration::disabledReason() const
+{
+    if (!m_enabled)
+        return tr("The executable is not built by the current build configuration");
+    return QString();
+}
+
 QString PremakeRunConfiguration::title() const
 {
-    retunr m_title;
+    return m_title;
+}
+
+void PremakeRunConfiguration::setExecutable(const QString &executable)
+{
+    m_buildTarget = executable;
+}
+
+void PremakeRunConfiguration::setBaseWorkingDirectory(const QString &wd)
+{
+    const QString oldWorkingDirectory = workingDirectory();
+
+    m_workingDirectory = wd;
+
+    const QString &newWorkingDirectory = workingDirectory();
+    if (oldWorkingDirectory != newWorkingDirectory)
+        emit baseWorkingDirectoryChanged(newWorkingDirectory);
+}
+
+void PremakeRunConfiguration::setEnabled(bool enabled)
+{
+    m_enabled = enabled;
 }
 
 bool PremakeRunConfiguration::fromMap(const QVariantMap &map)
@@ -153,6 +208,17 @@ QString PremakeRunConfiguration::defaultDisplayName() const
 PremakeRunConfiguration::PremakeRunConfiguration(PremakeTarget *parent, PremakeRunConfiguration *source)
     : ProjectExplorer::LocalApplicationRunConfiguration(parent, source)
 {
+}
+
+void PremakeRunConfiguration::setUserWorkingDirectory(const QString &wd)
+{
+    const QString oldWorkingDirectory = workingDirectory();
+
+    m_userWorkingDirectory = wd;
+
+    const QString &newWorkingDirectory = workingDirectory();
+    if (oldWorkingDirectory != newWorkingDirectory)
+        emit baseWorkingDirectoryChanged(newWorkingDirectory);
 }
 
 
@@ -181,6 +247,14 @@ QString PremakeRunConfiguration::baseEnvironmentText() const
     return QString();
 }
 
+void PremakeRunConfiguration::setUserEnvironmentChanges(const QList<Utils::EnvironmentItem> &diff)
+{
+    if (m_userEnvironmentChanges != diff) {
+        m_userEnvironmentChanges = diff;
+        emit userEnvironmentChangesChanged(diff);
+    }
+}
+
 
 void PremakeRunConfiguration::setBaseEnvironmentBase(PremakeRunConfiguration::BaseEnvironmentBase env)
 {
@@ -199,6 +273,166 @@ PremakeRunConfiguration::BaseEnvironmentBase PremakeRunConfiguration::baseEnviro
 QList<Utils::EnvironmentItem> PremakeRunConfiguration::userEnvironmentChanges() const
 {
     return m_userEnvironmentChanges;
+}
+
+
+// Configuration widget
+PremakeRunConfigurationWidget::PremakeRunConfigurationWidget(PremakeRunConfiguration *cmakeRunConfiguration, QWidget *parent)
+    : QWidget(parent), m_ignoreChange(false), m_premakeRunConfiguration(cmakeRunConfiguration)
+{
+    QFormLayout *fl = new QFormLayout();
+    fl->setMargin(0);
+    fl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+    QLineEdit *argumentsLineEdit = new QLineEdit();
+    argumentsLineEdit->setText(cmakeRunConfiguration->commandLineArguments());
+    connect(argumentsLineEdit, SIGNAL(textChanged(QString)),
+            this, SLOT(setArguments(QString)));
+    fl->addRow(tr("Arguments:"), argumentsLineEdit);
+
+    m_workingDirectoryEdit = new Utils::PathChooser();
+    m_workingDirectoryEdit->setExpectedKind(Utils::PathChooser::Directory);
+    m_workingDirectoryEdit->setBaseDirectory(m_premakeRunConfiguration->target()->project()->projectDirectory());
+    m_workingDirectoryEdit->setPath(m_premakeRunConfiguration->baseWorkingDirectory());
+    m_workingDirectoryEdit->setPromptDialogTitle(tr("Select Working Directory"));
+
+    QToolButton *resetButton = new QToolButton();
+    resetButton->setToolTip(tr("Reset to default"));
+    resetButton->setIcon(QIcon(QLatin1String(Core::Constants::ICON_RESET)));
+
+    QHBoxLayout *boxlayout = new QHBoxLayout();
+    boxlayout->addWidget(m_workingDirectoryEdit);
+    boxlayout->addWidget(resetButton);
+
+    fl->addRow(tr("Working directory:"), boxlayout);
+
+    QCheckBox *runInTerminal = new QCheckBox;
+    fl->addRow(tr("Run in Terminal"), runInTerminal);
+
+    m_detailsContainer = new Utils::DetailsWidget(this);
+    m_detailsContainer->setState(Utils::DetailsWidget::NoSummary);
+
+    QWidget *m_details = new QWidget(m_detailsContainer);
+    m_detailsContainer->setWidget(m_details);
+    m_details->setLayout(fl);
+
+    QVBoxLayout *vbx = new QVBoxLayout(this);
+    vbx->setMargin(0);;
+    vbx->addWidget(m_detailsContainer);
+
+    QLabel *environmentLabel = new QLabel(this);
+    environmentLabel->setText(tr("Run Environment"));
+    QFont f = environmentLabel->font();
+    f.setBold(true);
+    f.setPointSizeF(f.pointSizeF() *1.2);
+    environmentLabel->setFont(f);
+    vbx->addWidget(environmentLabel);
+
+    QWidget *baseEnvironmentWidget = new QWidget;
+    QHBoxLayout *baseEnvironmentLayout = new QHBoxLayout(baseEnvironmentWidget);
+    baseEnvironmentLayout->setMargin(0);
+    QLabel *label = new QLabel(tr("Base environment for this runconfiguration:"), this);
+    baseEnvironmentLayout->addWidget(label);
+    m_baseEnvironmentComboBox = new QComboBox(this);
+    m_baseEnvironmentComboBox->addItems(QStringList()
+                                        << tr("Clean Environment")
+                                        << tr("System Environment")
+                                        << tr("Build Environment"));
+    m_baseEnvironmentComboBox->setCurrentIndex(m_premakeRunConfiguration->baseEnvironmentBase());
+    connect(m_baseEnvironmentComboBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(baseEnvironmentComboBoxChanged(int)));
+    baseEnvironmentLayout->addWidget(m_baseEnvironmentComboBox);
+    baseEnvironmentLayout->addStretch(10);
+
+    m_environmentWidget = new ProjectExplorer::EnvironmentWidget(this, baseEnvironmentWidget);
+    m_environmentWidget->setBaseEnvironment(m_premakeRunConfiguration->baseEnvironment());
+    m_environmentWidget->setBaseEnvironmentText(m_premakeRunConfiguration->baseEnvironmentText());
+    m_environmentWidget->setUserChanges(m_premakeRunConfiguration->userEnvironmentChanges());
+
+    vbx->addWidget(m_environmentWidget);
+
+    connect(m_workingDirectoryEdit, SIGNAL(changed(QString)),
+            this, SLOT(setWorkingDirectory()));
+
+    connect(resetButton, SIGNAL(clicked()),
+            this, SLOT(resetWorkingDirectory()));
+
+    connect(runInTerminal, SIGNAL(toggled(bool)),
+            this, SLOT(runInTerminalToggled(bool)));
+
+    connect(m_environmentWidget, SIGNAL(userChangesChanged()),
+            this, SLOT(userChangesChanged()));
+
+    connect(m_premakeRunConfiguration, SIGNAL(baseWorkingDirectoryChanged(QString)),
+            this, SLOT(workingDirectoryChanged(QString)));
+    connect(m_premakeRunConfiguration, SIGNAL(baseEnvironmentChanged()),
+            this, SLOT(baseEnvironmentChanged()));
+    connect(m_premakeRunConfiguration, SIGNAL(userEnvironmentChangesChanged(QList<Utils::EnvironmentItem>)),
+            this, SLOT(userEnvironmentChangesChanged()));
+
+    setEnabled(m_premakeRunConfiguration->isEnabled());
+}
+
+void PremakeRunConfigurationWidget::setWorkingDirectory()
+{
+    if (m_ignoreChange)
+        return;
+    m_ignoreChange = true;
+    m_premakeRunConfiguration->setUserWorkingDirectory(m_workingDirectoryEdit->rawPath());
+    m_ignoreChange = false;
+}
+
+void PremakeRunConfigurationWidget::workingDirectoryChanged(const QString &workingDirectory)
+{
+    if (!m_ignoreChange)
+        m_workingDirectoryEdit->setPath(workingDirectory);
+}
+
+void PremakeRunConfigurationWidget::resetWorkingDirectory()
+{
+    // This emits a signal connected to workingDirectoryChanged()
+    // that sets the m_workingDirectoryEdit
+    m_premakeRunConfiguration->setUserWorkingDirectory(QString());
+}
+
+void PremakeRunConfigurationWidget::runInTerminalToggled(bool toggled)
+{
+    m_premakeRunConfiguration->setRunMode(toggled ? ProjectExplorer::LocalApplicationRunConfiguration::Console
+                                                : ProjectExplorer::LocalApplicationRunConfiguration::Gui);
+}
+
+void PremakeRunConfigurationWidget::userChangesChanged()
+{
+    m_premakeRunConfiguration->setUserEnvironmentChanges(m_environmentWidget->userChanges());
+}
+
+void PremakeRunConfigurationWidget::baseEnvironmentComboBoxChanged(int index)
+{
+    m_ignoreChange = true;
+    m_premakeRunConfiguration->setBaseEnvironmentBase(PremakeRunConfiguration::BaseEnvironmentBase(index));
+
+    m_environmentWidget->setBaseEnvironment(m_premakeRunConfiguration->baseEnvironment());
+    m_environmentWidget->setBaseEnvironmentText(m_premakeRunConfiguration->baseEnvironmentText());
+    m_ignoreChange = false;
+}
+
+void PremakeRunConfigurationWidget::baseEnvironmentChanged()
+{
+    if (m_ignoreChange)
+        return;
+
+    m_baseEnvironmentComboBox->setCurrentIndex(m_premakeRunConfiguration->baseEnvironmentBase());
+    m_environmentWidget->setBaseEnvironment(m_premakeRunConfiguration->baseEnvironment());
+    m_environmentWidget->setBaseEnvironmentText(m_premakeRunConfiguration->baseEnvironmentText());
+}
+
+void PremakeRunConfigurationWidget::userEnvironmentChangesChanged()
+{
+    m_environmentWidget->setUserChanges(m_premakeRunConfiguration->userEnvironmentChanges());
+}
+
+void PremakeRunConfigurationWidget::setArguments(const QString &args)
+{
+    m_premakeRunConfiguration->setCommandLineArguments(args);
 }
 
 
@@ -234,6 +468,7 @@ QString PremakeRunConfigurationFactory::displayNameForId(const QString &id) cons
 
 bool PremakeRunConfigurationFactory::canCreate(ProjectExplorer::Target *parent, const QString &id) const
 {
+    qDebug() << Q_FUNC_INFO;
     PremakeTarget *t = qobject_cast<PremakeTarget *>(parent);
     if (!t)
         return false;
@@ -247,9 +482,8 @@ ProjectExplorer::RunConfiguration *PremakeRunConfigurationFactory::create(Projec
     PremakeTarget *t(static_cast<PremakeTarget *>(parent));
 
     const QString title(buildTargetFromId(id));
-    return new PremakeRunConfiguration(t, "");
-//    const PremakeBuildTarget &ct = t->premakeProject()->buildTargetForTitle(title);
-//    return new PremakeRunConfiguration(t, ct.executable, ct.workingDirectory, ct.title);
+    const PremakeBuildTarget &ct = t->premakeProject()->buildTargetForTitle(title);
+    return new PremakeRunConfiguration(t, ct.executable, ct.workingDirectory, title);
 }
 
 bool PremakeRunConfigurationFactory::canClone(ProjectExplorer::Target *parent, ProjectExplorer::RunConfiguration *source) const
@@ -281,7 +515,7 @@ ProjectExplorer::RunConfiguration *PremakeRunConfigurationFactory::restore(Proje
     if (!canRestore(parent, map))
         return 0;
     PremakeTarget *t(static_cast<PremakeTarget *>(parent));
-    PremakeRunConfiguration *rc(new PremakeRunConfiguration(t, ""));
+    PremakeRunConfiguration *rc(new PremakeRunConfiguration(t, QString(), QString(), QString()));
     if (rc->fromMap(map))
         return rc;
     delete rc;

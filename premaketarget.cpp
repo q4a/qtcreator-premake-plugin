@@ -119,19 +119,21 @@ void PremakeTarget::updateRunConfigurations()
             toRemove << rc;
     }
 
-    foreach (const QString &title, premakeProject()->consoleApps()) {
+    foreach (const QString &title, premakeProject()->buildTargetTitles()) {
+        PremakeBuildTarget pt = premakeProject()->buildTargetForTitle(title);
         QList<PremakeRunConfiguration *> list = existingRunConfigurations.values(title);
         if (!list.isEmpty()) {
             // Already exists, so override the settings...
             foreach (PremakeRunConfiguration *rc, list) {
-                rc->setExecutable(ct.executable);
-                rc->setBaseWorkingDirectory(ct.workingDirectory);
+                rc->setExecutable(pt.executable);
+                rc->setBaseWorkingDirectory(pt.workingDirectory);
                 rc->setEnabled(true);
             }
-            existingRunConfigurations.remove(ct.title);
+            existingRunConfigurations.remove(title);
         } else {
             // Does not exist yet
-            addRunConfiguration(new PremakeRunConfiguration(this, title));
+            addRunConfiguration(new PremakeRunConfiguration(this, pt.executable,
+                                                            pt.workingDirectory, title));
         }
     }
 
@@ -163,6 +165,9 @@ void PremakeTarget::updateRunConfigurations()
 PremakeTargetFactory::PremakeTargetFactory(QObject *parent) :
     ITargetFactory(parent)
 {
+//    setDefaultDisplayName(displayNameForId(id()));
+//    setIcon(qApp->style()->standardIcon(QStyle::SP_ComputerIcon));
+    connect(parent, SIGNAL(buildTargetsChanged()), SLOT(updateRunConfigurations()));
 }
 
 PremakeTargetFactory::~PremakeTargetFactory()
@@ -219,6 +224,7 @@ PremakeTarget *PremakeTargetFactory::create(ProjectExplorer::Project *parent, co
     t->addDeployConfiguration(t->deployConfigurationFactory()->create(t,
                 QLatin1String(ProjectExplorer::Constants::DEFAULT_DEPLOYCONFIGURATION_ID)));
 
+    qDebug() << Q_FUNC_INFO << "here";
     // Query project on executables
     t->updateRunConfigurations();
 

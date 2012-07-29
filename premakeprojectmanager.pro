@@ -59,6 +59,7 @@ FORMS += premakestep.ui \
     premakeprojectconfigwidget.ui
 OTHER_FILES += premakebridge.lua \
     PremakeProject.mimetypes.xml \
+    PremakeProjectManager.pluginspec.in \
     README
 
 !macx {

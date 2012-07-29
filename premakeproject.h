@@ -57,6 +57,13 @@ class PremakeTarget;
 class PremakeStep;
 class PremakeProjectFile;
 
+struct PremakeBuildTarget
+{
+    QString executable;
+    QString workingDirectory;
+    bool isConsole;
+};
+
 class PremakeProject : public ProjectExplorer::Project
 {
     Q_OBJECT
@@ -106,10 +113,9 @@ public:
     ProjectExplorer::ToolChain *toolChain() const;
     void setToolChain(ProjectExplorer::ToolChain *tc);
 
-    bool hasBuildTarget(const QString &title) const;
     QStringList buildTargetTitles() const;
-    QStringList consoleApps() const;
-    QStringList windowedApps() const;
+    bool hasBuildTarget(const QString &title) const;
+    PremakeBuildTarget buildTargetForTitle(const QString &title);
 
     QVariantMap toMap() const;
 signals:
@@ -134,8 +140,7 @@ private:
     QByteArray m_defines;
     QStringList m_configurations;
 
-    QStringList m_consoleApps;
-    QStringList m_windowedApps;
+    QHash<QString, PremakeBuildTarget> m_buildTargets;
 
     PremakeProjectNode *m_rootNode;
     ProjectExplorer::ToolChain *m_toolChain;

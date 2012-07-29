@@ -129,6 +129,13 @@ static void tableToStringList(lua_State *L, const QByteArray &tablename, QString
 //    qDebug() << Q_FUNC_INFO << tablename << "=" << to << endl;
 }
 
+static void tableToStringMapList(lua_State *L, const QByteArray &tablename, StringMapList &to)
+{
+    GetStringMapList callback(to);
+    if (!luaRecursiveAccessor(L, tablename, callback))
+        projectParseError(callback.error());
+}
+
 
 void PremakeProject::parseConfigurations()
 {
@@ -200,11 +207,22 @@ void PremakeProject::parseProject(RefreshOptions options)
         }
     }
 
-    QStringList consoleApps;
-    QStringList windowedApps;
-    tableToStringList(L, "_qtcreator_consoleapps", consoleApps);
-    tableToStringList(L, "_qtcreator_windowedapps", windowedApps);
-    qDebug() << Q_FUNC_INFO << consoleApps << windowedApps;
+//    QStringList consoleApps;
+//    QStringList windowedApps;
+//    tableToStringList(L, "_qtcreator_consoleapps", consoleApps);
+//    tableToStringList(L, "_qtcreator_windowedapps", windowedApps);
+//    qDebug() << Q_FUNC_INFO << consoleApps << windowedApps;
+
+    StringMapList targets;
+    tableToStringMapList(L, "_qtcreator_targets", targets);
+    foreach (const StringMap &tgt, targets) {
+//        qDebug() << Q_FUNC_INFO << tgt;
+        PremakeBuildTarget target;
+        target.executable = tgt[QLatin1String("name")];
+        target.workingDirectory = tgt[QLatin1String("directory")];
+        target.isConsole = (tgt[QLatin1String("isConsole")] == QLatin1String("true"));
+        m_buildTargets[tgt[QLatin1String("title")]] = target;
+    }
 
     // }
 
@@ -370,24 +388,20 @@ void PremakeProject::setToolChain(ToolChain *tc)
 
 bool PremakeProject::hasBuildTarget(const QString &title) const
 {
-    qDebug() << Q_FUNC_INFO  << title;
-    return m_consoleApps.contains(title) || m_windowedApps.contains(title);
+    qDebug() << Q_FUNC_INFO;
+    return m_buildTargets.contains(title);
+}
+
+PremakeBuildTarget PremakeProject::buildTargetForTitle(const QString &title)
+{
+    qDebug() << Q_FUNC_INFO;
+    return m_buildTargets[title];
 }
 
 QStringList PremakeProject::buildTargetTitles() const
 {
-    qDebug() << Q_FUNC_INFO << m_consoleApps + m_windowedApps;
-    return m_consoleApps + m_windowedApps;
-}
-
-QStringList PremakeProject::consoleApps() const
-{
-    return m_consoleApps;
-}
-
-QStringList PremakeProject::windowedApps() const
-{
-    return m_windowedApps;
+    qDebug() << Q_FUNC_INFO;
+    return m_buildTargets.keys();
 }
 
 ToolChain *PremakeProject::toolChain() const

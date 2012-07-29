@@ -38,15 +38,31 @@
 #include <projectexplorer/applicationrunconfiguration.h>
 #include <utils/environment.h>
 
+QT_BEGIN_NAMESPACE
+class QComboBox;
+QT_END_NAMESPACE
+
+namespace Utils {
+class PathChooser;
+class DetailsWidget;
+}
+
+namespace ProjectExplorer {
+class EnvironmentWidget;
+}
+
 namespace PremakeProjectManager {
 
 namespace Internal {
 
 class PremakeRunConfiguration : public ProjectExplorer::LocalApplicationRunConfiguration
 {
+    Q_OBJECT
     friend class PremakeRunConfigurationFactory;
+    friend class PremakeRunConfigurationWidget;
 public:
-    PremakeRunConfiguration(PremakeTarget *parent, const QString &title);
+    PremakeRunConfiguration(PremakeTarget *parent, const QString &target,
+                            const QString &workingDirectory, const QString &title);
     ~PremakeRunConfiguration();
 
     PremakeTarget *premakeTarget() const;
@@ -55,17 +71,30 @@ public:
 
     QString executable() const;
     RunMode runMode() const;
+    void setRunMode(RunMode runMode);
     QString workingDirectory() const;
     QString commandLineArguments() const;
+    void setCommandLineArguments(const QString &args);
     Utils::Environment environment() const;
     QString dumperLibrary() const;
     QStringList dumperLibraryLocations() const;
+    bool isEnabled() const;
+    QString disabledReason() const;
 
     QString title() const;
+
+    void setExecutable(const QString &executable);
+    void setBaseWorkingDirectory(const QString &workingDirectory);
+    void setEnabled(bool enabled);
 
 protected:
     virtual bool fromMap(const QVariantMap &map);
     QString defaultDisplayName() const;
+
+signals:
+    void baseEnvironmentChanged();
+    void userEnvironmentChangesChanged(const QList<Utils::EnvironmentItem> &diff);
+    void baseWorkingDirectoryChanged(const QString&);
 
 private:
     PremakeRunConfiguration(PremakeTarget *parent, PremakeRunConfiguration *source);
@@ -95,6 +124,34 @@ private:
     QList<Utils::EnvironmentItem> m_userEnvironmentChanges;
     BaseEnvironmentBase m_baseEnvironmentBase;
     bool m_enabled;
+};
+
+class PremakeRunConfigurationWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit PremakeRunConfigurationWidget(PremakeRunConfiguration *cmakeRunConfiguration, QWidget *parent = 0);
+
+private slots:
+    void setArguments(const QString &args);
+    void baseEnvironmentChanged();
+    void userEnvironmentChangesChanged();
+    void userChangesChanged();
+    void setWorkingDirectory();
+    void resetWorkingDirectory();
+    void runInTerminalToggled(bool toggled);
+
+    void baseEnvironmentComboBoxChanged(int index);
+    void workingDirectoryChanged(const QString &workingDirectory);
+
+private:
+    void ctor();
+    bool m_ignoreChange;
+    PremakeRunConfiguration *m_premakeRunConfiguration;
+    Utils::PathChooser *m_workingDirectoryEdit;
+    QComboBox *m_baseEnvironmentComboBox;
+    ProjectExplorer::EnvironmentWidget *m_environmentWidget;
+    Utils::DetailsWidget *m_detailsContainer;
 };
 
 class PremakeRunConfigurationFactory : public ProjectExplorer::IRunConfigurationFactory

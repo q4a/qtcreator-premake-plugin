@@ -1,7 +1,7 @@
 Prerequisites
 =============
 
-Qt Creator 2.3.1 or 2.4.0
+Qt Creator 2.3.x, 2.4.x, or 2.5.x
 Source code of your Qt Creator version
 Linux, Mac OS X (>=10.5), or Windows (XP or higher)
 
@@ -11,7 +11,7 @@ Windows, and Mac OS X 10.4, however they were not tested.
 Building on Linux or Mac OS X
 =============================
 
-1. Get the source code of Qt Creator 2.3.1, or 2.4.0, or 2.4 git branch (master
+1. Get the source code of Qt Creator 2.3.1, or 2.4.1, or 2.5.1 (master
 won't work). We will assume you've unpacked/cloned it to ~/src/qt-creator
 
 2. Create ~/src/build-qtc and run
