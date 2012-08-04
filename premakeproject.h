@@ -118,8 +118,11 @@ public:
     PremakeBuildTarget buildTargetForTitle(const QString &title);
 
     QVariantMap toMap() const;
+
 signals:
-    void toolChainChanged(ProjectExplorer::ToolChain *);
+    void toolChainChanged(ProjectExplorer::ToolChain *);signals:
+    /// emitted after parsing
+    void buildTargetsChanged();
 
 protected:
     virtual bool fromMap(const QVariantMap &map);

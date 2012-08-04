@@ -75,9 +75,10 @@ public:
 protected:
     bool fromMap(const QVariantMap &map);
 
-private:
+private slots:
     void updateRunConfigurations();
 
+private:
     PremakeBuildConfigurationFactory *m_buildConfigurationFactory;
     ProjectExplorer::DeployConfigurationFactory *m_deployConfigurationFactory;
 };

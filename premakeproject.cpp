@@ -250,6 +250,8 @@ void PremakeProject::parseProject(RefreshOptions options)
     if (options & Files)
         emit fileListChanged();
 
+    emit buildTargetsChanged();
+
     lua_close(L);
 }
 

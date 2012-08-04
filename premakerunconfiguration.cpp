@@ -78,6 +78,7 @@ PremakeRunConfiguration::PremakeRunConfiguration(PremakeTarget *parent, const QS
     , m_baseEnvironmentBase(BuildEnvironmentBase)
     , m_enabled(true)
 {
+    setDefaultDisplayName(defaultDisplayName());
 }
 
 PremakeRunConfiguration::~PremakeRunConfiguration()
@@ -188,9 +189,13 @@ void PremakeRunConfiguration::setBaseWorkingDirectory(const QString &wd)
         emit baseWorkingDirectoryChanged(newWorkingDirectory);
 }
 
-void PremakeRunConfiguration::setEnabled(bool enabled)
+void PremakeRunConfiguration::setEnabled(bool b)
 {
-    m_enabled = enabled;
+    if (m_enabled == b)
+        return;
+    m_enabled = b;
+    emit isEnabledChanged(isEnabled());
+    setDefaultDisplayName(defaultDisplayName());
 }
 
 bool PremakeRunConfiguration::fromMap(const QVariantMap &map)

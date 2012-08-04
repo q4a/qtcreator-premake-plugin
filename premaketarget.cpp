@@ -65,6 +65,7 @@ PremakeTarget::PremakeTarget(PremakeProject *parent) :
     setDefaultDisplayName(QApplication::translate("PremakeProjectManager::PremakeTarget",
                                                   PREMAKE_DESKTOP_TARGET_DISPLAY_NAME));
     setIcon(qApp->style()->standardIcon(QStyle::SP_ComputerIcon));
+    connect(parent, SIGNAL(buildTargetsChanged()), SLOT(updateRunConfigurations()));
 }
 
 PremakeTarget::~PremakeTarget()
@@ -120,6 +121,7 @@ void PremakeTarget::updateRunConfigurations()
     }
 
     foreach (const QString &title, premakeProject()->buildTargetTitles()) {
+        qDebug() << Q_FUNC_INFO << title;
         PremakeBuildTarget pt = premakeProject()->buildTargetForTitle(title);
         QList<PremakeRunConfiguration *> list = existingRunConfigurations.values(title);
         if (!list.isEmpty()) {
@@ -167,7 +169,7 @@ PremakeTargetFactory::PremakeTargetFactory(QObject *parent) :
 {
 //    setDefaultDisplayName(displayNameForId(id()));
 //    setIcon(qApp->style()->standardIcon(QStyle::SP_ComputerIcon));
-    connect(parent, SIGNAL(buildTargetsChanged()), SLOT(updateRunConfigurations()));
+//    connect(parent, SIGNAL(buildTargetsChanged()), SLOT(updateRunConfigurations()));
 }
 
 PremakeTargetFactory::~PremakeTargetFactory()
