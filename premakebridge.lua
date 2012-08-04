@@ -70,10 +70,13 @@ function _qtcreator_rootpath()
 end
 
 local function target(prj, cfg, isConsole)
-    tgt = cfg.buildtarget
-    tgt.title = prj.name
-    tgt.isConsole = isConsole
-    return tgt
+    local tgt = cfg.buildtarget
+    local tginfo = {}
+    tginfo.title = prj.name
+    tginfo.isConsole = isConsole
+    tginfo.absoluteDirectory = path.getabsolute(path.join(prj.location, tgt.directory))
+    tginfo.executablePath = path.join(tginfo.absoluteDirectory, tgt.name)
+    return tginfo
 end
 
 newaction {

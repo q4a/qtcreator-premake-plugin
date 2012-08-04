@@ -78,6 +78,7 @@ PremakeRunConfiguration::PremakeRunConfiguration(PremakeTarget *parent, const QS
     , m_baseEnvironmentBase(BuildEnvironmentBase)
     , m_enabled(true)
 {
+    qDebug() << Q_FUNC_INFO << title << workingDirectory << target;
     setDefaultDisplayName(defaultDisplayName());
 }
 
@@ -97,6 +98,7 @@ QWidget *PremakeRunConfiguration::createConfigurationWidget()
 
 QString PremakeRunConfiguration::executable() const
 {
+    qDebug() << Q_FUNC_INFO << m_buildTarget;
     return m_buildTarget;
 }
 
@@ -112,6 +114,8 @@ void PremakeRunConfiguration::setRunMode(ProjectExplorer::LocalApplicationRunCon
 
 QString PremakeRunConfiguration::workingDirectory() const
 {
+    qDebug() << Q_FUNC_INFO << QDir::cleanPath(environment().expandVariables(
+                                                   Utils::expandMacros(baseWorkingDirectory(), macroExpander())));
     return QDir::cleanPath(environment().expandVariables(
                 Utils::expandMacros(baseWorkingDirectory(), macroExpander())));
 }

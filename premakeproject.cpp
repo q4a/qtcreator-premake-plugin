@@ -218,8 +218,8 @@ void PremakeProject::parseProject(RefreshOptions options)
     foreach (const StringMap &tgt, targets) {
 //        qDebug() << Q_FUNC_INFO << tgt;
         PremakeBuildTarget target;
-        target.executable = tgt[QLatin1String("name")];
-        target.workingDirectory = tgt[QLatin1String("directory")];
+        target.executable = tgt[QLatin1String("executablePath")];
+        target.workingDirectory = tgt[QLatin1String("absoluteDirectory")];
         target.isConsole = (tgt[QLatin1String("isConsole")] == QLatin1String("true"));
         m_buildTargets[tgt[QLatin1String("title")]] = target;
     }
