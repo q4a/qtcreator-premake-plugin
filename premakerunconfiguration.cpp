@@ -85,7 +85,6 @@ PremakeRunConfiguration::PremakeRunConfiguration(PremakeTarget *parent, const QS
     , m_baseEnvironmentBase(BuildEnvironmentBase)
     , m_enabled(true)
 {
-    qDebug() << Q_FUNC_INFO << title << workingDirectory << target;
     setDefaultDisplayName(defaultDisplayName());
 }
 
@@ -105,7 +104,6 @@ QWidget *PremakeRunConfiguration::createConfigurationWidget()
 
 QString PremakeRunConfiguration::executable() const
 {
-    qDebug() << Q_FUNC_INFO << m_buildTarget;
     return m_buildTarget;
 }
 
@@ -121,8 +119,6 @@ void PremakeRunConfiguration::setRunMode(ProjectExplorer::LocalApplicationRunCon
 
 QString PremakeRunConfiguration::workingDirectory() const
 {
-    qDebug() << Q_FUNC_INFO << QDir::cleanPath(environment().expandVariables(
-                                                   Utils::expandMacros(baseWorkingDirectory(), macroExpander())));
     return QDir::cleanPath(environment().expandVariables(
                 Utils::expandMacros(baseWorkingDirectory(), macroExpander())));
 }
@@ -298,7 +294,7 @@ void PremakeRunConfiguration::setBaseEnvironmentBase(PremakeRunConfiguration::Ba
     if (m_baseEnvironmentBase == env)
         return;
     m_baseEnvironmentBase = env;
-//    emit baseEnvironmentChanged();
+    emit baseEnvironmentChanged();
 }
 
 PremakeRunConfiguration::BaseEnvironmentBase PremakeRunConfiguration::baseEnvironmentBase() const
@@ -314,14 +310,14 @@ QList<Utils::EnvironmentItem> PremakeRunConfiguration::userEnvironmentChanges() 
 
 
 // Configuration widget
-PremakeRunConfigurationWidget::PremakeRunConfigurationWidget(PremakeRunConfiguration *cmakeRunConfiguration, QWidget *parent)
-    : QWidget(parent), m_ignoreChange(false), m_premakeRunConfiguration(cmakeRunConfiguration)
+PremakeRunConfigurationWidget::PremakeRunConfigurationWidget(PremakeRunConfiguration *premakeRunConfiguration, QWidget *parent)
+    : QWidget(parent), m_ignoreChange(false), m_premakeRunConfiguration(premakeRunConfiguration)
 {
     QFormLayout *fl = new QFormLayout();
     fl->setMargin(0);
     fl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     QLineEdit *argumentsLineEdit = new QLineEdit();
-    argumentsLineEdit->setText(cmakeRunConfiguration->commandLineArguments());
+    argumentsLineEdit->setText(premakeRunConfiguration->commandLineArguments());
     connect(argumentsLineEdit, SIGNAL(textChanged(QString)),
             this, SLOT(setArguments(QString)));
     fl->addRow(tr("Arguments:"), argumentsLineEdit);
@@ -477,7 +473,6 @@ void PremakeRunConfigurationWidget::setArguments(const QString &args)
 PremakeRunConfigurationFactory::PremakeRunConfigurationFactory(QObject *parent) :
     ProjectExplorer::IRunConfigurationFactory(parent)
 {
-    qDebug() << Q_FUNC_INFO;
 }
 
 PremakeRunConfigurationFactory::~PremakeRunConfigurationFactory()
@@ -487,7 +482,6 @@ PremakeRunConfigurationFactory::~PremakeRunConfigurationFactory()
 // used to show the list of possible additons to a project, returns a list of ids
 QStringList PremakeRunConfigurationFactory::availableCreationIds(ProjectExplorer::Target *parent) const
 {
-    qDebug() << Q_FUNC_INFO;
     PremakeTarget *t = qobject_cast<PremakeTarget *>(parent);
     if (!t)
         return QStringList();
@@ -505,7 +499,6 @@ QString PremakeRunConfigurationFactory::displayNameForId(const QString &id) cons
 
 bool PremakeRunConfigurationFactory::canCreate(ProjectExplorer::Target *parent, const QString &id) const
 {
-    qDebug() << Q_FUNC_INFO;
     PremakeTarget *t = qobject_cast<PremakeTarget *>(parent);
     if (!t)
         return false;

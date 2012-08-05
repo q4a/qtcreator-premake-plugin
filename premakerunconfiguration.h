@@ -132,7 +132,7 @@ class PremakeRunConfigurationWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PremakeRunConfigurationWidget(PremakeRunConfiguration *cmakeRunConfiguration, QWidget *parent = 0);
+    explicit PremakeRunConfigurationWidget(PremakeRunConfiguration *rc, QWidget *parent = 0);
 
 private slots:
     void setArguments(const QString &args);
