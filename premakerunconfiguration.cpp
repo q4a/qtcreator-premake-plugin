@@ -56,6 +56,13 @@ using namespace PremakeProjectManager::Internal;
 const char PREMAKE_RC_ID[] = "PremakeProjectManager.PremakeRunConfiguration";
 const char PREMAKE_RC_PREFIX[] = "PremakeProjectManager.PremakeRunConfiguration.";
 
+const char USER_WORKING_DIRECTORY_KEY[] = "PremakeProjectManager.PremakeRunConfiguration.UserWorkingDirectory";
+const char USE_TERMINAL_KEY[] = "PremakeProjectManager.PremakeRunConfiguration.UseTerminal";
+const char TITLE_KEY[] = "PremakeProjectManager.PremakeRunConfiguation.Title";
+const char ARGUMENTS_KEY[] = "PremakeProjectManager.PremakeRunConfiguration.Arguments";
+const char USER_ENVIRONMENT_CHANGES_KEY[] = "PremakeProjectManager.PremakeRunConfiguration.UserEnvironmentChanges";
+const char BASE_ENVIRONMENT_BASE_KEY[] = "PremakeProjectManager.BaseEnvironmentBase";
+
 QString buildTargetFromId(const QString &id)
 {
     if (!id.startsWith(QLatin1String(PREMAKE_RC_PREFIX)))
@@ -172,6 +179,20 @@ QString PremakeRunConfiguration::disabledReason() const
     return QString();
 }
 
+QVariantMap PremakeRunConfiguration::toMap() const
+{
+    QVariantMap map(ProjectExplorer::LocalApplicationRunConfiguration::toMap());
+
+    map.insert(QLatin1String(USER_WORKING_DIRECTORY_KEY), m_userWorkingDirectory);
+    map.insert(QLatin1String(USE_TERMINAL_KEY), m_runMode == Console);
+    map.insert(QLatin1String(TITLE_KEY), m_title);
+    map.insert(QLatin1String(ARGUMENTS_KEY), m_arguments);
+    map.insert(QLatin1String(USER_ENVIRONMENT_CHANGES_KEY), Utils::EnvironmentItem::toStringList(m_userEnvironmentChanges));
+    map.insert(QLatin1String(BASE_ENVIRONMENT_BASE_KEY), m_baseEnvironmentBase);
+
+    return map;
+}
+
 QString PremakeRunConfiguration::title() const
 {
     return m_title;
@@ -204,7 +225,14 @@ void PremakeRunConfiguration::setEnabled(bool b)
 
 bool PremakeRunConfiguration::fromMap(const QVariantMap &map)
 {
-    return true;
+    m_userWorkingDirectory = map.value(QLatin1String(USER_WORKING_DIRECTORY_KEY)).toString();
+    m_runMode = map.value(QLatin1String(USE_TERMINAL_KEY)).toBool() ? Console : Gui;
+    m_title = map.value(QLatin1String(TITLE_KEY)).toString();
+    m_arguments = map.value(QLatin1String(ARGUMENTS_KEY)).toString();
+    m_userEnvironmentChanges = Utils::EnvironmentItem::fromStringList(map.value(QLatin1String(USER_ENVIRONMENT_CHANGES_KEY)).toStringList());
+    m_baseEnvironmentBase = static_cast<BaseEnvironmentBase>(map.value(QLatin1String(BASE_ENVIRONMENT_BASE_KEY), static_cast<int>(BuildEnvironmentBase)).toInt());
+
+    return RunConfiguration::fromMap(map);
 }
 
 QString PremakeRunConfiguration::defaultDisplayName() const

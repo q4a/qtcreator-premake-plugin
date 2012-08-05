@@ -81,6 +81,8 @@ public:
     bool isEnabled() const;
     QString disabledReason() const;
 
+    QVariantMap toMap() const;
+
     QString title() const;
 
     void setExecutable(const QString &executable);
