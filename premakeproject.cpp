@@ -207,16 +207,9 @@ void PremakeProject::parseProject(RefreshOptions options)
         }
     }
 
-//    QStringList consoleApps;
-//    QStringList windowedApps;
-//    tableToStringList(L, "_qtcreator_consoleapps", consoleApps);
-//    tableToStringList(L, "_qtcreator_windowedapps", windowedApps);
-//    qDebug() << Q_FUNC_INFO << consoleApps << windowedApps;
-
     StringMapList targets;
     tableToStringMapList(L, "_qtcreator_targets", targets);
     foreach (const StringMap &tgt, targets) {
-//        qDebug() << Q_FUNC_INFO << tgt;
         PremakeBuildTarget target;
         target.executable = tgt[QLatin1String("executablePath")];
         target.workingDirectory = tgt[QLatin1String("absoluteDirectory")];
