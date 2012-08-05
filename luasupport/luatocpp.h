@@ -30,7 +30,12 @@
 #ifndef LUATOCPP_H
 #define LUATOCPP_H
 
+extern "C" {
+#include "lua.h"
+}
+
 #include <QList>
+#include <QMap>
 #include <QString>
 
 struct lua_State;
@@ -40,22 +45,30 @@ class QStringList;
 
 namespace LuaSupport {
 
-class Callback
+typedef QMap<QString, QString> StringMap;
+typedef QList<StringMap> StringMapList;
+
+
+namespace Internal {
+bool getFieldByPath(lua_State *L, const QList<QByteArray> &fields, const QByteArray &objname);
+}
+
+template <typename Callback>
+bool luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback)
 {
-public:
-    virtual ~Callback();
+    const QList<QByteArray> fields = objname.split('.');
+    if (!Internal::getFieldByPath(L, fields, objname))
+        return false; // getFieldByPath cleans stack on failure
 
-    // This function operates on stack top value
-    virtual bool call(lua_State *L) = 0;
+    // Perform callback action
+    bool result = callback.call(L);
+    // Restore stack state
+    lua_pop(L, fields.size());
 
-    virtual QString error() const = 0;
-};
+    return result;
+}
 
-
-bool luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback);
-
-
-class GetStringList : public Callback
+class GetStringList
 {
 public:
     GetStringList(QStringList &to);
@@ -66,11 +79,11 @@ private:
     QStringList &m_to;
 };
 
-class CallLuaFunctionSingleReturnValue : public Callback
+class CallLuaFunctionSingleReturnValue
 {
 public:
+    CallLuaFunctionSingleReturnValue(const QList<QByteArray> &args);
     bool call(lua_State *L);
-    void setArgs(const QList<QByteArray> &args);
     QString result();
     QString error() const;
 
@@ -78,6 +91,28 @@ private:
     QList<QByteArray> m_args;
     QString m_result;
     QString m_error;
+};
+
+class GetStringMap
+{
+public:
+    GetStringMap(StringMap &to);
+    bool call(lua_State *L);
+    QString error() const;
+
+private:
+    StringMap &m_to;
+};
+
+class GetStringMapList
+{
+public:
+    GetStringMapList(StringMapList &to);
+    bool call(lua_State *L);
+    QString error() const;
+
+private:
+    StringMapList &m_to;
 };
 
 }

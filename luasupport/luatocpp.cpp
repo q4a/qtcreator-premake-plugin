@@ -29,51 +29,28 @@
 
 #include "luatocpp.h"
 
-extern "C" {
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-}
-
 #include <QDebug>
 #include <QStringList>
 
-using namespace LuaSupport;
-
-Callback::~Callback()
+bool LuaSupport::Internal::getFieldByPath(lua_State *L, const QList<QByteArray> &fields, const QByteArray &objname)
 {
-}
-
-
-bool LuaSupport::luaRecursiveAccessor(lua_State *L, const QByteArray &objname, Callback &callback)
-{
-    qDebug() << Q_FUNC_INFO << "enter stack pos" << lua_gettop(L);
-    const QList<QByteArray> fields = objname.split('.');
     Q_ASSERT(fields.size() > 0);
 
     // Bring target table on stack
     lua_checkstack(L, fields.size());
     lua_getglobal(L, fields.first().data());
     for (int i = 1; i < fields.size(); ++i) {
-        if (lua_isnil(L, -1)) {
-            qWarning() << "Cannot access" << objname << ":" << fields.at(i-1) << "is nil";
+        if (!lua_istable(L, -1)) {
+            qWarning() << "Cannot access" << objname << ":" << fields.at(i-1) << "is not table";
             lua_pop(L, i);
             return false;
         }
         lua_getfield(L, -1, fields.at(i).data());
     }
-
-    // Perform needed actions
-    qDebug() << Q_FUNC_INFO << "callback enter stack pos" << lua_gettop(L);
-    bool result = callback.call(L);
-    qDebug() << Q_FUNC_INFO << "callback exit stack pos" << lua_gettop(L);
-
-    // Restore stack state
-    lua_pop(L, fields.size());
-    qDebug() << Q_FUNC_INFO << "exit stack pos" << lua_gettop(L);
-    return result;
+    return true;
 }
 
+using namespace LuaSupport;
 
 GetStringList::GetStringList(QStringList &to)
     : m_to(to)
@@ -88,7 +65,7 @@ bool GetStringList::call(lua_State *L)
     for(int i = 1; i <= n_elements; ++i) {
         lua_pushinteger(L, i);
         lua_gettable(L, -2);
-        const QString value = QString::fromLocal8Bit(lua_tolstring(L, -1, 0));
+        const QString value = QString::fromLocal8Bit(lua_tostring(L, -1));
         lua_pop(L, 1);
         m_to << value;
     }
@@ -98,6 +75,11 @@ bool GetStringList::call(lua_State *L)
 QString GetStringList::error() const
 {
     return QString();
+}
+
+CallLuaFunctionSingleReturnValue::CallLuaFunctionSingleReturnValue(const QList<QByteArray> &args)
+    : m_args(args)
+{
 }
 
 bool CallLuaFunctionSingleReturnValue::call(lua_State *L)
@@ -116,11 +98,6 @@ bool CallLuaFunctionSingleReturnValue::call(lua_State *L)
     }
 }
 
-void CallLuaFunctionSingleReturnValue::setArgs(const QList<QByteArray> &args)
-{
-    m_args = args;
-}
-
 QString CallLuaFunctionSingleReturnValue::result()
 {
     return m_result;
@@ -129,4 +106,66 @@ QString CallLuaFunctionSingleReturnValue::result()
 QString CallLuaFunctionSingleReturnValue::error() const
 {
     return m_error;
+}
+
+
+GetStringMap::GetStringMap(StringMap &to)
+    : m_to(to)
+{
+}
+
+bool GetStringMap::call(lua_State *L)
+{
+    m_to.clear();
+    for (lua_pushnil(L); lua_next(L, -2); lua_pop(L, 1)) {
+        if (lua_type(L, -2) != LUA_TSTRING)
+            continue;
+
+        const QString key = QString::fromLocal8Bit(lua_tostring(L, -2));
+        const QString value = QString::fromLocal8Bit(lua_tostring(L, -1));
+        m_to[key] = value;
+    }
+    return true;
+}
+
+QString GetStringMap::error() const
+{
+    return QString();
+}
+
+
+GetStringMapList::GetStringMapList(StringMapList &to)
+    : m_to(to)
+{
+}
+
+bool GetStringMapList::call(lua_State *L)
+{
+    m_to.clear();
+    int n_elements = lua_objlen(L, -1);
+    // Lua index starts from 1
+    for(int i = 1; i <= n_elements; ++i) {
+        lua_pushinteger(L, i);
+        lua_gettable(L, -2);
+
+        if (lua_type(L, -1) == LUA_TTABLE) {
+            StringMap map;
+            for (lua_pushnil(L); lua_next(L, -2); lua_pop(L, 1)) {
+                if (lua_type(L, -2) != LUA_TSTRING)
+                    continue;
+
+                const QString key = QString::fromLocal8Bit(lua_tostring(L, -2));
+                const QString value = QString::fromLocal8Bit(lua_tostring(L, -1));
+                map[key] = value;
+            }
+            m_to << map;
+        }
+        lua_pop(L, 1);
+    }
+    return true;
+}
+
+QString GetStringMapList::error() const
+{
+    return QString();
 }

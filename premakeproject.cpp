@@ -113,8 +113,7 @@ static void projectParseError(const char *errorMessage)
 static QString callLuaFunction(lua_State *L, const QByteArray &funcname,
                                const QList<QByteArray> &args = QList<QByteArray>())
 {
-    CallLuaFunctionSingleReturnValue callback;
-    callback.setArgs(args);
+    CallLuaFunctionSingleReturnValue callback(args);
     if (!luaRecursiveAccessor(L, funcname, callback)) {
         projectParseError(QString::fromLatin1(funcname) + QString::fromLatin1(": ")
                           + callback.error());
