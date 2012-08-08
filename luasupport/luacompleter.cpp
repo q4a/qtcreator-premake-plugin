@@ -1,19 +1,23 @@
 #include "luacompleter.h"
 
+#include "future/utils/bracematcher.h"
+
 #include <QtGui/QTextBlock>
 #include <QtGui/QTextCursor>
+
+Q_GLOBAL_STATIC_WITH_INITIALIZER(Utils::BraceMatcher, braceMatcher, {
+    x->addBraceCharPair(QLatin1Char('('), QLatin1Char(')'));
+    x->addBraceCharPair(QLatin1Char('['), QLatin1Char(']'));
+    x->addQuoteChar(QLatin1Char('"'));
+    x->addQuoteChar(QLatin1Char('\''));
+    x->addDelimiterChar(QLatin1Char(','));
+    x->addDelimiterChar(QLatin1Char(';'));
+})
 
 using namespace LuaSupport;
 
 LuaCompleter::LuaCompleter()
 {
-    m_matcher.addBraceCharPair(QLatin1Char('('), QLatin1Char(')'));
-    m_matcher.addBraceCharPair(QLatin1Char('['), QLatin1Char(']'));
-    m_matcher.addBraceCharPair(QLatin1Char('{'), QLatin1Char('}'));
-    m_matcher.addQuoteChar(QLatin1Char('"'));
-    m_matcher.addQuoteChar(QLatin1Char('\''));
-    m_matcher.addDelimiterChar(QLatin1Char(','));
-    m_matcher.addDelimiterChar(QLatin1Char(';'));
 }
 
 LuaCompleter::~LuaCompleter()
@@ -24,7 +28,7 @@ bool LuaCompleter::contextAllowsAutoParentheses(const QTextCursor &cursor, const
     if (textToInsert.isEmpty() || isInComment(cursor))
         return false;
 
-    return m_matcher.isKnownChar(textToInsert.at(0)); //shouldInsertMatchingText(textToInsert.at(0));
+    return braceMatcher()->isKnownChar(textToInsert.at(0));
 }
 
 bool LuaCompleter::contextAllowsElectricCharacters(const QTextCursor &cursor) const
@@ -46,8 +50,7 @@ bool LuaCompleter::isInComment(const QTextCursor &cursor) const
 
 QString LuaCompleter::insertMatchingBrace(const QTextCursor &cursor, const QString &text, QChar la, int *skippedChars) const
 {
-//    MatchingText m;
-    return m_matcher.insertMatchingBrace(cursor, text, la, skippedChars);
+    return braceMatcher()->insertMatchingBrace(cursor, text, la, skippedChars);
 }
 
 //QString LuaCompleter::insertParagraphSeparator(const QTextCursor &cursor) const
