@@ -24,6 +24,7 @@ include($$QTC_SOURCE/src/plugins/projectexplorer/projectexplorer.pri)
 include($$QTC_SOURCE/src/plugins/cpptools/cpptools.pri)
 include($$QTC_SOURCE/src/plugins/texteditor/texteditor.pri)
 include($$QTC_SOURCE/src/plugins/qtsupport/qtsupport.pri)
+include(future/future.pri)
 include(luasupport/luasupport.pri)
 include(premake.pri)
 

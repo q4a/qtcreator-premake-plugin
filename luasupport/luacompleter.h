@@ -1,6 +1,7 @@
 #ifndef LUACOMPLETER_H
 #define LUACOMPLETER_H
 
+#include "future/utils/bracematcher.h"
 #include <texteditor/autocompleter.h>
 
 namespace LuaSupport {
@@ -19,7 +20,10 @@ public:
                                         const QString &text,
                                         QChar la,
                                         int *skippedChars) const;
-    virtual QString insertParagraphSeparator(const QTextCursor &cursor) const;
+//    virtual QString insertParagraphSeparator(const QTextCursor &cursor) const;
+
+private:
+    Utils::BraceMatcher m_matcher;
 };
 
 }

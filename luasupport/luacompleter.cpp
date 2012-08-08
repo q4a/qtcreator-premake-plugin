@@ -1,41 +1,35 @@
 #include "luacompleter.h"
 
-#include <cplusplus/MatchingText.h>
-
 #include <QtGui/QTextBlock>
 #include <QtGui/QTextCursor>
-#include <QDebug>
 
 using namespace LuaSupport;
-using namespace CPlusPlus;
 
 LuaCompleter::LuaCompleter()
-{}
+{
+    m_matcher.addBraceCharPair(QLatin1Char('('), QLatin1Char(')'));
+    m_matcher.addBraceCharPair(QLatin1Char('['), QLatin1Char(']'));
+    m_matcher.addBraceCharPair(QLatin1Char('{'), QLatin1Char('}'));
+    m_matcher.addQuoteChar(QLatin1Char('"'));
+    m_matcher.addQuoteChar(QLatin1Char('\''));
+    m_matcher.addDelimiterChar(QLatin1Char(','));
+    m_matcher.addDelimiterChar(QLatin1Char(';'));
+}
 
 LuaCompleter::~LuaCompleter()
 {}
 
 bool LuaCompleter::contextAllowsAutoParentheses(const QTextCursor &cursor, const QString &textToInsert) const
 {
-    QChar ch;
-
-    if (! textToInsert.isEmpty())
-        ch = textToInsert.at(0);
-
-    if (! (MatchingText::shouldInsertMatchingText(cursor)
-           || ch == QLatin1Char('\'')
-           || ch == QLatin1Char('"')))
-        return false;
-    else if (isInComment(cursor))
+    if (textToInsert.isEmpty() || isInComment(cursor))
         return false;
 
-    return true;
+    return m_matcher.isKnownChar(textToInsert.at(0)); //shouldInsertMatchingText(textToInsert.at(0));
 }
 
 bool LuaCompleter::contextAllowsElectricCharacters(const QTextCursor &cursor) const
 {
-    Q_UNUSED(cursor)
-    return true;
+    return !isInComment(cursor);
 }
 
 bool LuaCompleter::isInComment(const QTextCursor &cursor) const
@@ -52,12 +46,12 @@ bool LuaCompleter::isInComment(const QTextCursor &cursor) const
 
 QString LuaCompleter::insertMatchingBrace(const QTextCursor &cursor, const QString &text, QChar la, int *skippedChars) const
 {
-    MatchingText m;
-    return m.insertMatchingBrace(cursor, text, la, skippedChars);
+//    MatchingText m;
+    return m_matcher.insertMatchingBrace(cursor, text, la, skippedChars);
 }
 
-QString LuaCompleter::insertParagraphSeparator(const QTextCursor &cursor) const
-{
-    MatchingText m;
-    return m.insertParagraphSeparator(cursor);
-}
+//QString LuaCompleter::insertParagraphSeparator(const QTextCursor &cursor) const
+//{
+//    MatchingText m;
+//    return m_matcher.insertParagraphSeparator(cursor);
+//}
