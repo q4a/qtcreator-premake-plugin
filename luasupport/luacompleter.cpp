@@ -2,8 +2,9 @@
 
 #include "future/utils/bracematcher.h"
 
-#include <QtGui/QTextBlock>
-#include <QtGui/QTextCursor>
+#include <QTextBlock>
+#include <QTextCursor>
+#include <QTextDocument>
 
 Q_GLOBAL_STATIC_WITH_INITIALIZER(Utils::BraceMatcher, braceMatcher, {
     x->addBraceCharPair(QLatin1Char('('), QLatin1Char(')'));
@@ -53,8 +54,38 @@ QString LuaCompleter::insertMatchingBrace(const QTextCursor &cursor, const QStri
     return braceMatcher()->insertMatchingBrace(cursor, text, la, skippedChars);
 }
 
-//QString LuaCompleter::insertParagraphSeparator(const QTextCursor &cursor) const
-//{
-//    MatchingText m;
-//    return m_matcher.insertParagraphSeparator(cursor);
-//}
+static bool shouldInsertNewline(const QTextCursor &tc)
+{
+    QTextDocument *doc = tc.document();
+    int pos = tc.selectionEnd();
+
+    // count the number of empty lines.
+    int newlines = 0;
+    for (int e = doc->characterCount(); pos != e; ++pos) {
+        const QChar ch = doc->characterAt(pos);
+
+        if (! ch.isSpace())
+            break;
+        else if (ch == QChar::ParagraphSeparator)
+            ++newlines;
+    }
+
+    if (newlines <= 1 && doc->characterAt(pos) != QLatin1Char('}'))
+        return true;
+
+    return false;
+}
+
+QString LuaCompleter::insertParagraphSeparator(const QTextCursor &cursor) const
+{
+    if (shouldInsertNewline(cursor)) {
+        QTextCursor selCursor = cursor;
+        selCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        if (!selCursor.selectedText().trimmed().isEmpty())
+            return QString();
+
+        return QLatin1String("}\n");
+    }
+
+    return QLatin1String("}");
+}

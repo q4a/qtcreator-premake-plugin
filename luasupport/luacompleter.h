@@ -9,17 +9,17 @@ class LuaCompleter : public TextEditor::AutoCompleter
 {
 public:
     LuaCompleter();
-    virtual ~LuaCompleter();
+    ~LuaCompleter();
 
-    virtual bool contextAllowsAutoParentheses(const QTextCursor &cursor,
+    bool contextAllowsAutoParentheses(const QTextCursor &cursor,
                                               const QString &textToInsert = QString()) const;
-    virtual bool contextAllowsElectricCharacters(const QTextCursor &cursor) const;
-    virtual bool isInComment(const QTextCursor &cursor) const;
-    virtual QString insertMatchingBrace(const QTextCursor &cursor,
+    bool contextAllowsElectricCharacters(const QTextCursor &cursor) const;
+    bool isInComment(const QTextCursor &cursor) const;
+    QString insertMatchingBrace(const QTextCursor &cursor,
                                         const QString &text,
                                         QChar la,
                                         int *skippedChars) const;
-//    virtual QString insertParagraphSeparator(const QTextCursor &cursor) const;
+    QString insertParagraphSeparator(const QTextCursor &cursor) const;
 };
 
 }
