@@ -1,4 +1,5 @@
-INCLUDEPATH *= $$PWD
+INCLUDEPATH += $$PWD \
+    ../premake/src/host/lua-5.1.4/src
 
 HEADERS += \
     $$PWD/luacompleter.h \
