@@ -1,0 +1,31 @@
+{
+    \"Name\" : \"PremakeProjectManager\",
+    \"Version\" : \"$$QTCREATOR_VERSION\",
+    \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
+    \"Vendor\" : \"Aleksey Komarov\",
+    \"Copyright\" : \"(C) $$QTCREATOR_COPYRIGHT_YEAR Konstantin Tokarev and Aleksey Komarov\",
+    \"License\" : [ \"GNU General Public License Usage\",
+                  \"\",
+                  \"This plugin may be used under the terms of the GNU General Public License version 3 as published by the Free Software Foundation with exceptions as appearing in the file LICENSE.GPL3-EXCEPT included in the packaging of this plugin. Please review the following information to ensure the GNU General Public License requirements will be met: https://www.gnu.org/licenses/gpl-3.0.html.\"
+    ],
+    \"Category\" : \"Build Systems\",
+    \"Description\" : \"Premake 5 support\",
+    \"Url\" : \"https://github.com/q4a/qtcreator-premake-plugin\",
+    $$dependencyList,
+
+    \"Mimetypes\" : [
+        \"<?xml version=\'1.0\'?>\",
+        \"<mime-info xmlns=\'http://www.freedesktop.org/standards/shared-mime-info\'>\",
+        \"  <mime-type type=\'text/x-cmake\'>\",
+        \"    <sub-class-of type=\'text/plain\'/>\",
+        \"    <comment>CMake Project file</comment>\",
+        \"    <glob pattern=\'*.cmake\'/>\",
+        \"  </mime-type>\",
+        \"  <mime-type type=\'text/x-cmake-project\'>\",
+        \"    <sub-class-of type=\'text/x-cmake\'/>\",
+        \"    <comment>CMake Project file</comment>\",
+        \"    <glob pattern=\'CMakeLists.txt\'/>\",
+        \"  </mime-type>\",
+        \"</mime-info>\"
+    ]
+}

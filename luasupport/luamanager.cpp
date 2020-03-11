@@ -35,8 +35,11 @@ LuaManager * LuaManager::instance()
 
 static void projectParseError(const QString &errorMessage)
 {
-    Core::ICore::instance()->messageManager()->printToOutputPanePopup(
-            QCoreApplication::translate("LuaManager", "Premake error: ") + errorMessage);
+    //Core::ICore::instance()->messageManager()->printToOutputPanePopup(
+    //        QCoreApplication::translate("LuaManager", "Premake error: ") + errorMessage);
+    const QString fullMessage = QCoreApplication::translate("LuaManager", "Premake error: %1").arg(errorMessage);
+    const Core::MessageManager::PrintToOutputPaneFlags flags = Core::MessageManager::ModeSwitch;
+    Core::MessageManager::write(fullMessage, flags);
 }
 
 lua_State * LuaManager::initLuaState(const QString &fileName,

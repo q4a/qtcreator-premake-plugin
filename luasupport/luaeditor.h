@@ -35,8 +35,8 @@
 
 #include "luaconstants.h"
 
-#include <texteditor/plaintexteditor.h>
-#include <texteditor/basetextdocument.h>
+#include <texteditor/textdocument.h>
+#include <texteditor/texteditor.h>
 
 #include <coreplugin/editormanager/ieditorfactory.h>
 
@@ -80,7 +80,7 @@ private:
     QStringList m_mimeTypes;
 };
 
-class LuaEditor : public TextEditor::PlainTextEditor
+class LuaEditor : public TextEditor::BaseTextEditor
 {
     Q_OBJECT
 
@@ -103,7 +103,7 @@ private:
     Core::Context m_context;
 };
 
-class LuaEditorWidget : public TextEditor::PlainTextEditorWidget
+class LuaEditorWidget : public TextEditor::TextEditorWidget
 {
     Q_OBJECT
 
@@ -119,7 +119,7 @@ public:
 
     void jumpToFile();
 
-    Link findLinkAt(const QTextCursor &cursor,
+    Utils::Link findLinkAt(const QTextCursor &cursor,
                                      bool resolveTarget = true);
 protected:
     TextEditor::BaseTextEditor *createEditor();

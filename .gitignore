@@ -1,3 +1,7 @@
+qt-creator*
+PremakeProjectManager.json
+.qmake.stash
+
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 

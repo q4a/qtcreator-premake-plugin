@@ -35,7 +35,7 @@
 
 #include "premaketarget.h"
 
-#include <projectexplorer/applicationrunconfiguration.h>
+#include <projectexplorer/runconfiguration.h>
 #include <utils/environment.h>
 
 QT_BEGIN_NAMESPACE
@@ -55,7 +55,7 @@ namespace PremakeProjectManager {
 
 namespace Internal {
 
-class PremakeRunConfiguration : public ProjectExplorer::LocalApplicationRunConfiguration
+class PremakeRunConfiguration : public ProjectExplorer::RunConfiguration
 {
     Q_OBJECT
     friend class PremakeRunConfigurationFactory;

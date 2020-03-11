@@ -9,9 +9,11 @@
 
 #include <QtCore/QDebug>
 
-using namespace LuaSupport;
+namespace LuaSupport {
+namespace Internal {
 
-LuaIndenter::LuaIndenter()
+LuaIndenter::LuaIndenter(QTextDocument *doc)
+    : TextEditor::TextIndenter(doc)
 {}
 
 LuaIndenter::~LuaIndenter()
@@ -114,3 +116,5 @@ void LuaIndenter::setCodeStylePreferences(TextEditor::ICodeStylePreferences *pre
 }
 */
 
+}
+}

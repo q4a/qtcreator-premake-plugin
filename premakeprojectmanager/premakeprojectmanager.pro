@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = PremakeProjectManager
 
-isEmpty(QTC_SOURCE): QTC_SOURCE = ../../qt-creator
+isEmpty(QTC_SOURCE): QTC_SOURCE = ../qt-creator
 isEmpty(QTC_BUILD): QTC_BUILD = $$QTC_SOURCE
 macx:isEmpty(QTC_INSTALL_ROOT): QTC_INSTALL_ROOT = "$$QTC_BUILD/bin/Qt Creator.app"
 
@@ -19,17 +19,18 @@ message("Qt Creator installation root: QTC_INSTALL_ROOT=$$QTC_INSTALL_ROOT")
 
 IDE_BUILD_TREE = $$QTC_BUILD
 
+include(premakeprojectmanager_dependencies.pri)
 include($$QTC_SOURCE/src/qtcreatorplugin.pri)
-include($$QTC_SOURCE/src/plugins/projectexplorer/projectexplorer.pri)
-include($$QTC_SOURCE/src/plugins/cpptools/cpptools.pri)
-include($$QTC_SOURCE/src/plugins/texteditor/texteditor.pri)
-include($$QTC_SOURCE/src/plugins/qtsupport/qtsupport.pri)
+#include($$QTC_SOURCE/src/plugins/projectexplorer/projectexplorer.pri)
+#include($$QTC_SOURCE/src/plugins/cpptools/cpptools.pri)
+#include($$QTC_SOURCE/src/plugins/texteditor/texteditor.pri)
+#include($$QTC_SOURCE/src/plugins/qtsupport/qtsupport.pri)
 include(../luasupport/luasupport.pri)
 include(../libpremake/libpremake.pri)
 #include(../premake.pri)
 
 INCLUDEPATH += . ..
-DEFINES += QT_NO_CAST_FROM_ASCII
+#DEFINES += QT_NO_CAST_FROM_ASCII
 HEADERS += premakeproject.h \
     premakeprojectplugin.h \
     premaketarget.h \
@@ -63,16 +64,16 @@ OTHER_FILES += premakebridge.lua \
     PremakeProjectManager.pluginspec.in \
     README
 
-!macx {
-    lua_highlight.target = $$QTC_BUILD/share/qtcreator/generic-highlighter/lua.xml
-} else {
-    lua_highlight.target = $$IDE_DATA_PATH/generic-highlighter/lua.xml
-}
-!win32 {
-    lua_highlight.commands = $$QMAKE_COPY generic-highlighter/lua.xml \"$$lua_highlight.target\"
-    QMAKE_EXTRA_TARGETS += lua_highlight
-    PRE_TARGETDEPS += $$lua_highlight.target
-}
+#!macx {
+#    lua_highlight.target = $$QTC_BUILD/share/qtcreator/generic-highlighter/lua.xml
+#} else {
+#    lua_highlight.target = $$IDE_DATA_PATH/generic-highlighter/lua.xml
+#}
+#!win32 {
+#    lua_highlight.commands = $$QMAKE_COPY generic-highlighter/lua.xml \"$$lua_highlight.target\"
+#    QMAKE_EXTRA_TARGETS += lua_highlight
+#    PRE_TARGETDEPS += $$lua_highlight.target
+#}
 
 ## Installation ##
 !isEmpty(QTC_INSTALL_ROOT) {
@@ -106,6 +107,6 @@ OTHER_FILES += premakebridge.lua \
 #win32:      install_plugin.files = $$DESTDIR/$${TARGET}.dll $$DESTDIR/$${TARGET}.pluginspec # ???
 
     INSTALLS = \
-        install_plugin \
-        install_lua_highlight
+        install_plugin
+#       \ install_lua_highlight
 }

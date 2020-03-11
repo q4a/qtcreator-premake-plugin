@@ -41,13 +41,13 @@
 #include "premaketarget.h"
 
 #include <coreplugin/icore.h>
-#include <coreplugin/mimedatabase.h>
+#include <utils/mimetypes/mimedatabase.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
 
 #include <QtCore/QtPlugin>
 #include <QtCore/QDebug>
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;

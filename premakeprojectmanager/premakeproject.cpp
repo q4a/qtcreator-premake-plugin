@@ -43,7 +43,7 @@
 #include <projectexplorer/customexecutablerunconfiguration.h>
 #include <projectexplorer/toolchainmanager.h>
 #include <projectexplorer/projectexplorerconstants.h>
-#include <cplusplus/ModelManagerInterface.h>
+//#include <cplusplus/ModelManagerInterface.h>
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/icore.h>
 #include <coreplugin/messagemanager.h>
@@ -101,8 +101,11 @@ bool PremakeProject::removeFiles(const QStringList &filePaths)
 
 static void projectParseError(const QString &errorMessage)
 {
-    Core::ICore::instance()->messageManager()->printToOutputPanePopup(
-            QCoreApplication::translate("PremakeProject", "Premake error: ") + errorMessage);
+    //Core::ICore::instance()->messageManager()->printToOutputPanePopup(
+    //        QCoreApplication::translate("PremakeProject", "Premake error: ") + errorMessage);
+    const QString fullMessage = QCoreApplication::translate("PremakeProject", "Premake error: %1").arg(errorMessage);
+    const Core::MessageManager::PrintToOutputPaneFlags flags = Core::MessageManager::ModeSwitch;
+    Core::MessageManager::write(fullMessage, flags);
 }
 
 static void projectParseError(const char *errorMessage)

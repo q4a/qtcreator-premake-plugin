@@ -48,8 +48,8 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
 #include <QtGui/QTextBlock>
 
 #include <QtCore/QDebug>

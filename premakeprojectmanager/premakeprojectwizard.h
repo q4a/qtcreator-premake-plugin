@@ -34,6 +34,7 @@
 #define PREMAKEPROJECTWIZARD_H
 
 #include <coreplugin/basefilewizard.h>
+#include <coreplugin/basefilewizardfactory.h>
 #include <utils/wizard.h>
 
 QT_BEGIN_NAMESPACE
@@ -74,12 +75,12 @@ public:
     PremakeProjectWizard();
     virtual ~PremakeProjectWizard();
 
-    static Core::BaseFileWizardParameters parameters();
+    static Core::WizardDialogParameters parameters();
 
 protected:
     virtual QWizard *createWizardDialog(QWidget *parent,
                                         const QString &defaultPath,
-                                        const WizardPageList &extensionPages) const;
+                                        const QList<QWizardPage *> &extensionPages) const;
 
     virtual Core::GeneratedFiles generateFiles(const QWizard *w,
                                                QString *errorMessage) const;

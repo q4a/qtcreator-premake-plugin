@@ -51,7 +51,7 @@ public:
 
     virtual bool hasBuildTargets() const;
 
-    virtual QList<ProjectExplorer::ProjectNode::ProjectAction> supportedActions(Node *node) const;
+    virtual QList<ProjectExplorer::ProjectAction> supportedActions(Node *node) const;
 
     virtual bool canAddSubProject(const QString &proFilePath) const;
 

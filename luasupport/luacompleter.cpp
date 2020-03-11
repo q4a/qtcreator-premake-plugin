@@ -50,10 +50,10 @@ bool LuaCompleter::isInComment(const QTextCursor &cursor) const
     return false;
 }
 
-QString LuaCompleter::insertMatchingBrace(const QTextCursor &cursor, const QString &text, QChar la, int *skippedChars) const
+QString LuaCompleter::insertMatchingBrace(const QTextCursor &cursor, const QString &text, QChar lookAhead, bool skipChars, int *skippedChars) const
 {
     MatchingText m;
-    return m.insertMatchingBrace(cursor, text, la, skippedChars);
+    return m.insertMatchingBrace(cursor, text, lookAhead, skipChars, skippedChars);
 }
 
 QString LuaCompleter::insertParagraphSeparator(const QTextCursor &cursor) const

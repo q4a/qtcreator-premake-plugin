@@ -14,11 +14,12 @@ namespace CppTools {
 }
 
 namespace LuaSupport {
+namespace Internal {
 
 class LuaIndenter : public TextEditor::Indenter
 {
 public:
-    LuaIndenter();
+    explicit LuaIndenter(QTextDocument *doc);
     ~LuaIndenter();
 
     bool isElectricCharacter(const QChar &ch) const;
@@ -33,6 +34,7 @@ public:
                              const TextEditor::TabSettings &tabSettings);
 };
 
+}
 }
 
 #endif // LUAINDENTER_H

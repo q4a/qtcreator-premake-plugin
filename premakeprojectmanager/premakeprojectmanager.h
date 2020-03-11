@@ -33,7 +33,7 @@
 #ifndef PREMAKEPROJECTMANAGER_H
 #define PREMAKEPROJECTMANAGER_H
 
-#include <projectexplorer/iprojectmanager.h>
+#include <projectexplorer/projectmanager.h>
 #include <coreplugin/icontext.h>
 
 namespace PremakeProjectManager {
@@ -41,7 +41,7 @@ namespace Internal {
 
 class PremakeProject;
 
-class PremakeManager : public ProjectExplorer::IProjectManager
+class PremakeManager : public ProjectExplorer::ProjectManager
 {
     Q_OBJECT
 
