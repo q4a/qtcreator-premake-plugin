@@ -1,11 +1,11 @@
 #ifndef LUAINDENTER_H
 #define LUAINDENTER_H
 
-#include <texteditor/indenter.h>
-#include <texteditor/tabsettings.h>
+#include <texteditor/textindenter.h>
+#include <texteditor/tabsettingswidget.h>
 
 namespace TextEditor {
-class BaseTextEditorWidget;
+class TabSettingsWidget;
 }
 
 namespace CppTools {
@@ -16,7 +16,7 @@ namespace CppTools {
 namespace LuaSupport {
 namespace Internal {
 
-class LuaIndenter : public TextEditor::Indenter
+class LuaIndenter : public TextEditor::TextIndenter
 {
 public:
     explicit LuaIndenter(QTextDocument *doc);
@@ -27,7 +27,7 @@ public:
     void indentBlock(QTextDocument *doc,
                              const QTextBlock &block,
                              const QChar &typedChar,
-                             TextEditor::BaseTextEditorWidget *editor);
+                             TextEditor::TabSettingsWidget *editor);
     void indentBlock(QTextDocument *doc,
                              const QTextBlock &block,
                              const QChar &typedChar,

@@ -2,6 +2,7 @@
 #define PREMAKEBUILDSETTINGSWIDGET_H
 
 #include <projectexplorer/buildstep.h>
+#include <projectexplorer/namedwidget.h>
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
@@ -21,7 +22,7 @@ namespace Internal {
 class PremakeBuildConfiguration;
 class PremakeTarget;
 
-class PremakeBuildSettingsWidget : public ProjectExplorer::BuildConfigWidget
+class PremakeBuildSettingsWidget : public ProjectExplorer::NamedWidget
 {
     Q_OBJECT
 

@@ -68,20 +68,22 @@ LuaEditorFactory::LuaEditorFactory(QObject *parent)
     using namespace Core;
     using namespace TextEditor;
 
-    FileIconProvider *iconProvider = FileIconProvider::instance();
-    iconProvider->registerIconOverlayForSuffix(QIcon(QLatin1String(Constants::ICON_LUA_FILE)),
-                                        QLatin1String("lua"));
+    //FileIconProvider *iconProvider = FileIconProvider::instance();
+    //iconProvider->registerIconOverlayForSuffix(QIcon(QLatin1String(Constants::ICON_LUA_FILE)),
+    //                                           QLatin1String("lua"));
+    FileIconProvider::registerIconOverlayForSuffix(Constants::ICON_LUA_FILE, QLatin1String("lua"));
     m_mimeTypes << QLatin1String(Constants::LUA_MIMETYPE);
 
     m_actionHandler =
-            new TextEditorActionHandler(Constants::C_LUAEDITOR,
+            new TextEditorActionHandler(parent, id(), Core::Id(Constants::C_LUAEDITOR),
             TextEditorActionHandler::UnCommentSelection |
             TextEditorActionHandler::Format |
             TextEditorActionHandler::UnCollapseAll);
 
     // Lua editor context menu
-    ICore *core = ICore::instance();
-    ActionManager *am = core->actionManager();
+    //ICore *core = ICore::instance();
+    //ActionManager *am = core->actionManager();
+    ActionManager *am = ActionManager::instance();
     ActionContainer *contextMenu = am->createMenu(Constants::M_CONTEXT);
     Command *cmd;
     Context luaEditorContext = Context(Constants::C_LUAEDITOR);
@@ -166,7 +168,7 @@ void LuaEditorFactory::jumpToFile()
 ////////////////////////////////////////////////////////////////////////////////////////
 
 LuaEditor::LuaEditor(LuaEditorWidget *editor)
-  : TextEditor::PlainTextEditor(editor),
+  : TextEditor::BaseTextEditor(), // TextEditor::PlainTextEditor(editor),
     m_context(Constants::C_LUAEDITOR)
 { }
 

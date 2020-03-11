@@ -34,6 +34,7 @@
 #define PREMAKEPROJECTNODE_H
 
 #include <projectexplorer/projectnodes.h>
+#include <projectexplorer/runconfiguration.h>
 
 #include <QtCore/QStringList>
 #include <QtCore/QHash>

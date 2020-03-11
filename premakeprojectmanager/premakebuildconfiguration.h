@@ -102,7 +102,7 @@ private:
     mutable QtSupport::BaseQtVersion *m_qtVersion;
 };
 
-class PremakeBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurationFactory
+class PremakeBuildConfigurationFactory : public ProjectExplorer::BuildConfigurationFactory
 {
     Q_OBJECT
 

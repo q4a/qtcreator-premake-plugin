@@ -34,7 +34,7 @@ bool LuaIndenter::isElectricCharacter(const QChar &ch) const
 
 void LuaIndenter::indentBlock(QTextDocument *doc, const QTextBlock &block,
                               const QChar &typedChar,
-                              TextEditor::BaseTextEditorWidget *editor)
+                              TextEditor::TabSettingsWidget *editor)
 {
     indentBlock(doc, block, typedChar, editor->tabSettings());
 }

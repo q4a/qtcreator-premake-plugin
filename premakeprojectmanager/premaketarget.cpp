@@ -43,8 +43,8 @@
 #include <projectexplorer/deployconfiguration.h>
 #include <projectexplorer/projectexplorerconstants.h>
 
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
 
 namespace {
 const char * const PREMAKE_DESKTOP_TARGET_DISPLAY_NAME("Desktop");

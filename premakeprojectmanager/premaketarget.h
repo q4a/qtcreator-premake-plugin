@@ -64,7 +64,7 @@ public:
     explicit PremakeTarget(PremakeProject *parent);
     ~PremakeTarget();
 
-    ProjectExplorer::BuildConfigWidget *createConfigWidget();
+    ProjectExplorer::NamedWidget *createConfigWidget();
 
     PremakeProject *premakeProject() const;
 
@@ -83,7 +83,7 @@ private:
     ProjectExplorer::DeployConfigurationFactory *m_deployConfigurationFactory;
 };
 
-class PremakeTargetFactory : public ProjectExplorer::ITargetFactory
+class PremakeTargetFactory : public ProjectExplorer::Target
 {
     Q_OBJECT
 
