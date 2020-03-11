@@ -63,7 +63,7 @@ using namespace LuaSupport;
 ////////////////////////////////////////////////////////////////////////////////////////
 
 LuaEditorFactory::LuaEditorFactory(QObject *parent)
-    : Core::IEditorFactory(parent)
+    : TextEditor::TextEditorFactory(parent)
 {
     using namespace Core;
     using namespace TextEditor;
@@ -114,9 +114,11 @@ LuaEditorFactory::~LuaEditorFactory()
 
 Core::IEditor *LuaEditorFactory::createEditor(QWidget *parent)
 {
-    LuaEditorWidget *ed = new LuaEditorWidget(parent, this, m_actionHandler);
-    TextEditor::TextEditorSettings::instance()->initializeEditor(ed);
-    return ed->editor();
+    // FIXME: Qt5 unused parent, m_actionHandler and other
+    //LuaEditorWidget *ed = new LuaEditorWidget(parent, this, m_actionHandler);
+    //TextEditor::TextEditorSettings::instance()->initializeEditor(ed);
+    //return ed->editor();
+    return new TextEditor::BaseTextEditor();
 }
 
 QStringList LuaEditorFactory::mimeTypes() const
@@ -168,7 +170,9 @@ void LuaEditorFactory::jumpToFile()
 ////////////////////////////////////////////////////////////////////////////////////////
 
 LuaEditor::LuaEditor(LuaEditorWidget *editor)
-  : TextEditor::BaseTextEditor(), // TextEditor::PlainTextEditor(editor),
+// FIXME: Qt5 unused editor
+//  : TextEditor::PlainTextEditor(editor),
+  : TextEditor::BaseTextEditor(),
     m_context(Constants::C_LUAEDITOR)
 { }
 
@@ -199,12 +203,13 @@ bool LuaEditor::duplicateSupported() const
 
 Core::IEditor *LuaEditor::duplicate(QWidget *parent)
 {
-    LuaEditorWidget *parentEditor = qobject_cast<LuaEditorWidget *>(editorWidget());
-    LuaEditorWidget *editor = new LuaEditorWidget(parent,
-                                                        parentEditor->factory(),
-                                                        parentEditor->actionHandler());
-    TextEditor::TextEditorSettings::instance()->initializeEditor(editor);
-    return editor->editor();
+    //LuaEditorWidget *parentEditor = qobject_cast<LuaEditorWidget *>(editorWidget());
+    //LuaEditorWidget *editor = new LuaEditorWidget(parent,
+    //                                                    parentEditor->factory(),
+    //                                                    parentEditor->actionHandler());
+    //TextEditor::TextEditorSettings::instance()->initializeEditor(editor);
+    //return editor->editor();
+    return this->duplicate(parent);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -213,20 +218,25 @@ Core::IEditor *LuaEditor::duplicate(QWidget *parent)
 
 LuaEditorWidget::LuaEditorWidget(QWidget *parent, LuaEditorFactory *factory,
                                        TextEditor::TextEditorActionHandler *handler)
-    : TextEditor::PlainTextEditorWidget(parent),
+    : TextEditor::TextEditorWidget(parent),
       m_factory(factory),
       m_actionHandler(handler)
 {
-    setMimeType(QLatin1String(Constants::LUA_MIMETYPE));
-    setDisplayName(QLatin1String(Constants::LUA_EDITOR_DISPLAY_NAME));
-    setIndenter(new LuaIndenter);
+    //setMimeType(QLatin1String(Constants::LUA_MIMETYPE));
+    auto doc = new TextEditor::TextDocument;
+    doc->setMimeType(QLatin1String(Constants::LUA_MIMETYPE));
+    // FIXME: Qt5 use TextDocument to setMimeType and LuaEditorFactory to setDisplayName and setIndenter
+    //setDisplayName(QLatin1String(Constants::LUA_EDITOR_DISPLAY_NAME));
+    //setIndenter(new Internal::LuaIndenter(doc->document()));
     setAutoCompleter(new LuaCompleter);
-    m_commentDefinition.clearCommentStyles();
-    m_commentDefinition.setSingleLine(QLatin1String("--"));
-    m_commentDefinition.setMultiLineStart(QLatin1String("--[["));
-    m_commentDefinition.setMultiLineEnd(QLatin1String("]]"));
+    //m_commentDefinition.clearCommentStyles();
+    //m_commentDefinition.setSingleLine(QLatin1String("--"));
+    //m_commentDefinition.setMultiLineStart(QLatin1String("--[["));
+    //m_commentDefinition.setMultiLineEnd(QLatin1String("]]"));
+    m_commentDefinition = Utils::CommentDefinition(QLatin1String("--"), QLatin1String("--[["), QLatin1String("]]"));
 
-    handler->setupActions(this);
+    // FIXME: Qt5 use LuaEditorFactory to set TextEditorActionHandler
+    //handler->setupActions(this);
 }
 
 LuaEditorWidget::~LuaEditorWidget()
@@ -256,8 +266,9 @@ void LuaEditorWidget::contextMenuEvent(QContextMenuEvent *e)
 {
     QMenu *menu = new QMenu();
 
-    Core::ActionManager *am = Core::ICore::instance()->actionManager();
-    Core::ActionContainer *mcontext = am->actionContainer(Constants::M_CONTEXT);
+    //Core::ActionManager *am = Core::ICore::instance()->actionManager();
+    //Core::ActionContainer *mcontext = am->actionContainer(Constants::M_CONTEXT);
+    Core::ActionContainer *mcontext = Core::ActionManager::createMenu(Constants::M_CONTEXT);
     QMenu *contextMenu = mcontext->menu();
 
     foreach (QAction *action, contextMenu->actions())
@@ -269,10 +280,10 @@ void LuaEditorWidget::contextMenuEvent(QContextMenuEvent *e)
     delete menu;
 }
 
-LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
+Utils::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
                                       bool /* resolveTarget */)
 {
-    Link link;
+    Utils::Link link;
 
     int lineNumber = 0, positionInBlock = 0;
     convertPosition(cursor.position(), &lineNumber, &positionInBlock);
@@ -313,11 +324,12 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
     if (buffer.isEmpty())
         return link;
 
-#if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
-    QDir dir(QFileInfo(editorDocument()->fileName()).absolutePath());
-#else
-    QDir dir(QFileInfo(file()->fileName()).absolutePath());
-#endif
+//#if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
+//    QDir dir(QFileInfo(editorDocument()->fileName()).absolutePath());
+//#else
+//    QDir dir(QFileInfo(file()->fileName()).absolutePath());
+//#endif
+    QDir dir(textDocument()->filePath().toFileInfo().absolutePath());
     QString fileName = dir.filePath(buffer);
     QFileInfo fi(fileName);
     if (fi.exists()) {
@@ -329,9 +341,9 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
             else
                 return link;
         }
-        link.fileName = fileName;
-        link.begin = cursor.position() - positionInBlock + beginPos + 1;
-        link.end = cursor.position() - positionInBlock + endPos;
+        link.targetFileName = fileName;
+        link.linkTextStart = cursor.position() - positionInBlock + beginPos + 1;
+        link.linkTextEnd = cursor.position() - positionInBlock + endPos;
     }
 
     // require "fileName"
@@ -340,9 +352,9 @@ LuaEditorWidget::Link LuaEditorWidget::findLinkAt(const QTextCursor &cursor,
     fileName.append(QLatin1String(".lua"));
     fi.setFile(fileName);
     if (fi.exists()) {
-        link.fileName = fileName;
-        link.begin = cursor.position() - positionInBlock + beginPos + 1;
-        link.end = cursor.position() - positionInBlock + endPos;
+        link.targetFileName = fileName;
+        link.linkTextStart = cursor.position() - positionInBlock + beginPos + 1;
+        link.linkTextEnd = cursor.position() - positionInBlock + endPos;
     }
 
     return link;

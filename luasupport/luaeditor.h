@@ -51,7 +51,7 @@ class LuaEditorWidget;
 class LuaDocument;
 class LuaEditorFactory;
 
-class LuaEditorFactory: public Core::IEditorFactory
+class LuaEditorFactory: public TextEditor::TextEditorFactory
 {
     Q_OBJECT
 
