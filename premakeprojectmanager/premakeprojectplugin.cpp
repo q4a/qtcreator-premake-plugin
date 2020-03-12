@@ -44,6 +44,7 @@
 #include <utils/mimetypes/mimedatabase.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/actionmanager/actioncontainer.h>
+#include <extensionsystem/pluginmanager.h>
 
 #include <QtCore/QtPlugin>
 #include <QtCore/QDebug>
@@ -80,7 +81,8 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     PremakeManager *manager = new PremakeManager;
 
     m_luaEditorFactory = new LuaSupport::LuaEditorFactory(manager);
-    addObject(m_luaEditorFactory);
+    //addObject(m_luaEditorFactory);
+    ExtensionSystem::PluginManager::addObject(m_luaEditorFactory);
 
     addAutoReleasedObject(manager);
     addAutoReleasedObject(new MakeStepFactory);

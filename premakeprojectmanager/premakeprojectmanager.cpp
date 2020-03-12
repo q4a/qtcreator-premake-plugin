@@ -77,14 +77,19 @@ ProjectExplorer::Project *PremakeManager::openProject(const QString &fileName, Q
     //foreach (ProjectExplorer::Project *pi, projectExplorer->session()->projects()) {
     foreach (ProjectExplorer::Project *pi, ProjectExplorer::SessionManager::projects()) {
 #if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
-        const QString existingProjectFileName = pi->document()->fileName();
+        //const QString existingProjectFileName = pi->document()->fileName();
+        const QString existingProjectFileName = pi->document()->displayName();
 #else
         const QString existingProjectFileName = pi->file()->fileName();
 #endif
         if (fileName == existingProjectFileName) {
-            Core::MessageManager *messageManager = Core::ICore::instance()->messageManager();
-            messageManager->printToOutputPanePopup(tr("Failed opening project '%1': Project already open")
-                                                   .arg(QDir::toNativeSeparators(fileName)));
+            //Core::MessageManager *messageManager = Core::ICore::instance()->messageManager();
+            //messageManager->printToOutputPanePopup(tr("Failed opening project '%1': Project already open")
+            //                                       .arg(QDir::toNativeSeparators(fileName)));
+            const QString fullMessage = QCoreApplication::translate("Failed opening project '%1': Project already open").arg(QDir::toNativeSeparators(fileName));
+            const Core::MessageManager::PrintToOutputPaneFlags flags = Core::MessageManager::ModeSwitch;
+            Core::MessageManager::write(fullMessage, flags);
+
             return 0;
         }
     }
