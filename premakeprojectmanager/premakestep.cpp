@@ -43,16 +43,16 @@
 #include <projectexplorer/buildsteplist.h>
 #include <projectexplorer/toolchain.h>
 #include <projectexplorer/projectexplorer.h>
-#include <coreplugin/variablemanager.h>
+//#include <coreplugin/variablemanager.h>
 #include <utils/stringutils.h>
 #include <utils/qtcassert.h>
 #include <utils/qtcprocess.h>
 
-#include <QtGui/QFormLayout>
-#include <QtGui/QGroupBox>
-#include <QtGui/QCheckBox>
-#include <QtGui/QLineEdit>
-#include <QtGui/QListWidget>
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListWidget>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;

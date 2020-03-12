@@ -61,7 +61,7 @@ class PremakeTarget : public ProjectExplorer::Target
     friend class PremakeTargetFactory;
 
 public:
-    explicit PremakeTarget(PremakeProject *parent);
+    //explicit PremakeTarget(PremakeProject *parent);
     ~PremakeTarget();
 
     ProjectExplorer::NamedWidget *createConfigWidget();

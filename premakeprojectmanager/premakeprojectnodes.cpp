@@ -78,7 +78,7 @@ static void clearPremakeNodeStaticData()
 }
 
 PremakeProjectNode::PremakeProjectNode(PremakeProject *project)
-    : ProjectExplorer::ProjectNode(project->file()->fileName()),
+    : ProjectExplorer::ProjectNode(project->file()->filePath()),
       m_project(project)
 {
     setDisplayName(m_project->displayName());
@@ -183,15 +183,19 @@ ProjectExplorer::FolderNode *PremakeProjectNode::findOrCreateFolderByName(const 
     else if (FolderNode *folder = m_folderByName.value(folderName))
         return folder;
 
-    const QString baseDir = QFileInfo(path()).path();
-    FolderNode *folder = new FolderNode(baseDir + QLatin1Char('/') + folderName);
+    //const QString baseDir = filePath().toFileInfo().path();
+    //const QString baseDir = QFileInfo(path()).path();
+    //FolderNode *folder = new FolderNode(baseDir + QLatin1Char('/') + folderName);
+    FolderNode *folder = new FolderNode(filePath() + QString('/') + folderName);
     folder->setDisplayName(component);
     m_folderByName.insert(folderName, folder);
 
     FolderNode *parent = findOrCreateFolderByName(components, end - 1);
     if (! parent)
         parent = this;
-    addFolderNodes(QList<FolderNode*>() << folder, parent);
+    //addFolderNodes(QList<FolderNode*>() << folder, parent);
+    addNode(takeNode(folder));
+    addNode(takeNode(parent));
 
     return folder;
 }
@@ -207,10 +211,10 @@ bool PremakeProjectNode::hasBuildTargets() const
     return true;
 }
 
-QList<ProjectExplorer::ProjectNode::ProjectAction> PremakeProjectNode::supportedActions(Node *node) const
+QList<ProjectExplorer::ProjectAction> PremakeProjectNode::supportedActions(Node *node) const
 {
     Q_UNUSED(node);
-    return QList<ProjectAction>(); // Don't support yet
+    return QList<ProjectExplorer::ProjectAction>(); // Don't support yet
 //        << AddNewFile
 //        << AddExistingFile
 //        << RemoveFile;
@@ -277,6 +281,9 @@ QList<ProjectExplorer::RunConfiguration *> PremakeProjectNode::runConfigurations
 
 void PremakeProjectManager::Internal::PremakeProjectNode::setPath(const QString &path)
 {
+// FIXME: Qt5 will port later
+/*
     if(!path.isEmpty())
         Node::setPath(path);
+*/
 }

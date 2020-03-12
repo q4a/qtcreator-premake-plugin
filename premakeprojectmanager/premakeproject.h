@@ -45,6 +45,8 @@
 #include <projectexplorer/buildstep.h>
 #include <projectexplorer/buildconfiguration.h>
 
+#include <utils/fileutils.h>
+
 #include <QtCore/QFuture>
 
 struct lua_State;
@@ -69,7 +71,7 @@ class PremakeProject : public ProjectExplorer::Project
     Q_OBJECT
 
 public:
-    PremakeProject(PremakeManager *manager, const QString &filename);
+    explicit PremakeProject(const Utils::FileName &filename);
     virtual ~PremakeProject();
 
     QString displayName() const;

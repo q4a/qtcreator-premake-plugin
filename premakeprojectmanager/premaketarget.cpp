@@ -58,23 +58,24 @@ using namespace PremakeProjectManager::Internal;
 ////////////////////////////////////////////////////////////////////////////////////
 
 // FIXME: Qt5 do I need this file? cmake and cmake2 targets has only header file
-//PremakeTarget::PremakeTarget(PremakeProject *parent) :
-//    ProjectExplorer::Target(parent, QLatin1String(PREMAKE_DESKTOP_TARGET_ID)),
-//    m_buildConfigurationFactory(new PremakeBuildConfigurationFactory(this)),
-//    m_deployConfigurationFactory(new ProjectExplorer::DeployConfigurationFactory(this))
-PremakeTarget::PremakeTarget(PremakeProject *parent, ProjectExplorer::Kit *k, ProjectExplorer::Target::_constructor_tag()) :
+/*
+PremakeTarget::PremakeTarget(PremakeProject *parent) :
+    ProjectExplorer::Target(parent, QLatin1String(PREMAKE_DESKTOP_TARGET_ID)),
+    m_buildConfigurationFactory(new PremakeBuildConfigurationFactory(this)),
+    m_deployConfigurationFactory(new ProjectExplorer::DeployConfigurationFactory(this))
 {
-    //setDefaultDisplayName(QApplication::translate("PremakeProjectManager::PremakeTarget",
-    //                                              PREMAKE_DESKTOP_TARGET_DISPLAY_NAME));
-    //setIcon(qApp->style()->standardIcon(QStyle::SP_ComputerIcon));
-    //connect(parent, SIGNAL(buildTargetsChanged()), SLOT(updateRunConfigurations()));
+    setDefaultDisplayName(QApplication::translate("PremakeProjectManager::PremakeTarget",
+                                                  PREMAKE_DESKTOP_TARGET_DISPLAY_NAME));
+    setIcon(qApp->style()->standardIcon(QStyle::SP_ComputerIcon));
+    connect(parent, SIGNAL(buildTargetsChanged()), SLOT(updateRunConfigurations()));
 }
+*/
 
 PremakeTarget::~PremakeTarget()
 {
 }
 
-ProjectExplorer::BuildConfigWidget *PremakeTarget::createConfigWidget()
+ProjectExplorer::NamedWidget *PremakeTarget::createConfigWidget()
 {
     return new PremakeBuildSettingsWidget(this);
 }

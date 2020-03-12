@@ -65,12 +65,10 @@ const char * const TOOLCHAIN_KEY("PremakeProjectManager.PremakeProject.Toolchain
 // PremakeProject
 ////////////////////////////////////////////////////////////////////////////////////
 
-PremakeProject::PremakeProject(PremakeManager *manager, const QString &fileName)
-    : m_manager(manager),
-      m_fileName(fileName)
-//      ,m_toolChain(0)
+PremakeProject::PremakeProject(const Utils::FileName &fileName)
+    : Project(Constants::PREMAKEMIMETYPE, fileName)
 {
-    m_file = new PremakeProjectFile(this, fileName);
+    m_file = new PremakeProjectFile(this, fileName.toString());
     m_rootNode = new PremakeProjectNode(this);
     m_manager->registerProject(this);
 }

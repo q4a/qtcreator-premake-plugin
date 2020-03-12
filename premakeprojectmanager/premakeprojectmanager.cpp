@@ -94,7 +94,7 @@ ProjectExplorer::Project *PremakeManager::openProject(const QString &fileName, Q
         }
     }
 
-    PremakeProject *project = new PremakeProject(this, fileName);
+    PremakeProject *project = new PremakeProject(Utils::FileName::fromString(fileName));
     qWarning() << Q_FUNC_INFO << "here";
     return project;
 }
