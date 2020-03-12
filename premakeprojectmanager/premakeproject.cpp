@@ -422,7 +422,7 @@ Core::IDocument *PremakeProject::document() const
     return m_file;
 }
 
-IProjectManager *PremakeProject::projectManager() const
+QObject *PremakeProject::projectManager() const
 {
     return m_manager;
 }
@@ -444,11 +444,12 @@ PremakeProjectNode *PremakeProject::rootProjectNode() const
     return m_rootNode;
 }
 
-QStringList PremakeProject::files(FilesMode fileMode) const
-{
-    Q_UNUSED(fileMode)
-    return m_files; // ### TODO: handle generated files here.
-}
+// FIXME: Qt5 no FilesMode
+//QStringList PremakeProject::files(FilesMode fileMode) const
+//{
+//    Q_UNUSED(fileMode)
+//    return m_files; // ### TODO: handle generated files here.
+//}
 
 QVariantMap PremakeProject::toMap() const
 {

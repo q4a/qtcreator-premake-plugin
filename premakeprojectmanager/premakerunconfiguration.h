@@ -70,8 +70,9 @@ public:
     QWidget *createConfigurationWidget();
 
     QString executable() const;
-    RunMode runMode() const;
-    void setRunMode(RunMode runMode);
+    // FIXME: Qt5 it was ProjectExplorer::LocalApplicationRunConfiguration::RunMode then ProjectExplorer::ApplicationLauncher::Mode
+    //RunMode runMode() const;
+    //void setRunMode(RunMode runMode);
     QString workingDirectory() const;
     QString commandLineArguments() const;
     void setCommandLineArguments(const QString &args);
@@ -115,7 +116,8 @@ private:
     void setUserEnvironmentChanges(const QList<Utils::EnvironmentItem> &diff);
     QList<Utils::EnvironmentItem> userEnvironmentChanges() const;
 
-    RunMode m_runMode;
+    // FIXME: Qt5 it was ProjectExplorer::LocalApplicationRunConfiguration::RunMode then ProjectExplorer::ApplicationLauncher::Mode
+    //RunMode m_runMode;
     QByteArray m_projectName;
     QString m_buildTarget;
     QString m_workingDirectory;
@@ -156,7 +158,7 @@ private:
     Utils::DetailsWidget *m_detailsContainer;
 };
 
-class PremakeRunConfigurationFactory : public ProjectExplorer::IRunConfigurationFactory
+class PremakeRunConfigurationFactory : public ProjectExplorer::RunConfigurationFactory
 {
     Q_OBJECT
 

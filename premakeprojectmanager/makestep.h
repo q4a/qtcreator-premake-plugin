@@ -46,7 +46,7 @@ QT_END_NAMESPACE
 namespace ProjectExplorer {
 class BuildStep;
 class GnuMakeParser;
-class IBuildStepFactory;
+class BuildStepFactory;
 class Project;
 }
 
@@ -55,7 +55,7 @@ namespace Internal {
 
 class PremakeBuildConfiguration;
 
-class MakeStepFactory : public ProjectExplorer::IBuildStepFactory
+class MakeStepFactory : public ProjectExplorer::BuildStepFactory
 {
     Q_OBJECT
 

@@ -41,7 +41,7 @@ namespace Internal {
 
 class PremakeProject;
 
-class PremakeManager : public ProjectExplorer::ProjectManager
+class PremakeManager : public QObject
 {
     Q_OBJECT
 

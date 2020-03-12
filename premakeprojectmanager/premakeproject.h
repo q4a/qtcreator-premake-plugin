@@ -76,15 +76,16 @@ public:
     QString id() const;
     Core::IDocument *document() const;
     Core::IDocument *file() const { return document(); }
-    ProjectExplorer::IProjectManager *projectManager() const;
+    QObject *projectManager() const;
     PremakeTarget *activeTarget() const;
 
     QList<ProjectExplorer::Project *> dependsOn();
 
-    QList<ProjectExplorer::BuildConfigWidget*> subConfigWidgets();
+    QList<ProjectExplorer::NamedWidget*> subConfigWidgets();
 
     PremakeProjectNode *rootProjectNode() const;
-    QStringList files(FilesMode fileMode) const;
+    // FIXME: Qt5 no FilesMode
+    //QStringList files(FilesMode fileMode) const;
 
     bool addFiles(const QStringList &filePaths);
     bool removeFiles(const QStringList &filePaths);

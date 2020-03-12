@@ -47,7 +47,7 @@ using namespace PremakeProjectManager::Internal;
 PremakeManager::PremakeManager()
 {
     m_projectContext  = Core::Context(PremakeProjectManager::Constants::PROJECTCONTEXT);
-    m_projectLanguage = Core::Context(ProjectExplorer::Constants::LANG_CXX);
+    m_projectLanguage = Core::Context(ProjectExplorer::Constants::CXX_LANGUAGE_ID);
 }
 
 PremakeManager::~PremakeManager()
@@ -73,8 +73,9 @@ ProjectExplorer::Project *PremakeManager::openProject(const QString &fileName, Q
     if (!QFileInfo(fileName).isFile())
         return 0;
 
-    ProjectExplorer::ProjectExplorerPlugin *projectExplorer = ProjectExplorer::ProjectExplorerPlugin::instance();
-    foreach (ProjectExplorer::Project *pi, projectExplorer->session()->projects()) {
+    //ProjectExplorer::ProjectExplorerPlugin *projectExplorer = ProjectExplorer::ProjectExplorerPlugin::instance();
+    //foreach (ProjectExplorer::Project *pi, projectExplorer->session()->projects()) {
+    foreach (ProjectExplorer::Project *pi, ProjectExplorer::SessionManager::projects()) {
 #if IDE_VER >= IDE_VERSION_CHECK(2, 4, 80)
         const QString existingProjectFileName = pi->document()->fileName();
 #else

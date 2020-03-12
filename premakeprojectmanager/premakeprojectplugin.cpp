@@ -58,7 +58,8 @@ PremakeProjectPlugin::PremakeProjectPlugin()
 
 PremakeProjectPlugin::~PremakeProjectPlugin()
 {
-    removeObject(m_luaEditorFactory);
+    // FIXME: Qt5 no removeObject
+    //removeObject(m_luaEditorFactory);
     delete m_luaEditorFactory;
 }
 
@@ -66,13 +67,15 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
 {
     using namespace Core;
 
-    ICore *core = ICore::instance();
-    Core::MimeDatabase *mimeDB = core->mimeDatabase();
+    // FIXME: Qt5 check types regisytration. Core plugin has this code: "register all mime types from all plugins"
+    // https://github.com/qt-creator/qt-creator/blob/299d34d54757823014db77bf0cc9ba864353731a/src/plugins/coreplugin/coreplugin.cpp#L133
+    //ICore *core = ICore::instance();
+    //Core::MimeDatabase *mimeDB = core->mimeDatabase();
 
-    const QLatin1String mimetypesXml(":/premakeproject/PremakeProject.mimetypes.xml");
+    //const QLatin1String mimetypesXml(":/premakeproject/PremakeProject.mimetypes.xml");
 
-    if (! mimeDB->addMimeTypes(mimetypesXml, errorMessage))
-        return false;
+    //if (! mimeDB->addMimeTypes(mimetypesXml, errorMessage))
+    //    return false;
 
     PremakeManager *manager = new PremakeManager;
 

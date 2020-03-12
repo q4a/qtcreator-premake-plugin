@@ -101,7 +101,7 @@ private:
     QString m_summaryText;
 };
 
-class PremakeStepFactory : public ProjectExplorer::IBuildStepFactory
+class PremakeStepFactory : public ProjectExplorer::BuildStepFactory
 {
     Q_OBJECT
 
