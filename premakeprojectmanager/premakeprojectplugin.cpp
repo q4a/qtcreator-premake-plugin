@@ -53,15 +53,31 @@
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
 
+namespace PremakeProjectManager {
+namespace Internal {
+
+class PremakeProjectPluginPrivate
+{
+public:
+    MakeStepFactory m_makeStepFactory;
+    PremakeStepFactory m_premakeStepFactory;
+    PremakeTargetFactory m_premakeTargetFactory;
+    PremakeRunConfigurationFactory m_premakeRunConfigurationFactory;
+    // TODO: Uncomment when ready to use
+    //addAutoReleasedObject(new PremakeProjectWizard);
+    //PremakeProjectWizard m_premakeProjectWizard;
+};
+
 PremakeProjectPlugin::PremakeProjectPlugin()
     : m_luaEditorFactory(0)
 { }
 
 PremakeProjectPlugin::~PremakeProjectPlugin()
 {
-    // FIXME: Qt5 no removeObject
     //removeObject(m_luaEditorFactory);
+    ExtensionSystem::PluginManager::removeObject(m_luaEditorFactory);
     delete m_luaEditorFactory;
+    delete d;
 }
 
 bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage)
@@ -84,13 +100,12 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
     //addObject(m_luaEditorFactory);
     ExtensionSystem::PluginManager::addObject(m_luaEditorFactory);
 
-    addAutoReleasedObject(manager);
-    addAutoReleasedObject(new MakeStepFactory);
-    addAutoReleasedObject(new PremakeStepFactory);
-    addAutoReleasedObject(new PremakeTargetFactory);
-    addAutoReleasedObject(new PremakeRunConfigurationFactory);
-    // TODO: Uncomment when ready to use
-//    addAutoReleasedObject(new PremakeProjectWizard);
+    // FIXME: Qt5 check manager, other mast be ok
+    //addAutoReleasedObject(manager);
+    //addAutoReleasedObject(new MakeStepFactory);
+    //addAutoReleasedObject(new PremakeStepFactory);
+    //addAutoReleasedObject(new PremakeTargetFactory);
+    //addAutoReleasedObject(new PremakeRunConfigurationFactory);
 
     return true;
 }
@@ -98,4 +113,7 @@ bool PremakeProjectPlugin::initialize(const QStringList &, QString *errorMessage
 void PremakeProjectPlugin::extensionsInitialized()
 { }
 
-Q_EXPORT_PLUGIN(PremakeProjectPlugin)
+//Q_EXPORT_PLUGIN(PremakeProjectPlugin)
+
+}
+}

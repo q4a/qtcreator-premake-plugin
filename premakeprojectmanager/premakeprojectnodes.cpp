@@ -39,20 +39,24 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFileInfo>
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;
 
-struct PremakeNodeStaticData
+class PremakeNodeStaticData
 {
+public:
     QIcon projectIcon;
+
+    PremakeNodeStaticData();
 };
 
 static void clearPremakeNodeStaticData();
 
 // TODO: Add file type icons
-Q_GLOBAL_STATIC_WITH_INITIALIZER(PremakeNodeStaticData, premakeNodeStaticData, {
+PremakeNodeStaticData::PremakeNodeStaticData()
+{
     // Overlay the SP_DirIcon with the custom icons
     const QSize desiredSize = QSize(16, 16);
 
@@ -61,10 +65,12 @@ Q_GLOBAL_STATIC_WITH_INITIALIZER(PremakeNodeStaticData, premakeNodeStaticData, {
     const QPixmap projectPixmap = Core::FileIconProvider::overlayIcon(QStyle::SP_DirIcon,
                                                                   projectBaseIcon,
                                                                   desiredSize);
-    x->projectIcon.addPixmap(projectPixmap);
+    projectIcon.addPixmap(projectPixmap);
 
     qAddPostRoutine(clearPremakeNodeStaticData);
-})
+}
+
+Q_GLOBAL_STATIC(PremakeNodeStaticData, premakeNodeStaticData)
 
 static void clearPremakeNodeStaticData()
 {
@@ -84,6 +90,8 @@ PremakeProjectNode::~PremakeProjectNode()
 
 void PremakeProjectNode::refresh()
 {
+// FIXME: Qt5 will port later
+/*
     using namespace ProjectExplorer;
 
     // remove the existing nodes.
@@ -97,7 +105,8 @@ void PremakeProjectNode::refresh()
 
     projectFileNodes << new FileNode(m_project->file()->fileName(),
                                      ProjectFileType,
-                                     /* generated = */ false);
+*/
+//                                     /* generated = */ false);
 
 //    foreach(const QString &filename, m_project->scriptDepends()) {
 //        projectFileNodes << new FileNode(filename,
@@ -105,6 +114,7 @@ void PremakeProjectNode::refresh()
 //                                         /* generated = */ false);
 //    }
 
+/*
     addFileNodes(QList<FileNode *>()
                  << projectFileNodes,
                  this);
@@ -151,6 +161,7 @@ void PremakeProjectNode::refresh()
     }
 
     m_folderByName.clear();
+*/
 }
 
 ProjectExplorer::FolderNode *PremakeProjectNode::findOrCreateFolderByName(const QStringList &components, int end)

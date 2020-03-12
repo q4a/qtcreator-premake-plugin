@@ -86,7 +86,7 @@ ProjectExplorer::Project *PremakeManager::openProject(const QString &fileName, Q
             //Core::MessageManager *messageManager = Core::ICore::instance()->messageManager();
             //messageManager->printToOutputPanePopup(tr("Failed opening project '%1': Project already open")
             //                                       .arg(QDir::toNativeSeparators(fileName)));
-            const QString fullMessage = QCoreApplication::translate("Failed opening project '%1': Project already open").arg(QDir::toNativeSeparators(fileName));
+            const QString fullMessage = QCoreApplication::translate("PremakeProject", "Failed opening project '%1': Project already open").arg(QDir::toNativeSeparators(fileName));
             const Core::MessageManager::PrintToOutputPaneFlags flags = Core::MessageManager::ModeSwitch;
             Core::MessageManager::write(fullMessage, flags);
 

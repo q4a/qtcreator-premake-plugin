@@ -33,7 +33,8 @@
 #include "premakeprojectwizard.h"
 
 #include <coreplugin/icore.h>
-#include <coreplugin/mimedatabase.h>
+#include <coreplugin/basefilewizard.h>
+#include <utils/mimetypes//mimedatabase.h>
 #include <projectexplorer/projectexplorerconstants.h>
 #include <projectexplorer/customwizard/customwizard.h>
 
@@ -41,8 +42,8 @@
 
 #include <QtGui/QIcon>
 
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
@@ -93,16 +94,19 @@ QString PremakeProjectWizardDialog::projectName() const
     return m_firstPage->fileName();
 }
 
-PremakeProjectWizard::PremakeProjectWizard()
-    : Core::BaseFileWizard(parameters())
+PremakeProjectWizard::PremakeProjectWizard(const Core::BaseFileWizardFactory *factory,
+                                           QWidget *parent)
+    : Core::BaseFileWizard(factory, QVariantMap(), parent)
 { }
 
 PremakeProjectWizard::~PremakeProjectWizard()
 { }
 
-Core::BaseFileWizardParameters PremakeProjectWizard::parameters()
+Core::WizardDialogParameters PremakeProjectWizard::parameters()
 {
-    Core::BaseFileWizardParameters parameters(ProjectWizard);
+// FIXME: Qt5 will port later
+/*
+    Core::WizardDialogParameters parameters(ProjectWizard);
     // TODO do something about the ugliness of standard icons in sizes different than 16, 32, 64, 128
     {
         QPixmap icon(22, 22);
@@ -121,12 +125,15 @@ Core::BaseFileWizardParameters PremakeProjectWizard::parameters()
     parameters.setDisplayCategory(QCoreApplication::translate("ProjectExplorer", ProjectExplorer::Constants::PROJECT_WIZARD_TR_CATEGORY));
 #endif
     return parameters;
+*/
 }
 
 QWizard *PremakeProjectWizard::createWizardDialog(QWidget *parent,
                                                   const QString &defaultPath,
-                                                  const WizardPageList &extensionPages) const
+                                                  const QList<QWizardPage *> &extensionPages) const
 {
+// FIXME: Qt5 will port later
+/*
     PremakeProjectWizardDialog *wizard = new PremakeProjectWizardDialog(parent);
     setupWizard(wizard);
 
@@ -136,6 +143,7 @@ QWizard *PremakeProjectWizard::createWizardDialog(QWidget *parent,
         BaseFileWizard::applyExtensionPageShortTitle(wizard, wizard->addPage(p));
 
     return wizard;
+*/
 }
 
 void PremakeProjectWizard::getFileList(const QDir &dir, const QString &projectRoot,
@@ -183,6 +191,8 @@ bool PremakeProjectWizard::isValidDir(const QFileInfo &fileInfo) const
 Core::GeneratedFiles PremakeProjectWizard::generateFiles(const QWizard *w,
                                                          QString *errorMessage) const
 {
+// FIXME: Qt5 will port later
+/*
     Q_UNUSED(errorMessage)
 
     const PremakeProjectWizardDialog *wizard = qobject_cast<const PremakeProjectWizardDialog *>(w);
@@ -237,6 +247,7 @@ Core::GeneratedFiles PremakeProjectWizard::generateFiles(const QWizard *w,
     files.append(generatedCreatorFile);
 
     return files;
+*/
 }
 
 bool PremakeProjectWizard::postGenerateFiles(const QWizard *w, const Core::GeneratedFiles &l, QString *errorMessage)

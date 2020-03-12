@@ -53,11 +53,12 @@ public:
     PremakeProjectPlugin();
     ~PremakeProjectPlugin();
 
-    virtual bool initialize(const QStringList &arguments, QString *errorString);
-    virtual void extensionsInitialized();
-
 private:
+    bool initialize(const QStringList &arguments, QString *errorMessage) override;
+    void extensionsInitialized() override;
+
     LuaSupport::LuaEditorFactory *m_luaEditorFactory;
+    class PremakeProjectPluginPrivate *d = nullptr;
 };
 
 } // namespace Internal

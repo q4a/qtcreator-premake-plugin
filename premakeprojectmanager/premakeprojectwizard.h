@@ -72,7 +72,7 @@ class PremakeProjectWizard : public Core::BaseFileWizard
     Q_OBJECT
 
 public:
-    PremakeProjectWizard();
+    explicit PremakeProjectWizard(const Core::BaseFileWizardFactory *factory, QWidget *parent = nullptr);
     virtual ~PremakeProjectWizard();
 
     static Core::WizardDialogParameters parameters();
