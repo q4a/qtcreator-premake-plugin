@@ -49,10 +49,10 @@ class PremakeBuildConfiguration : public ProjectExplorer::BuildConfiguration
     friend class PremakeBuildConfigurationFactory;
 
 public:
-    explicit PremakeBuildConfiguration(PremakeTarget *parent);
+    explicit PremakeBuildConfiguration(ProjectExplorer::Target *target, Core::Id id);
     virtual ~PremakeBuildConfiguration();
 
-    PremakeTarget *premakeTarget() const;
+    //PremakeTarget *premakeTarget() const;
 
     QByteArray internalConfigurationName() const;
     void setInternalConfigurationName(const QByteArray &internalConf);
@@ -95,7 +95,7 @@ protected:
 
 private:
     QString m_fileName;
-    QString m_buildDirectory;
+    const QString m_buildDirectory;
     QByteArray m_internalConfiguration;
     QByteArray m_shortConfiguration;
     bool m_shadowBuildEnabled;

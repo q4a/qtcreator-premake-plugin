@@ -13,10 +13,10 @@
 #include <qtsupport/qtversionmanager.h>
 #include <utils/pathchooser.h>
 
-#include <QtGui/QFormLayout>
-#include <QtGui/QMainWindow>
-#include <QtGui/QCheckBox>
-#include <QtGui/QComboBox>
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
 
 using namespace PremakeProjectManager;
 using namespace PremakeProjectManager::Internal;

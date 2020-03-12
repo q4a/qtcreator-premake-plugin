@@ -100,6 +100,8 @@ PremakeBuildConfiguration *PremakeTarget::activeBuildConfiguration() const
     return static_cast<PremakeBuildConfiguration *>(Target::activeBuildConfiguration());
 }
 
+// FIXME: Qt5 do I need this file? cmake and cmake2 targets has only header file
+/*
 bool PremakeTarget::fromMap(const QVariantMap &map)
 {
     if (!Target::fromMap(map))
@@ -107,6 +109,7 @@ bool PremakeTarget::fromMap(const QVariantMap &map)
 
     return true;
 }
+*/
 
 void PremakeTarget::updateRunConfigurations()
 {
@@ -167,6 +170,8 @@ void PremakeTarget::updateRunConfigurations()
 // PremakeTargetFactory
 ////////////////////////////////////////////////////////////////////////////////////
 
+// FIXME: Qt5 do I need this file? cmake and cmake2 targets has only header file
+/*
 PremakeTargetFactory::PremakeTargetFactory(QObject *parent) :
     ITargetFactory(parent)
 {
@@ -252,3 +257,4 @@ PremakeTarget *PremakeTargetFactory::restore(ProjectExplorer::Project *parent, c
     delete target;
     return 0;
 }
+*/

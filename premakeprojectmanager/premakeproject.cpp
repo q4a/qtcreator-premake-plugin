@@ -43,7 +43,7 @@
 #include <projectexplorer/customexecutablerunconfiguration.h>
 #include <projectexplorer/toolchainmanager.h>
 #include <projectexplorer/projectexplorerconstants.h>
-//#include <cplusplus/ModelManagerInterface.h>
+#include <cpptools/cppmodelmanagerinterface.h>
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/icore.h>
 #include <coreplugin/messagemanager.h>
@@ -159,9 +159,9 @@ void PremakeProject::parseConfigurations()
 void PremakeProject::parseProject(RefreshOptions options)
 {
     const PremakeBuildConfiguration *conf = activeTarget()->activeBuildConfiguration();
-    QHash<QString,QString> qtInfo;
-    if (conf->qtVersion())
-        qtInfo = conf->qtVersion()->versionInfo();
+    //QHash<QString,QString> qtInfo;
+    //if (conf->qtVersion())
+    //    qtInfo = conf->qtVersion()->versionInfo();
 
     /// @todo Create a persistent lua state with all built-in scripts loaded
     /// and clone it before loading project
@@ -225,9 +225,9 @@ void PremakeProject::parseProject(RefreshOptions options)
         m_includePaths.removeDuplicates();
         for (int i=0; i<m_includePaths.size(); ++i) {
             m_includePaths[i].replace(QLatin1String("$(QT_INCLUDE)"),
-                                      qtInfo.value(QLatin1String("QT_INSTALL_HEADERS")));
+                                      conf->qtVersion()->headerPath().toString()); // qtInfo.value(QLatin1String("QT_INSTALL_HEADERS")));
             m_includePaths[i].replace(QLatin1String("$(QT_LIB)"),
-                                      qtInfo.value(QLatin1String("QT_INSTALL_LIBS")));
+                                      conf->qtVersion()->libraryPath().toString()); // qtInfo.value(QLatin1String("QT_INSTALL_LIBS")));
         }
 //        qDebug() << Q_FUNC_INFO << "m_includePaths=" << m_includePaths;
 
@@ -251,6 +251,8 @@ void PremakeProject::parseProject(RefreshOptions options)
 
 void PremakeProject::refresh(RefreshOptions options)
 {
+// FIXME: Qt5 will port later
+/*
     QSet<QString> oldFileList;
     if (!(options & Configuration))
         oldFileList = m_files.toSet();
@@ -260,11 +262,11 @@ void PremakeProject::refresh(RefreshOptions options)
     if (options & Files)
         m_rootNode->refresh();
 
-    CPlusPlus::CppModelManagerInterface *modelManager =
-        CPlusPlus::CppModelManagerInterface::instance();
+    CppTools::CppModelManagerInterface *modelManager =
+        CppTools::CppModelManagerInterface::instance();
 
     if (modelManager) {
-        CPlusPlus::CppModelManagerInterface::ProjectInfo pinfo = modelManager->projectInfo(this);
+        CppTools::CppModelManagerInterface::ProjectInfo pinfo = modelManager->projectInfo(this);
         ToolChain *tc = activeTarget()->activeBuildConfiguration()->toolChain();
 
 #if IDE_VER < IDE_VERSION_CHECK(2, 4, 80)
@@ -331,6 +333,7 @@ void PremakeProject::refresh(RefreshOptions options)
         modelManager->updateProjectInfo(pinfo);
         m_codeModelFuture = modelManager->updateSourceFiles(filesToUpdate);
     }
+*/
 }
 
 QStringList PremakeProject::allIncludePaths() const
@@ -430,12 +433,14 @@ QList<Project *> PremakeProject::dependsOn()
     return QList<Project *>();
 }
 
+/*
 QList<BuildConfigWidget*> PremakeProject::subConfigWidgets()
 {
     QList<BuildConfigWidget*> list;
     list << new BuildEnvironmentWidget;
     return list;
 }
+*/
 
 PremakeProjectNode *PremakeProject::rootProjectNode() const
 {

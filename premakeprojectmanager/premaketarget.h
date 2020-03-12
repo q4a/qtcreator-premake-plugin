@@ -53,12 +53,12 @@ const char * const PREMAKE_DESKTOP_TARGET_ID = "PremakeProjectManager.Target.Des
 class PremakeProject;
 class PremakeRunConfiguration;
 class PremakeBuildConfigurationFactory;
-class PremakeTargetFactory;
+//class PremakeTargetFactory;
 
 class PremakeTarget : public ProjectExplorer::Target
 {
     Q_OBJECT
-    friend class PremakeTargetFactory;
+//    friend class PremakeTargetFactory;
 
 public:
     //explicit PremakeTarget(PremakeProject *parent);
@@ -83,6 +83,8 @@ private:
     ProjectExplorer::DeployConfigurationFactory *m_deployConfigurationFactory;
 };
 
+// FIXME: Qt5 do I need this file? cmake and cmake2 targets has only header file
+/*
 class PremakeTargetFactory : public ProjectExplorer::Target
 {
     Q_OBJECT
@@ -102,6 +104,7 @@ public:
     bool canRestore(ProjectExplorer::Project *parent, const QVariantMap &map) const;
     PremakeTarget *restore(ProjectExplorer::Project *parent, const QVariantMap &map);
 };
+*/
 
 } // namespace Internal
 

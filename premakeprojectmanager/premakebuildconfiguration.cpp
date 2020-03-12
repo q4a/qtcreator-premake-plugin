@@ -42,7 +42,7 @@
 #include <projectexplorer/projectexplorerconstants.h>
 #include <utils/qtcassert.h>
 
-#include <QtGui/QInputDialog>
+#include <QtWidgets/QInputDialog>
 
 using namespace ProjectExplorer;
 using namespace PremakeProjectManager;
@@ -57,27 +57,9 @@ const char * const QT_VERSION_ID_KEY("PremakeProjectManager.PremakeBuildConfigur
 const char * const INTERNAL_CONFIGURATION_KEY("PremakeProjectManager.PremakeBuildConfiguration.InternalConfiguration");
 }
 
-PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent)
-    : BuildConfiguration(parent, QLatin1String(Constants::PREMAKE_BC_ID))
-    , m_fileName(parent->premakeProject()->file()->fileName())
-    , m_buildDirectory(target()->project()->projectDirectory() + QLatin1String("/build"))
-    , m_shadowBuildEnabled(true)
-    , m_qtVersion(0)
+PremakeBuildConfiguration::PremakeBuildConfiguration(Target *target, Core::Id id)
+    : BuildConfiguration(target, id)
 {
-}
-
-PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent, const QString &id)
-    : BuildConfiguration(parent, id)
-    , m_buildDirectory(target()->project()->projectDirectory() + QLatin1String("/build"))
-    , m_shadowBuildEnabled(true)
-{
-}
-
-PremakeBuildConfiguration::PremakeBuildConfiguration(PremakeTarget *parent, PremakeBuildConfiguration *source) :
-    BuildConfiguration(parent, source),
-    m_buildDirectory(source->m_buildDirectory)
-{
-    cloneSteps(source);
 }
 
 PremakeBuildConfiguration::~PremakeBuildConfiguration()
@@ -103,7 +85,7 @@ bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
     m_internalConfiguration = map.value(QLatin1String(INTERNAL_CONFIGURATION_KEY), QByteArray()).toByteArray();
 
     m_buildDirectory = map.value(QLatin1String(BUILD_DIRECTORY_KEY),
-        target()->project()->projectDirectory().append(QLatin1String("/build"))).toString();
+        target()->project()->projectDirectory().appendString(QLatin1String("/build")).toString());
     m_shadowBuildEnabled = map.value(QLatin1String(SHADOW_BUILD_KEY),
                                      true).toBool();
     const int qtVersionId = map.value(QLatin1String(QT_VERSION_ID_KEY)).toInt();
@@ -113,7 +95,7 @@ bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 //    if (m_qtVersion && !m_qtVersion->supportsTargetId(target()->id()))
 //        m_qtVersion = 0;
 
-    if (!toolChain()) {
+//    if (!toolChain()) {
 //        QList<ProjectExplorer::ToolChain *> list = ProjectExplorer::ToolChainManager::instance()->toolChains();
 //#ifdef Q_OS_WIN
 //            QString toolChainId = ProjectExplorer::Constants::MINGW_TOOLCHAIN_ID;
@@ -126,7 +108,7 @@ bool PremakeBuildConfiguration::fromMap(const QVariantMap &map)
 //                    break;
 //                }
 //            }
-    }
+//    }
 
     return true;
 }

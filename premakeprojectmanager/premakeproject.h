@@ -83,7 +83,7 @@ public:
 
     QList<ProjectExplorer::Project *> dependsOn();
 
-    QList<ProjectExplorer::NamedWidget*> subConfigWidgets();
+    //QList<ProjectExplorer::NamedWidget*> subConfigWidgets();
 
     PremakeProjectNode *rootProjectNode() const;
     // FIXME: Qt5 no FilesMode

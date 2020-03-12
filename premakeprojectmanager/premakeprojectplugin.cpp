@@ -61,7 +61,7 @@ class PremakeProjectPluginPrivate
 public:
     MakeStepFactory m_makeStepFactory;
     PremakeStepFactory m_premakeStepFactory;
-    PremakeTargetFactory m_premakeTargetFactory;
+    //PremakeTargetFactory m_premakeTargetFactory;
     PremakeRunConfigurationFactory m_premakeRunConfigurationFactory;
     // TODO: Uncomment when ready to use
     //addAutoReleasedObject(new PremakeProjectWizard);
